@@ -1,0 +1,40 @@
+﻿@* Partial View Hóa đơn mua hàng *@
+<div class="invoice-box shadow-sm">
+    <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
+        <div>
+            <h4 class="fw-bold text-danger mb-0">HOÁ ĐƠN ĐẶT MÓN #FH-10023</h4>
+            <small class="text-muted">Ngày đặt: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</small>
+        </div>
+        <span class="badge bg-success align-self-center px-3 py-2">ĐÃ XÁC NHẬN</span>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h6><strong>Khách hàng:</strong> Nguyễn Văn A</h6>
+            <h6><strong>SĐT:</strong> 0901 234 567</h6>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <h6><strong>Địa chỉ giao:</strong> 155 Sư Vạn Hạnh, Q10, TP.HCM</h6>
+        </div>
+    </div>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Tên món ăn</th>
+                <th class="text-center">Số lượng</th>
+                <th class="text-end">Đơn giá</th>
+                <th class="text-end">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Trà Sữa Trân Châu Đường Đen</td>
+                <td class="text-center">2</td>
+                <td class="text-end">35.000đ</td>
+                <td class="text-end fw-bold">70.000đ</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-end fs-5 fw-bold text-danger mt-3">
+        TỔNG TIỀN: 70.000 VNĐ
+    </div>
+</div>

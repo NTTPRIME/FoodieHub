@@ -1,0 +1,80 @@
+﻿/* ========================================================
+   1. BẢNG MÀU & CLASS THƯƠNG HIỆU FOODEHUB 
+   ======================================================== */
+:root {
+    --primary-color: #EE4D2D; /* Màu cam */
+    --primary-hover: #D73211;
+    --bg-light: #F8F9FA;
+    --text-color: #222222;
+    --border-color: #E8E8E8;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Nút bấm & Badge màu cam */
+.btn-foodie {
+    background-color: var(--primary-color);
+    color: #ffffff !important;
+    font-weight: 600;
+    border: none;
+}
+
+    .btn-foodie:hover {
+        background-color: var(--primary-hover);
+    }
+
+.btn-outline-foodie {
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color) !important;
+    font-weight: 600;
+}
+
+    .btn-outline-foodie:hover {
+        background-color: var(--primary-color);
+        color: #ffffff !important;
+    }
+
+.badge-cart {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+/* Card Món Ăn & Khung Hóa Đơn */
+.food-card {
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .food-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+.invoice-box {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 25px;
+}
+
+
+/* ========================================================
+   2. GIỮ LẠI CSS MẶC ĐỊNH CỦA ASP.NET MVC
+   ======================================================== */
+.body-content {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.dl-horizontal dt {
+    white-space: normal;
+}
+
