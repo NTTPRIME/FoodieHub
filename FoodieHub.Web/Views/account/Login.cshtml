@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<div class="container my-5" style="max-width: 450px;">
+    <div class="card shadow border-0 p-4">
+        <h2 class="text-center mb-4 text-danger fw-bold">ĐĂNG NHẬP</h2>
+
+        <!-- BEGIN: Form Đăng nhập -->
+        <form action="/Account/Login" method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email tài khoản</label>
+                <input type="email" name="Email" class="form-control" required placeholder="Nhập email của bạn" />
+            </div>
+             
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Mật khẩu</label>
+                <div class="input-group">
+                    <input type="password" name="Password" id="loginPassword" class="form-control" required placeholder="Nhập mật khẩu" />
+                    <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword">
+                        <i class="fa-solid fa-eye" id="loginEyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100 py-2 fw-bold mb-3">Đăng Nhập</button>
+            <!-- Dòng thêm mới để chuyển hướng sang trang đăng ký -->
+            <div class="text-center mt-2">
+                <span class="text-muted">Chưa có tài khoản?</span>
+                <a href="/Account/Register" class="text-danger text-decoration-none fw-semibold">Đăng ký ngay</a>
+            </div>
+        </form>
+        <!-- END: Form Đăng nhập -->
+    </div>
+</div>
+
+@section scripts {
+    <script>// JavaScript toggle ẩn/hiện mật khẩu trang đăng nhập
+        const toggleLoginBtn = document.getElementById('toggleLoginPassword');
+        const loginPassInput = document.getElementById('loginPassword');
+        const loginEyeIcon = document.getElementById('loginEyeIcon');
+
+        toggleLoginBtn.addEventListener('click', function () {
+            const type = loginPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPassInput.setAttribute('type', type);
+            loginEyeIcon.classList.toggle('fa-eye');
+            loginEyeIcon.classList.toggle('fa-eye-slash');
+        });</script>
+}

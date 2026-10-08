@@ -120,6 +120,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -181,6 +182,9 @@
     <Content Include="Views\Shared\_OrderDetail.cshtml" />
     <Content Include="Views\Shared\_OrderList.cshtml" />
     <Content Include="Views\Shared\_MasterLayout.cshtml" />
+    <Content Include="Views\account\Login.cshtml" />
+    <Content Include="Views\account\Register.cshtml" />
+    <Content Include="Views\Shared\_AdminLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml"; /* Kế thừa MasterLayout của khách hàng */
+}
+
+<div class="container my-5" style="max-width: 500px;">
+    <div class="card shadow border-0 p-4">
+        <h2 class="text-center mb-4 text-danger fw-bold">ĐĂNG KÝ</h2>
+
+        <!-- BEGIN: Form Đăng ký tích hợp HTML5 Validation -->
+        <form action="/Account/Register" method="POST">
+            <!-- Ô nhập Họ tên (Bắt buộc) -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Họ và tên</label>
+                <input type="text" name="FullName" class="form-control" placeholder="Nhập họ tên của bạn" required />
+            </div>
+
+            <!-- Ô nhập Email (Tự validate chuẩn email) -->
+            <div class="mb-3"> 
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" name="Email" class="form-control" placeholder="example@gmail.com" required />
+            </div>
+
+            <!-- Ô nhập Mật khẩu kèm JS ẩn/hiện -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Mật khẩu</label>
+                <div class="input-group">
+                    <input type="password" name="Password" id="txtPassword" class="form-control" placeholder="Ít nhất 6 ký tự" minlength="6" required />
+                    <!-- Nút bấm kích hoạt JavaScript ẩn/hiện mật khẩu -->
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nút submit form -->
+            <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">Đăng Ký Ngay</button>
+        </form>
+        <!-- END: Form Đăng ký -->
+    </div>
+</div>
+
+<!-- BEGIN: JavaScript xử lý ẩn/hiện mật khẩu -->
+@section scripts {
+    <script>// Lấy các phần tử HTML cần thao tác
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('txtPassword');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        // Lắng nghe sự kiện click vào nút mắt
+        togglePasswordBtn.addEventListener('click', function () {
+            // Đổi type của input từ password sang text và ngược lại
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Thay đổi icon mắt mở / mắt gạch chéo
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });</script>
+}
+<!-- END: JavaScript -->
