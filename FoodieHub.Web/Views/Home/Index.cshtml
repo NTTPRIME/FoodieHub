@@ -1,11 +1,249 @@
 ﻿@{
-    ViewBag.Title = "Trang Chủ Món Ăn";
+    // Thiết lập tiêu đề trang hiển thị trên tab của trình duyệt
+    ViewBag.Title = "GoFood - Đặt Món Ngon Giao Nhanh";
+
+    // Liên kết View này với file giao diện chung Master Layout do Dev 1 quản lý
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
-<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
-    <div class="container-fluid py-3 text-center">
-        <h1 class="display-5 fw-bold text-danger">Thánh Địa Ẩm Thực FoodieHub</h1>
-        <p class="fs-5 text-muted">Đặt món cực nhanh - Giao đồ ăn tận nơi - Không cần đăng nhập vẫn xem menu thoải mái!</p>
+<!-- Nhúng thư viện Bootstrap 5 CSS trực tiếp từ CDN để đảm bảo giao diện luôn được chia cột chuẩn xác -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- Nhúng thư viện FontAwesome 6 để hiển thị các biểu tượng (icon) đẹp mắt -->
+<link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+
+<style>
+    /* Định dạng nền chuyển màu (Gradient) nhẹ cho khu vực Banner chính */
+    .gofood-hero {
+        background: linear-gradient(135deg, #fff5f2 0%, #ffffff 100%);
+        border-radius: 16px; /* Bo tròn góc cho khung Banner */
+    }
+
+    /* Khống chế kích thước tối đa của ảnh Banner để không bị phình to làm vỡ khung */
+    .img-banner-fix {
+        max-height: 350px;
+        width: 100%;
+        object-fit: cover; /* Giữ tỉ lệ ảnh cân đối không bị méo */
+        border-radius: 16px;
+    }
+
+    /* Khống chế chiều cao cố định cho hình ảnh món ăn trong từng thẻ sản phẩm */
+    .img-card-fix {
+        height: 180px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    /* Hiệu ứng nổi lên nhẹ nhàng khi rê chuột qua danh mục sản phẩm */
+    .category-card {
+        transition: transform 0.2s ease, shadow 0.2s ease;
+        cursor: pointer;
+    }
+
+        /* Đẩy thẻ danh mục lên 5px khi di chuột vào */
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+</style>
+
+<!-- Thẻ Container chứa toàn bộ nội dung trang chủ, tự động căn giữa màn hình -->
+<div class="container py-4">
+
+    <!-- ========================================== -->
+    <!-- 1. KHU VỰC HERO BANNER (GIỚI THIỆU CHÍNH)  -->
+    <!-- ========================================== -->
+    <div class="gofood-hero p-4 p-lg-5 mb-5 border shadow-sm">
+        <div class="row align-items-center g-4">
+
+            <!-- Cột trái: Thông điệp chào mừng và các nút chuyển hướng -->
+            <div class="col-12 col-lg-6">
+                <!-- Nhãn nổi bật thông báo dịch vụ giao nhanh -->
+                <span class="badge bg-danger text-white px-3 py-2 fs-6 rounded-pill mb-3">
+                    <i class="fas fa-bolt me-1"></i> Giao Nhanh 20 Phút
+                </span>
+
+                <!-- Tiêu đề lớn thu hút sự chú ý của khách hàng -->
+                <h1 class="display-5 fw-bold text-dark mb-3">
+                    Món Ngon Nóng Hổi <br />
+                    <!-- Nhấn mạnh màu da cam đặc trưng của GoFood -->
+                    <span style="color: #EE4D2D;">Giao Tận Tay Bạn</span>
+                </h1>
+
+                <!-- Đoạn mô tả ngắn về chất lượng dịch vụ -->
+                <p class="text-muted fs-6 mb-4">
+                    Thưởng thức hàng ngàn món ăn chuẩn vị từ các nhà hàng chất lượng. Đội ngũ tài xế GoFood luôn sẵn sàng phục vụ nhanh chóng và chu đáo.
+                </p>
+
+                <!-- Nhóm các nút bấm chuyển hướng chính -->
+                <div class="d-flex flex-wrap gap-2">
+                    <!-- Nút xem danh sách thực đơn -> Dẫn tới ProductController/Index -->
+                    <a href="@Url.Action("Index", "Product")" class="btn text-white fw-bold px-4 py-2 shadow-sm" style="background-color: #EE4D2D;">
+                        <i class="fas fa-utensils me-2"></i>Xem Thực Đơn
+                    </a>
+
+                    <!-- Nút xem giỏ hàng -> Dẫn tới CartController/Index -->
+                    <a href="@Url.Action("Index", "Cart")" class="btn btn-outline-secondary fw-bold px-4 py-2">
+                        <i class="fas fa-shopping-basket me-2"></i>Giỏ Hàng
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cột phải: Hình ảnh Banner minh họa món ăn -->
+            <div class="col-12 col-lg-6 text-center">
+                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80"
+                     alt="GoFood Banner"
+                     class="img-fluid img-banner-fix shadow" />
+            </div>
+        </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- 2. KHU VỰC DANH MỤC MÓN ĂN (CATEGORIES)     -->
+    <!-- ========================================== -->
+    <div class="mb-5">
+        <!-- Thanh tiêu đề danh mục kèm liên kết xem tất cả -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-dark m-0">
+                <i class="fas fa-th-large me-2" style="color: #EE4D2D;"></i>Danh Mục Món Ăn
+            </h4>
+            <a href="@Url.Action("Index", "Product")" class="text-decoration-none fw-bold" style="color: #EE4D2D;">
+                Xem tất cả <i class="fas fa-chevron-right ms-1"></i>
+            </a>
+        </div>
+
+        <!-- Lưới hiển thị 4 danh mục phổ biến -->
+        <div class="row g-3">
+            <!-- Danh mục 1: Cơm & Món Chính -->
+            <div class="col-6 col-md-3">
+                <a href="@Url.Action("Index", "Product")" class="text-decoration-none">
+                    <div class="card category-card text-center border-0 bg-light py-3 shadow-sm">
+                        <i class="fas fa-drumstick-bite fa-2x mb-2" style="color: #EE4D2D;"></i>
+                        <h6 class="fw-bold text-dark m-0">Cơm & Món Chính</h6>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Danh mục 2: Bún / Phở / Mì -->
+            <div class="col-6 col-md-3">
+                <a href="@Url.Action("Index", "Product")" class="text-decoration-none">
+                    <div class="card category-card text-center border-0 bg-light py-3 shadow-sm">
+                        <i class="fas fa-bowl-food fa-2x mb-2" style="color: #EE4D2D;"></i>
+                        <h6 class="fw-bold text-dark m-0">Bún / Phở / Mì</h6>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Danh mục 3: Trà Sữa & Đồ Uống -->
+            <div class="col-6 col-md-3">
+                <a href="@Url.Action("Index", "Product")" class="text-decoration-none">
+                    <div class="card category-card text-center border-0 bg-light py-3 shadow-sm">
+                        <i class="fas fa-mug-hot fa-2x mb-2" style="color: #EE4D2D;"></i>
+                        <h6 class="fw-bold text-dark m-0">Trà Sữa & Đồ Uống</h6>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Danh mục 4: Đồ Ăn Vặt -->
+            <div class="col-6 col-md-3">
+                <a href="@Url.Action("Index", "Product")" class="text-decoration-none">
+                    <div class="card category-card text-center border-0 bg-light py-3 shadow-sm">
+                        <i class="fas fa-hamburger fa-2x mb-2" style="color: #EE4D2D;"></i>
+                        <h6 class="fw-bold text-dark m-0">Đồ Ăn Vặt</h6>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. KHU VỰC MÓN ĂN BÁN CHẠY (BEST SELLERS)  -->
+    <!-- ========================================== -->
+    <div class="mb-5">
+        <!-- Thanh tiêu đề Món ăn bán chạy -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <h4 class="fw-bold text-dark m-0">
+                <i class="fas fa-fire text-danger me-2"></i>Món Ăn Bán Chạy
+            </h4>
+            <a href="@Url.Action("Index", "Product")" class="btn btn-sm btn-outline-danger fw-bold">
+                Xem Tất Cả
+            </a>
+        </div>
+
+        <!-- Lưới hiển thị 3 sản phẩm nổi bật -->
+        <div class="row g-4">
+
+            <!-- Món ăn 1: Cơm Tấm Sườn Bì Chả -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                    <!-- Ảnh đại diện món ăn -->
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80"
+                         class="card-img-top img-card-fix" alt="Cơm Tấm" />
+                    <div class="card-body d-flex flex-column">
+                        <!-- Điểm đánh giá và số lượng đã bán -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>4.9</span>
+                            <small class="text-muted">Đã bán 200+</small>
+                        </div>
+                        <!-- Tên món ăn -->
+                        <h5 class="card-title fw-bold text-dark">Cơm Tấm Sườn Bì Chả</h5>
+                        <!-- Mô tả món ăn -->
+                        <p class="card-text text-muted small flex-grow-1">Sườn nướng mật ong đậm đà, bì heo giòn ngon, chả trứng béo ngậy kèm nước mắm.</p>
+                        <!-- Giá tiền và Nút đặt món -> Dẫn tới xem chi tiết ProductController/Detail/1 -->
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                            <span class="text-danger fw-bold fs-5">55.000đ</span>
+                            <a href="@Url.Action("Detail", "Product", new { id = 1 })" class="btn text-white btn-sm fw-bold px-3" style="background-color: #EE4D2D;">
+                                Đặt Món
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Món ăn 2: Phở Bò Tái Nạm -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80"
+                         class="card-img-top img-card-fix" alt="Phở Bò" />
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>4.8</span>
+                            <small class="text-muted">Đã bán 180+</small>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark">Phở Bò Tái Nạm</h5>
+                        <p class="card-text text-muted small flex-grow-1">Nước dùng hầm xương ngọt thanh, thịt bò tươi mềm ngon ăn kèm quẩy giòn tôm.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                            <span class="text-danger fw-bold fs-5">65.000đ</span>
+                            <a href="@Url.Action("Detail", "Product", new { id = 2 })" class="btn text-white btn-sm fw-bold px-3" style="background-color: #EE4D2D;">
+                                Đặt Món
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Món ăn 3: Salad Ức Gà Hạt Nut -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80"
+                         class="card-img-top img-card-fix" alt="Salad" />
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>4.7</span>
+                            <small class="text-muted">Đã bán 120+</small>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark">Salad Ức Gà Hạt Nut</h5>
+                        <p class="card-text text-muted small flex-grow-1">Rau hữu cơ tươi mát kết hợp ức gà áp chảo và sốt Mè rang thơm ngon đậm vị.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                            <span class="text-danger fw-bold fs-5">49.000đ</span>
+                            <a href="@Url.Action("Detail", "Product", new { id = 3 })" class="btn text-white btn-sm fw-bold px-3" style="background-color: #EE4D2D;">
+                                Đặt Món
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </div>
