@@ -1,0 +1,90 @@
+@{
+    ViewBag.Title = "L?ch s? giao d?ch";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4 text-danger fw-bold"><i class="fa-solid fa-clock-rotate-left"></i> L?ch S? Giao D?ch C?a Tôi</h2>
+
+    <!-- BEGIN: B?ng danh sách ??n hàng ?ã mua -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã ??n Hàng</th>
+                        <th>Ngày ??t</th>
+                        <th>T?ng Ti?n</th>
+                        <th>Tr?ng Thái</th>
+                        <th class="text-center">Chi Ti?t</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">#GF8823</td>
+                        <td>06/10/2026</td>
+                        <td class="text-danger fw-bold">120,000 ?</td>
+                        <td><span class="badge bg-success">Hoàn thành</span></td>
+                        <td class="text-center">
+                            <!-- Nút m? Modal xem chi ti?t ??n hàng (t??ng t? m?u hóa ??n) -->
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#customerInvoiceModal">
+                                <i class="fa-solid fa-eye"></i> Xem Chi Ti?t
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- END: B?ng danh sách ??n hàng -->
+</div>
+
+<!-- BEGIN: Modal Chi Ti?t Hóa ??n Dành Cho Khách Hàng -->
+<div class="modal fade" id="customerInvoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content p-3">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-white p-3 border rounded">
+                <div class="text-center mb-3">
+                    <h3 class="fw-bold text-danger m-0">GOFOOD RESTAURANT</h3>
+                    <p class="text-muted small m-0">Chi ti?t ??n hàng cá nhân</p>
+                    <h5 class="fw-bold mt-3">HÓA ??N #GF8823</h5>
+                    <span class="text-muted small">Ngày ??t: 06/10/2026</span>
+                </div>
+                <hr>
+                <table class="table table-sm small">
+                    <thead>
+                        <tr>
+                            <th>Món</th>
+                            <th>SL</th>
+                            <th class="text-end">T?m tính</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mì Ý S?t Bò B?m</td>
+                            <td>1</td>
+                            <td class="text-end">100,000 ?</td>
+                        </tr>
+                        <tr>
+                            <td>Trà ?ào Cam S?</td>
+                            <td>1</td>
+                            <td class="text-end">20,000 ?</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>T?ng c?ng:</span>
+                    <span class="text-danger">120,000 ?</span>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">?óng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Modal -->

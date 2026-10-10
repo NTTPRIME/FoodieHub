@@ -120,6 +120,13 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdmincategoryController.cs" />
+    <Compile Include="Controllers\AdminCustomerController.cs" />
+    <Compile Include="Controllers\AdminOrderController.cs" />
+    <Compile Include="Controllers\AdminProductController.cs" />
+    <Compile Include="Controllers\AdminWarehouseController.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -181,6 +188,15 @@
     <Content Include="Views\Shared\_OrderDetail.cshtml" />
     <Content Include="Views\Shared\_OrderList.cshtml" />
     <Content Include="Views\Shared\_MasterLayout.cshtml" />
+    <Content Include="Views\account\Login.cshtml" />
+    <Content Include="Views\account\Register.cshtml" />
+    <Content Include="Views\admincategory\Index.cshtml" />
+    <Content Include="Views\admincustomer\Index.cshtml" />
+    <Content Include="Views\adminorder\Index.cshtml" />
+    <Content Include="Views\adminproduct\Index.cshtml" />
+    <Content Include="Views\adminwarehouse\Index.cshtml" />
+    <Content Include="Views\customer\TransactionHistory.cshtml" />
+    <Content Include="Views\Shared\_AdminLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
