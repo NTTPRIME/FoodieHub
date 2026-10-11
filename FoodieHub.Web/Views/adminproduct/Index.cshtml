@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Quản lý hàng hóa";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Quản Lý Hàng Hóa (Sản Phẩm)</h2>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#productModal">
+            <i class="fa-solid fa-plus me-1"></i> Thêm Sản Phẩm
+        </button>
+    </div>
+
+    <!-- BEGIN: Bảng sản phẩm hiển thị 5 cột chính -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Hình Ảnh</th>
+                        <th>Tên Món Ăn</th>
+                        <th>Danh Mục</th>
+                        <th>Giá Bán</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/50" class="rounded" alt="Món ăn"></td>
+                        <td>Gà Rán Sốt Cay</td>
+                        <td>Món Gà</td>
+                        <td class="text-danger fw-bold">45,000 đ</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning text-white me-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- END: Bảng sản phẩm -->
+</div>
+
+<!-- BEGIN: Modal Thêm/Sửa Sản Phẩm kèm JS Image Preview -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Thêm / Sửa Sản Phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Tên sản phẩm</label>
+                        <input type="text" class="form-control" required placeholder="Nhập tên món ăn..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Danh mục</label>
+                        <select class="form-select">
+                            <option>Món Gà</option>
+                            <option>Đồ Uống</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá tiền (VNĐ)</label>
+                        <input type="number" class="form-control" required placeholder="Ví dụ: 45000" />
+                    </div>
+                    <!-- Ô chọn file ảnh -->
+                    <div class="mb-3">
+                        <label class="form-label">Chọn ảnh minh họa</label>
+                        <input type="file" class="form-control" id="imageInput" accept="image/*" />
+                    </div>
+                    <!-- Khung xem trước (Preview) ảnh vừa chọn -->
+                    <div class="mb-3 text-center">
+                        <img id="imagePreview" src="#" alt="Preview ảnh" class="rounded border d-none" style="max-height: 150px;" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-danger">Lưu sản phẩm</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Modal -->
+
+@section scripts {
+    <script>// BEGIN: Xử lý JavaScript Preview ảnh ngay khi chọn file
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0]; // Lấy file hình ảnh người dùng chọn
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.setAttribute('src', e.target.result); // Đưa dữ liệu ảnh vào src
+                    imagePreview.classList.remove('d-none'); // Hiển thị thẻ img lên
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        // END: JavaScript Preview</script>
+}
