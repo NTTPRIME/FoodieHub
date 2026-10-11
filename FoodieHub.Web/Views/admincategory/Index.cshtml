@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title = "Quản lý danh mục";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Quản Lý Danh Mục Món Ăn</h2>
+        <!-- Nút mở Modal Thêm danh mục -->
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#categoryModal">
+            <i class="fa-solid fa-plus me-1"></i> Thêm Danh Mục
+        </button>
+    </div>
+
+    <!-- BEGIN: Bảng hiển thị danh sách danh mục -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên Danh Mục</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Món Gà Rán</td>
+                        <td><span class="badge bg-success">Hiển thị</span></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning text-white me-1"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                            <!-- Nút mở Popup xác nhận xóa -->
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="fa-solid fa-trash"></i> Xóa</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- END: Bảng dữ liệu -->
+</div>
+
+<!-- BEGIN: Modal Thêm/Sửa Danh Mục -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Thông Tin Danh Mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục</label>
+                        <input type="text" class="form-control" placeholder="Nhập tên danh mục..." required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select">
+                            <option value="1">Hiển thị</option>
+                            <option value="0">Ẩn</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Modal -->
+<!-- BEGIN: Popup Xác nhận Xóa -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-3">
+            <div class="modal-body">
+                <i class="fa-solid fa-triangle-exclamation text-warning fs-1 mb-3"></i>
+                <h4>Bạn có chắc chắn muốn xóa?</h4>
+                <p class="text-muted">Hành động này sẽ xóa danh mục khỏi hệ thống.</p>
+            </div>
+            <div class="modal-footer justify-content-center border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger px-4">Xác nhận xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Popup -->
