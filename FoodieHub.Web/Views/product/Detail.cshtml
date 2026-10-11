@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = "Chi Tiết Món Ăn - Green SM Food";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<div class="container my-5">
+    <!-- ĐƯỜNG DẪN BREADCRUMB GIÚP QUAY LẠI CÁC TRANG TRƯỚC -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-success text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Product")" class="text-success text-decoration-none">Món ăn</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Cơm Tấm Sườn Bì Chả</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- CỘT 1: HIỂN THỊ ẢNH CHI TIẾT SẢN PHẨM -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <!--
+                    LƯU Ý ĐƯỜNG DẪN ẢNH:
+                    Dùng @Url.Content("~/Content/...") sẽ giúp ảnh LUÔN HIỂN THỊ đúng
+                    kể cả khi URL trình duyệt là /Product/Detail/1
+                -->
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
+                     class="img-fluid w-100" alt="Cơm Tấm Sườn Bì Chả" style="max-height: 400px; object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- CỘT 2: THÔNG TIN CHI TIẾT MÓN VÀ NÚT MUA -->
+        <div class="col-md-6">
+            <h2 class="fw-bold text-dark">Cơm Tấm Sườn Bì Chả</h2>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <span class="badge bg-success">Đã bán 150+</span>
+                <span class="text-warning"><i class="fas fa-star"></i> 4.9 / 5.0</span>
+                <span class="text-muted small">Mã món: #FOOD01</span>
+            </div>
+
+            <!-- Giá tiền -->
+            <div class="p-3 bg-light rounded-3 mb-3">
+                <h3 class="text-danger fw-bold m-0">55.000 VNĐ</h3>
+            </div>
+
+            <!-- Mô tả sản phẩm -->
+            <p class="text-secondary lh-lg mb-4">
+                Sườn nướng mật ong được tẩm ướp theo công thức gia truyền nướng trên than hồng thơm lừng,
+                kết hợp cùng bì heo giòn rụm, chả trứng béo ngậy và bát nước mắm chua ngọt đặc trưng của Green SM Food.
+            </p>
+
+            <!-- Ô chọn số lượng mua -->
+            <div class="mb-4 d-flex align-items-center gap-3">
+                <label class="fw-bold">Số lượng đặt:</label>
+                <div class="input-group" style="width: 130px;">
+                    <button class="btn btn-outline-secondary" type="button">-</button>
+                    <input type="number" class="form-control text-center fw-bold" value="1" min="1" max="99">
+                    <button class="btn btn-outline-secondary" type="button">+</button>
+                </div>
+            </div>
+
+            <!-- NÚT MUA HÀNG & THÊM GIỎ HÀNG -->
+            <div class="d-flex gap-3">
+                <!-- Nút 1: Thêm vào giỏ -->
+                <button class="btn btn-outline-success btn-lg flex-fill fw-bold">
+                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                </button>
+                <!-- Nút 2: Mua ngay -> Chuyển đến trang Cart -->
+                <a href="@Url.Action("Index", "Cart")" class="btn btn-success btn-lg flex-fill fw-bold">
+                    Mua Ngay <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
