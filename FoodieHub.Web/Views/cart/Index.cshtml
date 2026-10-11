@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "Giỏ Hàng Của Bạn - Green SM Food";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<div class="container my-5">
+    <!-- TIÊU ĐỀ TRANG -->
+    <h3 class="fw-bold mb-4">
+        <i class="fas fa-shopping-cart text-success me-2"></i>Giỏ Hàng Của Bạn
+    </h3>
+
+    <div class="row g-4">
+        <!-- CỘT TRÁI: BẢNG DANH SÁCH MÓN ĂN ĐÃ CHỌN -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th scope="col" class="py-3">Món ăn</th>
+                                <th scope="col" class="py-3">Đơn giá</th>
+                                <th scope="col" class="py-3" style="width: 120px;">Số lượng</th>
+                                <th scope="col" class="py-3">Thành tiền</th>
+                                <th scope="col" class="py-3 text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- DÒNG MÓN 1 -->
+                            <tr>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        <!-- Ảnh thu nhỏ món ăn trong giỏ (Dùng URL chuẩn) -->
+                                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80"
+                                             class="rounded me-3" alt="Thumb" style="width: 65px; height: 65px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold text-dark">Cơm Tấm Sườn Bì Chả</h6>
+                                            <small class="text-muted">Ghi chú: Không lấy mỡ hành</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>55.000đ</td>
+                                <td>
+                                    <!-- Thay đổi số lượng -->
+                                    <input type="number" class="form-control form-control-sm text-center fw-bold" value="2" min="1">
+                                </td>
+                                <td class="fw-bold text-danger">110.000đ</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-danger btn-sm rounded-circle">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: BẢNG TÓM TẮT TỔNG TIỀN & THANH TOÁN -->
+        <div class="col-lg-4">
+            <div class="card p-4 border-0 shadow-sm rounded-3">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Tóm tắt đơn hàng</h5>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Tạm tính:</span>
+                    <span class="fw-bold">110.000đ</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Phí giao hàng (Green SM):</span>
+                    <span class="text-success fw-bold">15.000đ</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-4 fs-5 fw-bold text-danger">
+                    <span>Tổng thanh toán:</span>
+                    <span>125.000đ</span>
+                </div>
+
+                <!-- Nút chuyển tiếp sang trang Điền thông tin giao hàng (Checkout) -->
+                <a href="@Url.Action("Index", "Checkout")" class="btn btn-success w-100 fw-bold py-2 shadow-sm">
+                    TIẾN HÀNH THANH TOÁN <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
