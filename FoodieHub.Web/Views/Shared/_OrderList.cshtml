@@ -1,0 +1,23 @@
+﻿@* Partial View Bảng danh sách đơn hàng *@
+<table class="table table-hover border align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Ngày đặt</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="fw-bold">#FH-10023</td>
+            <td>Nguyễn Văn A</td>
+            <td>@DateTime.Now.ToString("dd/MM/yyyy")</td>
+            <td class="text-danger fw-bold">70.000đ</td>
+            <td><span class="badge bg-warning text-dark">Đang giao</span></td>
+            <td><button class="btn btn-outline-foodie btn-sm">Xem chi tiết</button></td>
+        </tr>
+    </tbody>
+</table>

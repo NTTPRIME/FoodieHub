@@ -1,0 +1,103 @@
+﻿@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Quản Lý Đơn Hàng & In Hóa Đơn</h2> 
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#GF9921</td>
+                        <td>Lê Tấn Phát</td>
+                        <td class="text-danger fw-bold">145,000 đ</td>
+                        <td><span class="badge bg-warning text-dark">Đang chuẩn bị</span></td>
+                        <td class="text-center">
+                            <!-- Nút mở Modal xem hóa đơn dạng in -->
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal">
+                                <i class="fa-solid fa-file-invoice"></i> Xem Hóa Đơn
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN: Modal Khung Chi Tiết Đơn Hàng Kiểu Hóa Đơn In (Invoice) -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content p-3">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Khung hóa đơn in -->
+            <div class="modal-body invoice-box bg-white p-3 border rounded">
+                <div class="text-center mb-3">
+                    <h3 class="fw-bold text-danger m-0">GOFOOD RESTAURANT</h3>
+                    <p class="text-muted small m-0">Địa chỉ: Quận 11, TP. Hồ Chí Minh</p>
+                    <p class="text-muted small">Hotline: 1900 1234</p>
+                    <h5 class="fw-bold mt-3">HÓA ĐƠN THANH TOÁN</h5>
+                    <span class="text-muted small">Mã đơn: #GF9921 - Ngày: 07/10/2026</span>
+                </div>
+
+                <hr>
+                <div class="small mb-2">
+                    <p class="m-0"><strong>Khách hàng:</strong> Lê Tấn Phát</p>
+                    <p class="m-0"><strong>Điện thoại:</strong> 090xxxxxxx</p>
+                    <p class="m-0"><strong>Địa chỉ:</strong> Quận 11, TP.HCM</p>
+                </div>
+                <hr>
+
+                <table class="table table-sm small">
+                    <thead>
+                        <tr>
+                            <th>Món</th>
+                            <th>SL</th>
+                            <th class="text-end">Tạm tính</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Gà Rán Sốt Cay</td>
+                            <td>2</td>
+                            <td class="text-end">90,000 đ</td>
+                        </tr>
+                        <tr>
+                            <td>Coca Cola</td>
+                            <td>1</td>
+                            <td class="text-end">15,000 đ</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Tổng cộng:</span>
+                    <span class="text-danger">105,000 đ</span>
+                </div>
+                <div class="text-center mt-4">
+                    <p class="small text-muted fst-italic m-0">Cảm ơn quý khách đã ủng hộ GoFood!</p>
+                </div>
+            </div>
+            <!-- Nút gọi hàm in thực tế của trình duyệt -->
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> In Hóa Đơn</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Modal -->

@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị - FoodieHub Admin</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/site.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- SIDEBAR ADMIN MENU -->
+        <div class="bg-dark text-white p-3 min-vh-100" style="width: 250px;">
+            <h4 class="text-danger fw-bold border-bottom pb-2">Foodie Admin</h4>
+            <ul class="nav nav-pills flex-column mb-auto gap-2">
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-white active bg-danger">Quản lý danh mục</a>
+                </li>
+                <li><a href="#" class="nav-link text-white">Quản lý hàng hóa</a></li>
+                <li><a href="#" class="nav-link text-white">Quản lý kho hàng</a></li>
+                <li><a href="#" class="nav-link text-white">Quản lý người dùng</a></li>
+                <li><a href="#" class="nav-link text-white">Quản lý khách hàng</a></li>
+                <li><a href="#" class="nav-link text-white">Quản lý đơn hàng</a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-grow-1 p-4 bg-light">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

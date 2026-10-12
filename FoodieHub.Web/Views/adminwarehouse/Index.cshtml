@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "Quản lý kho hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Quản Lý Kho Hàng</h2>
+
+    <!-- BEGIN: Tab chuyển đổi giao diện (Hàng tồn kho & Hàng cần nhập) -->
+    <ul class="nav nav-tabs mb-3" id="warehouseTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold text-dark" id="inStock-tab" data-bs-toggle="tab" data-bs-target="#inStock" type="button" role="tab">
+                <i class="fa-solid fa-boxes-stacked me-1"></i> Hàng Tồn Kho (> 0)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-danger" id="needImport-tab" data-bs-toggle="tab" data-bs-target="#needImport" type="button" role="tab">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Hàng Cần Nhập (= 0)
+            </button>
+        </li>
+    </ul>
+    <!-- END: Tab -->
+
+    <div class="tab-content" id="warehouseTabContent">
+        <!-- Tab 1: Hàng tồn kho > 0 -->
+        <div class="tab-pane fade show active" id="inStock" role="tabpanel">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mã SP</th>
+                                <th>Tên Sản Phẩm</th>
+                                <th>Số Lượng Tồn</th>
+                                <th>Trạng Thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SP001</td>
+                                <td>Gà Rán Cay</td>
+                                <td><strong>150</strong></td>
+                                <td><span class="badge bg-success">Còn hàng</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Hàng cần nhập = 0 (Hết hàng) kèm badge cảnh báo -->
+        <div class="tab-pane fade" id="needImport" role="tabpanel">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Mã SP</th>
+                                <th>Tên Sản Phẩm</th>
+                                <th>Số Lượng Tồn</th>
+                                <th>Cảnh Báo</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SP005</td>
+                                <td>Burger Phô Mai</td>
+                                <td><strong>0</strong></td>
+                                <td><span class="badge bg-danger">Hết hàng - Cần nhập gấp</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-cart-plus"></i> Tạo Phiếu Nhập</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

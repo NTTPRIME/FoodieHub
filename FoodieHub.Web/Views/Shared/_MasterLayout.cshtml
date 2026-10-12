@@ -1,0 +1,416 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <!-- Khai báo bảng mã ký tự Tiếng Việt -->
+    <meta charset="UTF-8">
+    <!-- Cấu hình Responsive giúp giao diện hiển thị chuẩn trên Điện thoại / Tablet / PC -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - GoFood - Đặt Món Ngon Giao Nhanh</title>
+
+    <!-- Thư viện Font Awesome dùng để hiển thị các Icon (Giỏ hàng, Tìm kiếm, Ngôi sao...) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Import Font chữ Roboto chuẩn từ Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS để hỗ trợ Grid system và các thành phần nâng cao nếu cần -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/site.css" rel="stylesheet" />
+
+    <style>
+        /* === KHAI BÁO BIẾN MÀU SẮC DÙNG CHUNG (CSS VARIABLES) === */
+        :root {
+            --gofood-orange: #EE4D2D; /* Màu cam thương hiệu GoFood */
+            --gofood-orange-hover: #d73a1e; /* Màu cam đậm khi rê chuột qua button */
+            --gofood-dark: #222222; /* Màu tối dùng cho Footer */
+            --gofood-light-bg: #f5f5f5; /* Màu nền xám nhẹ của trang web */
+            --gofood-border: #e0e0e0; /* Màu đường viền khung */
+        }
+
+        /* Reset margin/padding mặc định của tất cả thẻ HTML */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Thiết lập bố cục chung cho Body (Flexbox dồn Footer xuống đáy) */
+        body {
+            background-color: var(--gofood-light-bg);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Chiều cao tối thiểu bằng toàn bộ màn hình */
+        }
+
+        /* === 1. HEADER (THANH THƯỜNG TRỰC TRÊN CÙNG) === */
+        .gofood-header {
+            background-color: var(--gofood-orange);
+            color: white;
+            position: sticky; /* Giữ Header cố định ở đỉnh khi cuộn trang */
+            top: 0;
+            z-index: 1000; /* Đảm bảo Header luôn nổi lên trên các thành phần khác */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Đổ bóng nhẹ chân Header */
+        }
+
+        .header-container {
+            max-width: 1200px; /* Khống chế chiều rộng tối đa */
+            margin: 0 auto; /* Căn giữa màn hình */
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        /* Logo thương hiệu */
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo:hover {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Khung tìm kiếm món ăn */
+        .search-bar {
+            flex: 1; /* Tự động co giãn chiếm không gian còn trống */
+            max-width: 500px;
+            display: flex;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-bar button {
+            background: #ff6b4a;
+            border: none;
+            color: white;
+            padding: 0 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .search-bar button:hover {
+            background: var(--gofood-orange-hover);
+        }
+
+        /* Khu vực nút Giỏ hàng và Đăng nhập/Đăng ký */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Icon Giỏ hàng kèm Badge số lượng */
+        .cart-icon-btn {
+            color: white;
+            text-decoration: none;
+            position: relative;
+            font-size: 22px;
+        }
+
+        .cart-icon-btn:hover {
+            color: #fff;
+        }
+
+        /* Badge màu đỏ hiển thị số món trong giỏ */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: white;
+            color: var(--gofood-orange);
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid var(--gofood-orange);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-auth {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: 0.2s;
+            display: inline-block;
+        }
+
+        .btn-auth:hover {
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-auth-outline {
+            border: 1px solid white;
+        }
+
+        .btn-auth-outline:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* === 2. NAVIGATION BAR (THANH MENU DANH MỤC) === */
+        .gofood-nav {
+            background-color: white;
+            border-bottom: 1px solid var(--gofood-border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 0;
+            text-decoration: none;
+            color: #444;
+            font-weight: 500;
+            font-size: 15px;
+            border-bottom: 3px solid transparent; /* Đường gạch chân ẩn mặc định */
+            transition: 0.2s;
+            position: relative;
+            z-index: 12;
+            cursor: pointer;
+        }
+
+        /* Hiệu ứng gạch chân màu cam khi hover hoặc trang đang active */
+        .nav-item:hover, .nav-item.active {
+            color: var(--gofood-orange);
+            border-bottom-color: var(--gofood-orange);
+            text-decoration: none;
+        }
+
+        /* === 3. KHU VỰC NỘI DUNG CHÍNH (MAIN) === */
+        .main-content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            width: 100%;
+            flex: 1; /* Đẩy footer xuống chân trang nếu nội dung ngắn */
+        }
+
+        /* === 4. FOOTER (CHÂN TRANG) === */
+        .gofood-footer {
+            background-color: var(--gofood-dark);
+            color: #ccc;
+            margin-top: 40px;
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Chia cột tự động responsive */
+            gap: 30px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--gofood-orange);
+            padding-left: 8px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col ul li a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--gofood-orange);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 30px;
+            border-top: 1px solid #333;
+            font-size: 13px;
+            color: #777;
+        }
+
+        /* === 5. MEDIA QUERIES (XỬ LÝ RESPONSIVE MOBILE) === */
+        @@media (max-width: 768px) {
+            .header-container {
+                flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+            }
+
+            .search-bar {
+                order: 3; /* Đẩy thanh tìm kiếm xuống dòng dưới cùng trong Header */
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .nav-container {
+                overflow-x: auto; /* Cho phép cuộn ngang danh mục trên mobile */
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Đoạn mã tự động tính tổng số lượng món trong giỏ hàng (Hỗ trợ đa dạng tên Session và thuộc tính số lượng) -->
+    @{
+        int cartCount = 0;
+        object cartObj = Session["Cart"] ?? Session["GioHang"] ?? Session["cart"];
+        if (cartObj != null)
+        {
+            var cartList = cartObj as System.Collections.IEnumerable;
+            if (cartList != null)
+            {
+                foreach (var item in cartList)
+                {
+                    if (item != null)
+                    {
+                        var type = item.GetType();
+                        var qtyProp = type.GetProperty("Quantity")
+                                   ?? type.GetProperty("SoLuong")
+                                   ?? type.GetProperty("soluong")
+                                   ?? type.GetProperty("quantity");
+                        if (qtyProp != null)
+                        {
+                            var val = qtyProp.GetValue(item, null);
+                            if (val != null)
+                            {
+                                cartCount += System.Convert.ToInt32(val);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    <!-- KHỐI HEADER -->
+    <header class="gofood-header">
+        <div class="header-container">
+            <!-- Logo trang web trỏ về trang chủ -->
+            <a href="@Url.Action("Index", "Home")" class="logo">
+                <i class="fa-solid fa-utensils"></i> GoFood
+            </a>
+
+            <!-- Thanh tìm kiếm -->
+            <form method="get" action="@Url.Action("Index", "Product")" class="search-bar">
+                <input type="text" name="searchString" placeholder="Tìm món ăn, trà sữa, quán ăn..." value="@Request.QueryString["searchString"]">
+                <button type="submit" aria-label="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
+
+            <!-- Nút chức năng giỏ hàng & tài khoản -->
+            <div class="header-actions">
+                <!-- Nút Giỏ hàng liên kết đến CartController -->
+                <a href="@Url.Action("Index", "Cart")" class="cart-icon-btn" title="Giỏ hàng">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <!-- Badge hiển thị số lượng sản phẩm thực tế -->
+                    <span class="cart-badge" id="cartCount">@cartCount</span>
+                </a>
+
+                <!-- Nút Đăng nhập / Đăng ký -->
+                <div class="auth-buttons">
+                    <a href="@Url.Action("Login", "Account")" class="btn-auth btn-auth-outline">Đăng Nhập</a>
+                    <a href="@Url.Action("Register", "Account")" class="btn-auth">Đăng Ký</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- KHỐI NAVIGATION (MENU DANH MỤC) -->
+    <nav class="gofood-nav">
+        <div class="nav-container">
+            <a href="@Url.Action("Index", "Home")" class="nav-item active">Trang Chủ</a>
+            <a href="@Url.Action("Index", "Product", new { categoryId = 1 })" class="nav-item">Cơm Tấm & Đồ Ăn Trưa</a>
+            <a href="@Url.Action("Index", "Product", new { categoryId = 2 })" class="nav-item">Trà Sữa & Đồ Uống</a>
+            <a href="@Url.Action("Index", "Product", new { categoryId = 3 })" class="nav-item">Bún / Phở / Mì</a>
+            <a href="@Url.Action("Index", "Product", new { categoryId = 4 })" class="nav-item">Ăn Vặt & Ăn Nhẹ</a>
+        </div>
+    </nav>
+
+    <!-- KHỐI CHỨA NỘI DUNG CHÍNH -->
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <!-- KHỐI FOOTER -->
+    <footer class="gofood-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Về GoFood</h4>
+                <ul>
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="#">Trung tâm trợ giúp</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Danh Mục Món Ngon</h4>
+                <ul>
+                    <li><a href="#">Cơm Văn Phòng</a></li>
+                    <li><a href="#">Trà Sữa - Trái Cây</a></li>
+                    <li><a href="#">Gà Rán - Burger</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Hợp Tác</h4>
+                <ul>
+                    <li><a href="#">Đăng ký làm Đối tác Quán ăn</a></li>
+                    <li><a href="#">Đăng ký làm Tài xế Giao hàng</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Tải Ứng Dụng</h4>
+                <p style="font-size: 13px; color: #999; margin-top: 5px;">Đặt món cực nhanh ngay trên điện thoại của bạn.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 GoFood Project - Dev 1 Front-End Module UI</p>
+        </div>
+    </footer>
+
+    <!-- Các tệp kịch bản JavaScript hệ thống -->
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

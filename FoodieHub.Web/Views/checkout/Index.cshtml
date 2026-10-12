@@ -1,0 +1,91 @@
+﻿@{
+    ViewBag.Title = "Thanh Toán Đơn Hàng - Green SM Food";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<div class="container my-5">
+    <h3 class="fw-bold mb-4">
+        <i class="fas fa-credit-card text-success me-2"></i>Xác Nhận & Thanh Toán
+    </h3>
+
+    <div class="row g-4">
+        <!-- CỘT BÊN TRÁI: FORM ĐIỀN ĐỊA CHỈ & THÔNG TIN TÀI XẾ -->
+        <div class="col-md-7">
+            <div class="card p-4 border-0 shadow-sm rounded-3">
+                <h5 class="fw-bold text-success mb-3 border-bottom pb-2">
+                    <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ nhận hàng
+                </h5>
+                <form>
+                    <!-- Họ và tên -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Họ và tên người nhận (*)</label>
+                        <input type="text" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
+                    </div>
+                    <!-- Số điện thoại -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Số điện thoại (*)</label>
+                        <input type="tel" class="form-control" placeholder="Ví dụ: 0901234567" required>
+                    </div>
+                    <!-- Địa chỉ nhà -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Địa chỉ chi tiết (*)</label>
+                        <textarea class="form-control" rows="2" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." required></textarea>
+                    </div>
+                    <!-- Ghi chú cho tài xế Xanh SM -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ghi chú cho tài xế Green SM</label>
+                        <input type="text" class="form-control" placeholder="VD: Giao giờ hành chính, gọi trước khi đến 5 phút...">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- CỘT BÊN PHẢI: XÁC NHẬN CÁC MÓN VÀ PHƯƠNG THỨC THANH TOÁN -->
+        <div class="col-md-5">
+            <div class="card p-4 border-0 shadow-sm rounded-3">
+                <h5 class="fw-bold text-success mb-3 border-bottom pb-2">
+                    <i class="fas fa-utensils me-2"></i>Món ăn đã chọn
+                </h5>
+
+                <!-- Danh sách xem nhanh các món đã chọn kèm thumbnail ảnh -->
+                <div class="d-flex align-items-center mb-3">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80"
+                         class="rounded me-3" alt="Thumb" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div class="flex-grow-1">
+                        <h6 class="m-0 fw-bold">Cơm Tấm Sườn Bì Chả</h6>
+                        <small class="text-muted">Số lượng: 2</small>
+                    </div>
+                    <span class="fw-bold text-danger">110.000đ</span>
+                </div>
+
+                <hr>
+
+                <!-- Lựa chọn Phương thức thanh toán -->
+                <h6 class="fw-bold mb-3">Phương thức thanh toán</h6>
+                <div class="form-check mb-2 p-3 border rounded bg-light">
+                    <input class="form-check-input ms-0 me-2" type="radio" name="paymentMethod" id="cod" checked>
+                    <label class="form-check-label fw-bold" for="cod">
+                        <i class="fas fa-money-bill-wave text-success me-1"></i> Thanh toán khi nhận hàng (COD)
+                    </label>
+                </div>
+                <div class="form-check mb-4 p-3 border rounded bg-light">
+                    <input class="form-check-input ms-0 me-2" type="radio" name="paymentMethod" id="banking">
+                    <label class="form-check-label fw-bold" for="banking">
+                        <i class="fas fa-qrcode text-primary me-1"></i> Chuyển khoản Ngân hàng / QR Code
+                    </label>
+                </div>
+
+                <!-- Tổng chi phí -->
+                <div class="d-flex justify-content-between mb-3 fs-5 fw-bold text-danger">
+                    <span>Tổng tiền thanh toán:</span>
+                    <span>125.000đ</span>
+                </div>
+
+                <!-- Nút chốt đơn -->
+                <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm py-2">
+                    <i class="fas fa-check-circle me-1"></i> XÁC NHẬN ĐẶT HÀNG
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
