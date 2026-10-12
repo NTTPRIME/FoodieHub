@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <!-- Cấu hình Responsive giúp giao diện hiển thị chuẩn trên Điện thoại / Tablet / PC -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - GoFood - Đặt Món Ngon Giao Nhanh</title>
+    <title>@ViewBag.Title - FoodieHub - Đặt Món Ngon Giao Nhanh</title>
 
     <!-- Thư viện Font Awesome dùng để hiển thị các Icon (Giỏ hàng, Tìm kiếm, Ngôi sao...) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,11 +20,11 @@
     <style>
         /* === KHAI BÁO BIẾN MÀU SẮC DÙNG CHUNG (CSS VARIABLES) === */
         :root {
-            --gofood-orange: #EE4D2D; /* Màu cam thương hiệu GoFood */
-            --gofood-orange-hover: #d73a1e; /* Màu cam đậm khi rê chuột qua button */
-            --gofood-dark: #222222; /* Màu tối dùng cho Footer */
-            --gofood-light-bg: #f5f5f5; /* Màu nền xám nhẹ của trang web */
-            --gofood-border: #e0e0e0; /* Màu đường viền khung */
+            --foodiehub-orange: #EE4D2D; /* Màu cam thương hiệu FoodieHub */
+            --foodiehub-orange-hover: #d73a1e; /* Màu cam đậm khi rê chuột qua button */
+            --foodiehub-dark: #222222; /* Màu tối dùng cho Footer */
+            --foodiehub-light-bg: #f5f5f5; /* Màu nền xám nhẹ của trang web */
+            --foodiehub-border: #e0e0e0; /* Màu đường viền khung */
         }
 
         /* Reset margin/padding mặc định của tất cả thẻ HTML */
@@ -37,7 +37,7 @@
 
         /* Thiết lập bố cục chung cho Body (Flexbox dồn Footer xuống đáy) */
         body {
-            background-color: var(--gofood-light-bg);
+            background-color: var(--foodiehub-light-bg);
             color: #333;
             display: flex;
             flex-direction: column;
@@ -45,8 +45,8 @@
         }
 
         /* === 1. HEADER (THANH THƯỜNG TRỰC TRÊN CÙNG) === */
-        .gofood-header {
-            background-color: var(--gofood-orange);
+        .foodiehub-header {
+            background-color: var(--foodiehub-orange);
             color: white;
             position: sticky; /* Giữ Header cố định ở đỉnh khi cuộn trang */
             top: 0;
@@ -108,7 +108,7 @@
         }
 
         .search-bar button:hover {
-            background: var(--gofood-orange-hover);
+            background: var(--foodiehub-orange-hover);
         }
 
         /* Khu vực nút Giỏ hàng và Đăng nhập/Đăng ký */
@@ -136,12 +136,12 @@
             top: -8px;
             right: -10px;
             background: white;
-            color: var(--gofood-orange);
+            color: var(--foodiehub-orange);
             font-size: 11px;
             font-weight: bold;
             padding: 2px 6px;
             border-radius: 10px;
-            border: 2px solid var(--gofood-orange);
+            border: 2px solid var(--foodiehub-orange);
         }
 
         .auth-buttons {
@@ -174,9 +174,9 @@
         }
 
         /* === 2. NAVIGATION BAR (THANH MENU DANH MỤC) === */
-        .gofood-nav {
+        .foodiehub-nav {
             background-color: white;
-            border-bottom: 1px solid var(--gofood-border);
+            border-bottom: 1px solid var(--foodiehub-border);
             position: relative;
             z-index: 10;
         }
@@ -204,8 +204,8 @@
 
         /* Hiệu ứng gạch chân màu cam khi hover hoặc trang đang active */
         .nav-item:hover, .nav-item.active {
-            color: var(--gofood-orange);
-            border-bottom-color: var(--gofood-orange);
+            color: var(--foodiehub-orange);
+            border-bottom-color: var(--foodiehub-orange);
             text-decoration: none;
         }
 
@@ -219,8 +219,8 @@
         }
 
         /* === 4. FOOTER (CHÂN TRANG) === */
-        .gofood-footer {
-            background-color: var(--gofood-dark);
+        .foodiehub-footer {
+            background-color: var(--foodiehub-dark);
             color: #ccc;
             margin-top: 40px;
             padding: 40px 0 20px;
@@ -239,7 +239,7 @@
             color: white;
             font-size: 16px;
             margin-bottom: 16px;
-            border-left: 3px solid var(--gofood-orange);
+            border-left: 3px solid var(--foodiehub-orange);
             padding-left: 8px;
         }
 
@@ -259,7 +259,7 @@
         }
 
         .footer-col ul li a:hover {
-            color: var(--gofood-orange);
+            color: var(--foodiehub-orange);
         }
 
         .footer-bottom {
@@ -325,11 +325,11 @@
     }
 
     <!-- KHỐI HEADER -->
-    <header class="gofood-header">
+    <header class="foodiehub-header">
         <div class="header-container">
             <!-- Logo trang web trỏ về trang chủ -->
             <a href="@Url.Action("Index", "Home")" class="logo">
-                <i class="fa-solid fa-utensils"></i> GoFood
+                <i class="fa-solid fa-utensils"></i> FoodieHub
             </a>
 
             <!-- Thanh tìm kiếm -->
@@ -357,7 +357,7 @@
     </header>
 
     <!-- KHỐI NAVIGATION (MENU DANH MỤC) -->
-    <nav class="gofood-nav">
+    <nav class="foodiehub-nav">
         <div class="nav-container">
             <a href="@Url.Action("Index", "Home")" class="nav-item active">Trang Chủ</a>
             <a href="@Url.Action("Index", "Product", new { categoryId = 1 })" class="nav-item">Cơm Tấm & Đồ Ăn Trưa</a>
@@ -373,10 +373,10 @@
     </main>
 
     <!-- KHỐI FOOTER -->
-    <footer class="gofood-footer">
+    <footer class="foodiehub-footer">
         <div class="footer-container">
             <div class="footer-col">
-                <h4>Về GoFood</h4>
+                <h4>Về FoodieHub</h4>
                 <ul>
                     <li><a href="#">Giới thiệu</a></li>
                     <li><a href="#">Trung tâm trợ giúp</a></li>
@@ -404,7 +404,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 GoFood Project - Dev 1 Front-End Module UI</p>
+            <p>&copy; 2026 FoodieHub Platform. All rights reserved.</p>
         </div>
     </footer>
 
