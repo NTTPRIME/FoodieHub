@@ -1,0 +1,39 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là đối tượng sản phẩm Product *@
+@model FoodieHub.Web.Models.Product
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Chi tiết món ăn";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung bọc toàn bộ trang giao diện chi tiết món ăn *@
+<div class="container-fluid mt-3">
+    @* Khung tiêu đề trang kèm nút thao tác *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        @* Tiêu đề chính hiển thị tên trang *@
+        <h2 class="fw-bold text-dark m-0">
+            @* Biểu tượng mắt xem chi tiết *@
+            <i class="fa-solid fa-eye text-info me-2"></i>Chi Tiết Món Ăn
+        </h2>
+        @* Khung chứa các nút điều hướng thao tác *@
+        <div>
+            @* Nút chuyển hướng sang trang chỉnh sửa món ăn Edit *@
+            <a href="@Url.Action("Edit", "AdminProduct", new { id = Model.ProductID })" class="btn btn-warning text-white me-2 shadow-sm">
+                @* Biểu tượng cây bút chỉnh sửa *@
+                <i class="fa-solid fa-pen-to-square me-1"></i> Chỉnh sửa món này
+            </a>
+            @* Nút chuyển hướng quay về trang danh sách sản phẩm Index *@
+            <a href="@Url.Action("Index", "AdminProduct")" class="btn btn-secondary shadow-sm">
+                @* Biểu tượng mũi tên quay lại *@
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách
+            </a>
+        </div>
+    </div>
+
+    @* Gọi nhúng Partial View _ProductDetail.cshtml theo Barem Dòng 14 để tái sử dụng hiển thị chi tiết (không có nút MUA HÀNG) *@
+    <div class="mb-4">
+        @Html.Partial("_ProductDetail", Model)
+    </div>
+</div>

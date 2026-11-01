@@ -1,0 +1,59 @@
+﻿@* Khai báo Model liên kết với View là đối tượng Product chứa thông tin chi tiết món ăn *@
+@model FoodieHub.Web.Models.Product
+
+@{
+    @* Thiết lập tiêu đề trang web bao gồm tên món ăn *@
+    ViewBag.Title = Model.ProductName + " - FoodieHub";
+    @* Chỉ định kế thừa khung giao diện chung _MasterLayout.cshtml cho phân hệ khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+@* Khung vùng chứa chính của trang chi tiết món ăn *@
+<div class="container my-5">
+    @* Thanh điều hướng dấu trang (Breadcrumb) giúp khách hàng biết vị trí trang hiện tại *@
+    <nav aria-label="breadcrumb" class="mb-4">
+        @* Thẻ danh sách liên kết điều hướng dạng hàng ngang *@
+        <ol class="breadcrumb">
+            @* Đường dẫn quay về trang chủ *@
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-danger text-decoration-none">Trang chủ</a></li>
+            @* Đường dẫn quay về trang danh sách thực đơn *@
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Product")" class="text-danger text-decoration-none">Thực đơn</a></li>
+            @* Tên món ăn hiện tại không chứa đường dẫn link *@
+            <li class="breadcrumb-item active" aria-current="page">@Model.ProductName</li>
+        </ol>
+    </nav>
+
+    @* Lệnh nhúng Partial View _ProductDetail.cshtml tái sử dụng chung cho cả Admin và Customer (Barem Dòng 14, 16) *@
+    @Html.Partial("_ProductDetail", Model)
+
+    @* Khung chức năng tương tác đặt mua dành riêng cho trang Customer *@
+    <div class="mt-4 p-4 bg-white rounded-3 shadow-sm border">
+        @* Form gửi dữ liệu đặt mua món ăn sang CartController / AddToCart (Barem Dòng 38, 39, 40) *@
+        <form action="@Url.Action("AddToCart", "Cart")" method="post">
+            @* Trường ẩn lưu mã sản phẩm ProductID truyền sang Action AddToCart *@
+            <input type="hidden" name="id" value="@Model.ProductID" />
+
+            @* Khung chọn số lượng món ăn cần mua *@
+            <div class="mb-4 d-flex align-items-center gap-3">
+                @* Nhãn hiển thị yêu cầu chọn số lượng *@
+                <label class="fw-bold">Số lượng đặt mua:</label>
+                @* Ô nhập số lượng cho phép điều chỉnh từ 1 tới giới hạn số lượng tồn kho Stock (Barem Dòng 39) *@
+                <input type="number" name="quantity" class="form-control text-center fw-bold" value="1" min="1" max="@Model.Stock" style="width: 120px;" required>
+            </div>
+
+            @* Khung chứa các nút bấm hành động Thêm vào giỏ và Quay lại thực đơn *@
+            <div class="d-flex gap-3">
+                @* Nút bấm gửi form chọn mua hàng thêm vào giỏ, tự vô hiệu hóa nếu kho hết hàng (Barem Dòng 38) *@
+                <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm" @(Model.Stock <= 0 ? "disabled" : "")>
+                    @* Icon giỏ hàng và nhãn nút *@
+                    <i class="fas fa-cart-plus me-2"></i>Thêm Vào Giỏ Hàng
+                </button>
+                @* Nút đường dẫn cho phép khách hàng tiếp tục mua hàng quay lại trang thực đơn (Barem Dòng 40) *@
+                <a href="@Url.Action("Index", "Product")" class="btn btn-outline-secondary btn-lg fw-bold">
+                    @* Icon mũi tên và nhãn nút quay lại *@
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại thực đơn
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

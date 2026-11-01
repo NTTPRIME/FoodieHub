@@ -1,0 +1,78 @@
+﻿@* Khai báo kiểu dữ liệu Model liên kết với View là đối tượng User *@
+@model FoodieHub.Web.Models.User
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Thêm mới người dùng Admin";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Tiêu đề chính của trang thêm mới tài khoản Admin *@
+<h2 class="mt-4 mb-3 text-primary fw-bold">Thêm mới tài khoản Admin</h2>
+
+@* Kiểm tra nếu có thông báo lỗi từ Controller gửi sang ViewBag.Error *@
+@if (ViewBag.Error != null)
+{
+    @* Thẻ khung thông báo màu đỏ cảnh báo lỗi *@
+    <div class="alert alert-danger shadow-sm">
+        @* Hiển thị icon cảnh báo tam giác kèm nội dung câu báo lỗi *@
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.Error
+    </div>
+}
+
+@* Tạo Form gửi dữ liệu bằng phương thức POST tới Action Create trong AdminUserController (Barem Dòng 20) *@
+@using (Html.BeginForm("Create", "AdminUser", FormMethod.Post))
+{
+    @* Tạo mã Token xác thực chống tấn công giả mạo yêu cầu chéo trang CSRF *@
+    @Html.AntiForgeryToken()
+
+    @* Thẻ Card Bootstrap tạo khung bao quanh Form nhập liệu *@
+    <div class="card shadow p-4 mb-4">
+        @* Hiển thị tổng hợp các thông báo lỗi kiểm tra dữ liệu nếu có *@
+        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+        @* Khung nhập thông tin Họ và tên *@
+        <div class="mb-3">
+            @* Hiển thị nhãn tên trường Họ và tên theo cấu hình Metadata *@
+            @Html.LabelFor(model => model.FullName, new { @class = "form-label fw-bold" })
+            @* Ô nhập văn bản cho Họ và tên người dùng *@
+            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Nhập họ và tên đầy đủ..." })
+            @* Hiển thị thông báo lỗi màu đỏ riêng cho trường FullName *@
+            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+        </div>
+
+        @* Khung nhập địa chỉ Email đăng nhập *@
+        <div class="mb-3">
+            @* Hiển thị nhãn tên trường Địa chỉ Email *@
+            @Html.LabelFor(model => model.Email, new { @class = "form-label fw-bold" })
+            @* Ô nhập liệu định dạng Email *@
+            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Nhập địa chỉ email đăng nhập..." })
+            @* Hiển thị thông báo lỗi màu đỏ riêng cho trường Email *@
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+
+        @* Khung nhập Mật khẩu tài khoản *@
+        <div class="mb-3">
+            @* Hiển thị nhãn tên trường Mật khẩu *@
+            @Html.LabelFor(model => model.Password, new { @class = "form-label fw-bold" })
+            @* Ô nhập mật khẩu ẩn ký tự khi gõ *@
+            @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu (tối thiểu 6 ký tự)..." })
+            @* Hiển thị thông báo lỗi màu đỏ riêng cho trường Password *@
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+        </div>
+
+        @* Khung chứa các nút bấm thực thi thao tác *@
+        <div class="mt-3">
+            @* Nút gửi dữ liệu Form để lưu tài khoản người dùng mới *@
+            <button type="submit" class="btn btn-primary">
+                @* Biểu tượng đĩa đệm lưu dữ liệu *@
+                <i class="bi bi-save"></i> Lưu tài khoản
+            </button>
+            @* Nút chuyển hướng quay về trang danh sách tài khoản *@
+            <a href="@Url.Action("Index", "AdminUser")" class="btn btn-secondary ms-2">
+                Quay lại danh sách
+            </a>
+        </div>
+    </div>
+}

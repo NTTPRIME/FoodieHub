@@ -1,0 +1,93 @@
+﻿@* Khai báo Model truyền vào View là đối tượng Category cần xác nhận xóa *@
+@model FoodieHub.Web.Models.Category
+@{
+    @* Thiết lập tiêu đề hiển thị trên thanh tab trình duyệt *@
+    ViewBag.Title = "Xác nhận xóa danh mục món ăn";
+    @* Chỉ định sử dụng khung giao diện trang quản trị *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@* Khung container chứa giao diện xác nhận xóa *@
+<div class="container-fluid py-4" style="max-width: 750px;">
+    @* Kiểm tra nếu Controller truyền thông báo lỗi ràng buộc dữ liệu (Barem Dòng 12) *@
+    @if (ViewBag.Error != null)
+    {
+        @* Khung cảnh báo màu đỏ hiển thị thông báo không thể xóa do còn chứa sản phẩm *@
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+            @* Biểu tượng tam giác chấm cảm cảnh báo *@
+            <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+            @* Đổ nội dung câu thông báo lỗi từ ViewBag.Error *@
+            <strong>Lỗi ràng buộc:</strong> @ViewBag.Error
+            @* Nút đóng khung cảnh báo *@
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Thẻ Card Bootstrap viền đỏ hiển thị thông tin cảnh báo xóa *@
+    <div class="card shadow border-danger rounded-3 p-4">
+        @* Tiêu đề cảnh báo xóa danh mục *@
+        <h3 class="text-center mb-3 text-danger fw-bold">
+            @* Biểu tượng thùng rác màu đỏ *@
+            <i class="fa-solid fa-trash-can me-2"></i>XÁC NHẬN XÓA DANH MỤC
+        </h3>
+        @* Câu hỏi cảnh báo xác nhận xóa *@
+        <p class="text-center text-muted mb-4 fs-6">
+            Bạn có chắc chắn muốn xóa danh mục này khỏi hệ thống?
+        </p>
+
+        @* Bảng chi tiết thông tin đối tượng danh mục sắp xóa *@
+        <div class="bg-light p-3 rounded mb-4 border">
+            @* Hàng thông báo Mã danh mục *@
+            <div class="row mb-2">
+                <div class="col-sm-4 fw-bold text-secondary">Mã danh mục:</div>
+                <div class="col-sm-8 fw-bold">#@Model.CategoryID</div>
+            </div>
+            @* Hàng thông báo Tên danh mục *@
+            <div class="row mb-2">
+                <div class="col-sm-4 fw-bold text-secondary">Tên danh mục:</div>
+                <div class="col-sm-8 fw-bold text-primary fs-5">@Model.CategoryName</div>
+            </div>
+            @* Hàng thông báo Số lượng món ăn liên quan *@
+            <div class="row">
+                <div class="col-sm-4 fw-bold text-secondary">Số món ăn liên quan:</div>
+                <div class="col-sm-8">
+                    @* Thẻ badge đếm số lượng món ăn liên kết *@
+                    <span class="badge bg-info text-dark px-3 py-2 fs-6">
+                        @(Model.Products != null ? Model.Products.Count : 0) món ăn
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        @* Tạo Form HTML Helper gửi dữ liệu POST về Action DeleteConfirmed của AdminCategoryController *@
+        @using (Html.BeginForm("Delete", "AdminCategory", new { id = Model.CategoryID }, FormMethod.Post))
+        {
+            @* Mã xác thực CSRF Token bảo mật chống tấn công CSRF *@
+            @Html.AntiForgeryToken()
+            @* Khung chứa các nút hành động *@
+            <div class="d-flex justify-content-end gap-2 pt-2">
+                @* Nút Hủy và quay về trang danh sách *@
+                <a href="@Url.Action("Index", "AdminCategory")" class="btn btn-secondary px-4 fw-semibold">
+                    @* Biểu tượng mũi tên quay lại *@
+                    <i class="fa-solid fa-arrow-left me-1"></i> Hủy & Quay lại
+                </a>
+                @* Kiểm tra xem danh mục có đang chứa sản phẩm hay không để khóa/mở nút xóa *@
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    @* Nút xóa bị VÔ HIỆU HÓA khi còn vi phạm ràng buộc khóa ngoại (Barem Dòng 12) *@
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm" disabled title="Không thể xóa danh mục đang chứa món ăn!">
+                        @* Biểu tượng ổ khóa bị chặn *@
+                        <i class="fa-solid fa-lock me-1"></i> Không thể xóa (Vẫn còn món ăn)
+                    </button>
+                }
+                else
+                {
+                    @* Nút bấm xác nhận xóa khi danh mục hoàn toàn rỗng món ăn *@
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm" onclick="return confirm('Xác nhận xóa vĩnh viễn danh mục này?');">
+                        @* Biểu tượng thùng rác *@
+                        <i class="fa-solid fa-trash me-1"></i> Xác nhận xóa
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>

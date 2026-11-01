@@ -1,0 +1,68 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào Partial View là đối tượng sản phẩm Product *@
+@model FoodieHub.Web.Models.Product
+
+@* Thẻ Card Bootstrap bao bọc toàn bộ khung hiển thị chi tiết món ăn *@
+<div class="card border-0 shadow-sm p-3 bg-white rounded-3">
+    @* Khung chia lưới Grid 2 cột: Cột trái chứa Ảnh, Cột phải chứa Thông tin *@
+    <div class="row g-4 align-items-center">
+        @* Cột bên trái hiển thị ảnh sản phẩm (chiếm 5 cột trên PC) *@
+        <div class="col-md-5 text-center">
+            @* Kiểm tra xem món ăn có đường dẫn ảnh hợp lệ không *@
+            @if (Model != null && !string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                @* Thẻ hiển thị hình ảnh đại diện của món ăn *@
+                <img src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" class="img-fluid rounded-3 shadow-sm border" style="max-height: 320px; width: 100%; object-fit: cover;" />
+            }
+            else
+            {
+                @* Thẻ hiển thị hình ảnh mặc định khi chưa có ảnh đại diện *@
+                <img src="https://via.placeholder.com/400x300?text=FoodieHub+No+Image" alt="No image" class="img-fluid rounded-3 shadow-sm border" style="max-height: 320px; width: 100%; object-fit: cover;" />
+            }
+        </div>
+
+        @* Cột bên phải hiển thị đầy đủ thông tin chi tiết món ăn (chiếm 7 cột trên PC) *@
+        <div class="col-md-7">
+            @* Tên món ăn hiển thị in đậm cỡ chữ lớn *@
+            <h3 class="fw-bold text-dark mb-2">@(Model != null ? Model.ProductName : "Chưa có tên món")</h3>
+
+            @* Khung hiển thị Mã món ăn và Tên danh mục *@
+            <div class="d-flex align-items-center gap-2 mb-3">
+                @* Nhãn hiển thị Mã định danh món ăn *@
+                <span class="badge bg-secondary">Mã món: #@(Model != null ? Model.ProductID : 0)</span>
+                @* Nhãn hiển thị Tên danh mục món ăn *@
+                <span class="badge bg-primary">Category: @(Model != null && Model.Category != null ? Model.Category.CategoryName : "Chưa phân loại")</span>
+            </div>
+
+            @* Khung nổi bật hiển thị giá bán của sản phẩm *@
+            <div class="p-3 bg-light rounded-3 mb-3 border-start border-danger border-4">
+                @* Tiêu đề nhỏ nhãn Giá bán *@
+                <span class="text-muted d-block small">Đơn giá niêm yết:</span>
+                @* Giá tiền in màu đỏ nổi bật định dạng phân cách hàng nghìn *@
+                <h2 class="text-danger fw-bold m-0">@(Model != null ? Model.Price.ToString("N0") : "0") VNĐ</h2>
+            </div>
+
+            @* Khung thông tin tình trạng tồn kho *@
+            <div class="mb-3">
+                @* Tiêu đề nhãn số lượng tồn kho *@
+                <strong class="text-dark me-2"><i class="fa-solid fa-boxes-stacked text-secondary me-1"></i>Số lượng tồn kho:</strong>
+                @* Kiểm tra tình trạng kho hàng còn hay hết *@
+                @if (Model != null && Model.Stock > 0)
+                {
+                    @* Thẻ chữ màu xanh hiển thị số lượng tồn kho hiện tại *@
+                    <span class="fw-bold text-success">@Model.Stock món (Còn hàng sẵn sàng bán)</span>
+                }
+                else
+                {
+                    @* Thẻ chữ màu đỏ báo sản phẩm hiện đã hết hàng trong kho *@
+                    <span class="fw-bold text-danger">Đã hết hàng trong kho</span>
+                }
+            </div>
+
+            @* Đoạn văn bản mô tả khái quát về sản phẩm *@
+            <div class="text-muted small">
+                @* Biểu tượng thông tin món ăn *@
+                <p class="mb-1"><i class="fa-solid fa-circle-info me-1"></i>Món ăn được chế biến từ nguồn nguyên liệu tươi ngon, đảm bảo vệ sinh an toàn thực phẩm.</p>
+            </div>
+        </div>
+    </div>
+</div>

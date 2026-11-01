@@ -1,0 +1,113 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là đối tượng sản phẩm Product cần xác nhận xóa *@
+@model FoodieHub.Web.Models.Product
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Xác nhận xóa món ăn";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung bọc toàn bộ giao diện xác nhận xóa món ăn *@
+<div class="container-fluid mt-3">
+    @* Tiêu đề trang xác nhận xóa *@
+    <h2 class="fw-bold text-danger mb-4">
+        @* Biểu tượng thùng rác cảnh báo *@
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>Xác Nhận Xóa Món Ăn
+    </h2>
+
+    @* Kiểm tra nếu Controller gửi thông báo lỗi vi phạm ràng buộc dữ liệu sang ViewBag.Error (Barem Dòng 17) *@
+    @if (ViewBag.Error != null)
+    {
+        @* Thẻ alert màu đỏ hiển thị thông báo lỗi ràng buộc khóa ngoại *@
+        <div class="alert alert-danger shadow-sm border-0 mb-4">
+            @* Biểu tượng biển báo nguy hiểm và dòng nội dung lỗi *@
+            <i class="fa-solid fa-circle-exclamation me-2"></i><strong>Cảnh báo:</strong> @ViewBag.Error
+        </div>
+    }
+
+    @* Thẻ Card Bootstrap viền đỏ bao quanh thông tin sản phẩm chuẩn bị xóa *@
+    <div class="card shadow-sm border-danger p-4 mb-4">
+        @* Câu hỏi xác nhận hành động xóa *@
+        <h4 class="card-title text-danger border-bottom pb-2 fw-bold">Bạn có chắc chắn muốn xóa món ăn này khỏi hệ thống?</h4>
+
+        @* Bảng danh sách chi tiết thông tin món ăn sắp bị xóa *@
+        <dl class="row mt-3 mb-0">
+            @* Tên thuộc tính Mã món ăn *@
+            <dt class="col-sm-3 text-muted">Mã món ăn:</dt>
+            @* Giá trị Mã món ăn *@
+            <dd class="col-sm-9 fw-bold">#@Model.ProductID</dd>
+
+            @* Tên thuộc tính Tên món ăn *@
+            <dt class="col-sm-3 text-muted">Tên món ăn:</dt>
+            @* Giá trị Tên món ăn in đậm màu xanh *@
+            <dd class="col-sm-9 fw-bold text-primary fs-5">@Model.ProductName</dd>
+
+            @* Tên thuộc tính Danh mục *@
+            <dt class="col-sm-3 text-muted">Danh mục:</dt>
+            @* Giá trị Tên danh mục món ăn *@
+            <dd class="col-sm-9">
+                <span class="badge bg-secondary">@(Model.Category != null ? Model.Category.CategoryName : "Chưa phân loại")</span>
+            </dd>
+
+            @* Tên thuộc tính Giá bán *@
+            <dt class="col-sm-3 text-muted">Giá bán:</dt>
+            @* Giá trị Giá bán định dạng số phân cách hàng nghìn *@
+            <dd class="col-sm-9 text-danger fw-bold">@Model.Price.ToString("N0") VNĐ</dd>
+
+            @* Tên thuộc tính Số lượng tồn kho *@
+            <dt class="col-sm-3 text-muted">Số lượng tồn kho:</dt>
+            @* Giá trị Số lượng tồn kho *@
+            <dd class="col-sm-9 fw-bold">@Model.Stock món</dd>
+
+            @* Tên thuộc tính Hình ảnh đại diện *@
+            <dt class="col-sm-3 text-muted">Hình ảnh đại diện:</dt>
+            @* Khung hiển thị ảnh đại diện của món ăn *@
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    @* Thẻ hiển thị ảnh sản phẩm *@
+                    <img src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" class="rounded border shadow-sm" style="max-height: 120px; object-fit: cover;" />
+                }
+                else
+                {
+                    @* Thẻ chữ báo chưa có ảnh *@
+                    <span class="text-muted fst-italic">Chưa có hình ảnh</span>
+                }
+            </dd>
+        </dl>
+
+        @* Mở Form HTML Helper gửi phương thức POST về Action Delete trong AdminProductController (Barem Dòng 17) *@
+        @using (Html.BeginForm("Delete", "AdminProduct", new { id = Model.ProductID }, FormMethod.Post))
+        {
+            @* Mã hóa xác thực chống tấn công giả mạo CSRF Token *@
+            @Html.AntiForgeryToken()
+
+            @* Khung chứa các nút xác nhận xóa hoặc hủy thao tác *@
+            <div class="mt-4 pt-3 border-top">
+                @* BAREM CHECK CONSTRAINT: Kiểm tra nếu món ăn đã từng nằm trong Chi tiết đơn hàng (OrderDetails) *@
+                @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                {
+                    @* Nút Xóa bị vô hiệu hóa kèm cảnh báo do bị ràng buộc dữ liệu lịch sử đơn hàng *@
+                    <button type="submit" class="btn btn-danger px-4 fw-bold" disabled title="Không thể xóa món ăn đã xuất hiện trong lịch sử đơn hàng!">
+                        @* Biểu tượng khóa bảo vệ *@
+                        <i class="fa-solid fa-lock me-1"></i> Không thể xóa (Đã có trong lịch sử đơn hàng)
+                    </button>
+                }
+                else
+                {
+                    @* Nút kích hoạt lệnh xóa món ăn vĩnh viễn khỏi cơ sở dữ liệu *@
+                    <button type="submit" class="btn btn-danger px-4 fw-bold" onclick="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn món ăn này khỏi hệ thống?');">
+                        @* Biểu tượng thùng rác xóa *@
+                        <i class="fa-solid fa-trash me-1"></i> Xác nhận xóa vĩnh viễn
+                    </button>
+                }
+
+                @* Nút Hủy thao tác và quay trở lại trang danh sách món ăn *@
+                <a href="@Url.Action("Index", "AdminProduct")" class="btn btn-secondary px-4 ms-2">
+                    Hủy & Quay lại
+                </a>
+            </div>
+        }
+    </div>
+</div>

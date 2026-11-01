@@ -1,0 +1,61 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào Partial View là danh sách các sản phẩm *@
+@model IEnumerable<FoodieHub.Web.Models.Product>
+
+@* Khung chứa bảng dữ liệu hiển thị danh sách các sản phẩm còn hàng trong kho *@
+<div class="table-responsive">
+    @* Thẻ bảng dữ liệu HTML với các lớp định dạng Bootstrap *@
+    <table class="table table-bordered table-hover align-middle">
+        @* Tầng đầu bảng định nghĩa các tiêu đề cột dữ liệu *@
+        <thead class="table-success">
+            @* Dòng chứa tiêu đề các cột *@
+            <tr>
+                @* Cột tiêu đề hiển thị Mã sản phẩm *@
+                <th>Mã món</th>
+                @* Cột tiêu đề hiển thị Tên món ăn *@
+                <th>Tên món ăn</th>
+                @* Cột tiêu đề hiển thị Danh mục món ăn *@
+                <th>Danh mục</th>
+                @* Cột tiêu đề hiển thị Giá bán *@
+                <th>Giá bán</th>
+                @* Cột tiêu đề hiển thị Số lượng tồn kho *@
+                <th>Số lượng tồn</th>
+                @* Cột tiêu đề hiển thị Trạng thái kho hàng *@
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        @* Phần thân bảng chứa dữ liệu thực tế được đổ ra từ Model *@
+        <tbody>
+            @* Kiểm tra danh sách dữ liệu truyền vào có hợp lệ và chứa bản ghi nào hay không *@
+            @if (Model != null && Model.Any())
+            {
+                @* Vòng lặp foreach duyệt qua từng sản phẩm trong danh sách *@
+                foreach (var item in Model)
+                {
+                    @* Dòng hiển thị thông tin chi tiết của một sản phẩm còn hàng *@
+                    <tr>
+                        @* Hiển thị giá trị mã định danh sản phẩm *@
+                        <td>@item.ProductID</td>
+                        @* Hiển thị tên sản phẩm in đậm *@
+                        <td class="fw-bold">@item.ProductName</td>
+                        @* Hiển thị tên danh mục liên kết (kiểm tra null an toàn) *@
+                        <td>@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</td>
+                        @* Hiển thị đơn giá sản phẩm theo định dạng số phân cách hàng nghìn *@
+                        <td>@item.Price.ToString("N0") VNĐ</td>
+                        @* Hiển thị số lượng tồn kho màu xanh lá *@
+                        <td class="text-success fw-bold">@item.Stock</td>
+                        @* Hiển thị thẻ nhãn trạng thái Còn hàng màu xanh *@
+                        <td><span class="badge bg-success">Còn hàng</span></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                @* Hiển thị dòng thông báo khi danh sách rỗng *@
+                <tr>
+                    @* Ô gộp toàn bộ 6 cột để căn giữa câu thông báo rỗng *@
+                    <td colspan="6" class="text-center text-muted">Hiện tại không có sản phẩm nào còn hàng trong kho.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

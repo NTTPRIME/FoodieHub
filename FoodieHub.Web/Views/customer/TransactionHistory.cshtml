@@ -1,0 +1,156 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền từ Controller sang View là danh sách các Đơn hàng (Order) *@
+@model IEnumerable<FoodieHub.Web.Models.Order>
+
+@{
+    @* Thiết lập tiêu đề trang web hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Lịch sử giao dịch - FoodieHub";
+    @* Chỉ định sử dụng Master Layout dùng chung cho phân hệ Khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+@* Thẻ bọc toàn bộ nội dung trang Lịch sử giao dịch với khoảng cách lề trên dưới *@
+<div class="container my-5">
+    @* Tiêu đề chính của trang với biểu tượng đồng hồ lịch sử màu đỏ in đậm *@
+    <h2 class="mb-4 text-danger fw-bold"><i class="fa-solid fa-clock-rotate-left me-2"></i> Lịch Sử Giao Dịch Của Tôi</h2>
+
+    @* Thẻ Card Bootstrap tạo khung hiển thị danh sách đơn hàng có độ bóng nhẹ *@
+    <div class="card shadow-sm border-0">
+        @* Thân thẻ Card chứa bảng dữ liệu *@
+        <div class="card-body">
+            @* Khung cuộn responsive cho bảng dữ liệu khi xem trên thiết bị di động *@
+            <div class="table-responsive">
+                @* Thẻ bảng HTML hiển thị danh sách đơn hàng với hiệu ứng di chuột *@
+                <table class="table table-hover align-middle">
+                    @* Đầu bảng chứa tiêu đề các cột dữ liệu *@
+                    <thead class="table-light">
+                        @* Dòng tiêu đề các cột *@
+                        <tr>
+                            @* Tiêu đề cột Mã đơn hàng *@
+                            <th>Mã Đơn Hàng</th>
+                            @* Tiêu đề cột Ngày đặt hàng *@
+                            <th>Ngày Đặt</th>
+                            @* Tiêu đề cột Địa chỉ giao hàng *@
+                            <th>Địa Chỉ Giao Hàng</th>
+                            @* Tiêu đề cột Tổng tiền thanh toán *@
+                            <th>Tổng Tiền</th>
+                            @* Tiêu đề cột Trạng thái đơn hàng *@
+                            <th>Trạng Thái</th>
+                            @* Tiêu đề cột Nút xem chi tiết đơn hàng căn giữa *@
+                            <th class="text-center">Chi Tiết</th>
+                        </tr>
+                    </thead>
+                    @* Thân bảng chứa dữ liệu các đơn hàng *@
+                    <tbody>
+                        @* Kiểm tra xem danh sách đơn hàng truyền sang từ Controller có dữ liệu hay không *@
+                        @if (Model != null && Model.Any())
+                        {
+                            @* Vòng lặp foreach duyệt qua từng đơn hàng trong danh sách lịch sử của khách *@
+                            foreach (var item in Model)
+                            {
+                                @* Dòng hiển thị thông tin tổng quan của một đơn hàng *@
+                                <tr>
+                                    @* Cột hiển thị Mã đơn hàng dạng in đậm *@
+                                    <td class="fw-bold">#FH-@item.OrderID</td>
+                                    @* Cột hiển thị Ngày đặt hàng theo định dạng Ngày/Tháng/Năm Giờ:Phút *@
+                                    <td>@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                                    @* Cột hiển thị Địa chỉ giao hàng của đơn hàng *@
+                                    <td>@(string.IsNullOrEmpty(item.Address) ? "N/A" : item.Address)</td>
+                                    @* Cột hiển thị Tổng số tiền của đơn hàng màu đỏ in đậm *@
+                                    <td class="text-danger fw-bold">@item.TotalAmount.ToString("N0") VNĐ</td>
+                                    @* Cột hiển thị Trạng thái đơn hàng bằng thẻ Badge màu xanh *@
+                                    <td><span class="badge bg-success">Hoàn thành</span></td>
+                                    @* Cột chứa nút bấm mở Modal xem chi tiết hóa đơn đơn hàng *@
+                                    <td class="text-center">
+                                        @* Nút kích hoạt Modal xem hóa đơn chi tiết gắn ID động theo mã đơn hàng *@
+                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#customerInvoiceModal_@item.OrderID">
+                                            @* Biểu tượng con mắt kèm chữ Xem Chi Tiết *@
+                                            <i class="fa-solid fa-eye me-1"></i> Xem Chi Tiết
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            @* Dòng thông báo hiển thị khi khách hàng chưa thực hiện đơn hàng nào *@
+                            <tr>
+                                @* Ô gộp 6 cột căn giữa dòng thông báo giỏ hàng/lịch sử rỗng *@
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    @* Biểu tượng hộp rỗng cảnh báo *@
+                                    <i class="fa-solid fa-box-open fs-1 mb-3 text-secondary d-block"></i>
+                                    @* Dòng văn bản thông báo chưa có giao dịch *@
+                                    <p class="fs-5 mb-3">Bạn chưa có giao dịch hoặc đơn hàng nào trong hệ thống.</p>
+                                    @* Nút chuyển hướng sang trang thực đơn để khách chọn mua món ăn *@
+                                    <a href="@Url.Action("Index", "Product")" class="btn btn-danger fw-bold px-4 py-2">
+                                        @* Biểu tượng muỗng nĩa kèm chữ Khám phá thực đơn *@
+                                        <i class="fa-solid fa-utensils me-2"></i>Khám Phá Thực Đơn Ngay
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Kiểm tra nếu danh sách đơn hàng có dữ liệu thì sinh các Modal hóa đơn tương ứng *@
+@if (Model != null && Model.Any())
+{
+    @* Vòng lặp sinh khung Modal Chi tiết Hóa đơn cho từng đơn hàng riêng biệt *@
+    foreach (var item in Model)
+    {
+        @* Thẻ Modal chứa thông tin hóa đơn chi tiết gắn ID duy nhất theo OrderID *@
+        <div class="modal fade" id="customerInvoiceModal_@item.OrderID" tabindex="-1" aria-hidden="true">
+            @* Thẻ định dạng kích thước khung Modal *@
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                @* Thẻ nội dung Modal với khoảng cách padding *@
+                <div class="modal-content p-3">
+                    @* Đầu trang Modal chứa nút đóng *@
+                    <div class="modal-header border-0 pb-0">
+                        @* Tiêu đề khung Modal *@
+                        <h5 class="modal-title fw-bold text-danger">Hóa Đơn Chi Tiết Đơn Hàng</h5>
+                        @* Nút đóng Modal dạng X *@
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    @* Thân Modal chứa thông tin giao hàng và nhúng Partial View _OrderDetail (Barem Dòng 65) *@
+                    <div class="modal-body p-3">
+                        @* Khung hiển thị thông tin Người nhận, Địa chỉ và Thời gian đặt hàng riêng của Đơn hàng *@
+                        <div class="p-3 bg-light rounded-3 mb-3 border">
+                            <div class="row small">
+                                @* Hiển thị tên người nhận *@
+                                <div class="col-md-6 mb-1">
+                                    <strong>Người nhận:</strong> <span class="text-dark fw-bold">@(string.IsNullOrEmpty(item.CustomerName) ? "Khách hàng" : item.CustomerName)</span>
+                                </div>
+                                @* Hiển thị địa chỉ giao hàng *@
+                                <div class="col-md-6 mb-1">
+                                    <strong>Địa chỉ giao:</strong> <span class="text-dark fw-bold">@(string.IsNullOrEmpty(item.Address) ? "N/A" : item.Address)</span>
+                                </div>
+                                @* Hiển thị thời gian đặt hàng *@
+                                <div class="col-md-12 mt-1">
+                                    <strong>Thời gian đặt:</strong> <span class="text-muted">@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "N/A")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Lệnh nhúng Partial View hiển thị danh sách món ăn dạng hóa đơn dùng chung cho Admin & Customer (Barem Dòng 65) *@
+                        @Html.Partial("_OrderDetail", item.OrderDetails)
+                    </div>
+
+                    @* Chân Modal chứa nút đóng và nút in hóa đơn *@
+                    <div class="modal-footer border-0 justify-content-center">
+                        @* Nút bấm đóng cửa sổ Modal *@
+                        <button type="button" class="btn btn-secondary btn-sm px-4" data-bs-dismiss="modal">Đóng</button>
+                        @* Nút bấm gửi lệnh in trang tính hóa đơn của trình duyệt *@
+                        <button type="button" class="btn btn-danger btn-sm px-4 fw-bold" onclick="window.print()">
+                            @* Biểu tượng máy in *@
+                            <i class="fa-solid fa-print me-1"></i> In Hóa Đơn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

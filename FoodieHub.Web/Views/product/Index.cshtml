@@ -1,0 +1,169 @@
+﻿@* Khai báo kiểu dữ liệu Model nhận từ ProductController là danh sách món ăn *@
+@model IEnumerable<FoodieHub.Web.Models.Product>
+
+@{
+    @* Thiết lập tiêu đề trang web động theo tên danh mục hoặc từ khóa tìm kiếm *@
+    ViewBag.Title = ViewBag.CategoryName ?? "Thực Đơn Món Ăn - FoodieHub";
+    @* Chỉ định kế thừa khung giao diện chung _MasterLayout.cshtml cho khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+    @* Lấy chỉ số trang hiện tại từ ViewBag *@
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    @* Lấy tổng số trang từ ViewBag *@
+    int totalPages = ViewBag.TotalPages ?? 1;
+    @* Lấy từ khóa tìm kiếm hiện tại từ ViewBag *@
+    string searchString = ViewBag.SearchString as string;
+    @* Lấy mã danh mục đang chọn từ ViewBag *@
+    int? selectedCatId = ViewBag.SelectedCategoryID as int?;
+    @* Lấy danh sách danh mục từ ViewBag để nạp vào DropDownList *@
+    var categories = ViewBag.Categories as List<FoodieHub.Web.Models.Category>;
+}
+
+@* Vùng chứa chính của trang danh sách món ăn *@
+<div class="container my-4">
+    @* Thanh tiêu đề danh mục / kết quả tìm kiếm *@
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+        @* Hiển thị tên danh mục hoặc thông báo kết quả tìm kiếm *@
+        <h2 class="text-danger fw-bold m-0">
+            @* Icon chiếc thìa và nĩa trang trí *@
+            <i class="fas fa-utensils me-2"></i>@ViewBag.CategoryName
+        </h2>
+        @* Thẻ badge thông báo trạng thái sẵn sàng phục vụ *@
+        <span class="badge bg-success fs-6">Sẵn sàng giao hàng</span>
+    </div>
+
+    @* Form tìm kiếm và lọc món ăn theo danh mục (Barem Dòng 31, 33) *@
+    <form method="get" action="@Url.Action("Index", "Product")" class="card p-3 shadow-sm mb-4 border-0 bg-light">
+        @* Khung lưới chứa ô tìm kiếm và dropdown lọc *@
+        <div class="row g-3">
+            @* Cột chứa ô nhập từ khóa tìm kiếm *@
+            <div class="col-md-5">
+                @* Khung ô nhập liệu kết hợp icon kính lúp *@
+                <div class="input-group">
+                    @* Khung hiển thị icon kính lúp bên trái *@
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    @* Ô nhập từ khóa tìm kiếm tên món ăn *@
+                    <input type="text" name="searchString" class="form-control border-start-0" value="@searchString" placeholder="Nhập tên món ăn cần tìm...">
+                </div>
+            </div>
+
+            @* Cột chứa danh sách chọn danh mục món ăn *@
+            <div class="col-md-4">
+                @* Thẻ select dropdown chọn danh mục *@
+                <select name="categoryId" class="form-select">
+                    @* Tùy chọn mặc định xem tất cả danh mục *@
+                    <option value="">-- Tất cả danh mục --</option>
+                    @* Kiểm tra nếu danh sách danh mục tồn tại thì duyệt vòng lặp *@
+                    @if (categories != null)
+                    {
+                        @* Vòng lặp duyệt từng danh mục để hiển thị option *@
+                        foreach (var cat in categories)
+                        {
+                            @* Thẻ option hiển thị tên danh mục và tự chọn option trùng mã selectedCatId *@
+                            <option value="@cat.CategoryID" @(selectedCatId == cat.CategoryID ? "selected" : "")>@cat.CategoryName</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            @* Cột chứa nút bấm gửi yêu cầu lọc *@
+            <div class="col-md-3">
+                @* Nút gửi form thực hiện lọc và tìm kiếm món ăn *@
+                <button type="submit" class="btn btn-danger w-100 fw-bold">
+                    @* Icon phễu lọc và nhãn nút *@
+                    <i class="fas fa-filter me-1"></i> Lọc Món Ăn
+                </button>
+            </div>
+        </div>
+    </form>
+
+    @* Khung lưới hiển thị danh sách các thẻ món ăn *@
+    <div class="row g-4">
+        @* Kiểm tra danh sách món ăn truyền từ Controller có chứa bản ghi không *@
+        @if (Model != null && Model.Any())
+        {
+            @* Vòng lặp duyệt qua từng đối tượng món ăn trong danh sách *@
+            foreach (var item in Model)
+            {
+                @* Cột chia độ rộng card món ăn responsive trên các thiết bị *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    @* Thẻ Card bọc toàn bộ thông tin một món ăn *@
+                    <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                        @* Thẻ ảnh đại diện món ăn có kiểm tra đường dẫn rỗng để hiển thị ảnh mặc định *@
+                        <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content(item.ImageUrl) : "https://via.placeholder.com/300x200?text=FoodieHub")"
+                             class="card-img-top" alt="@item.ProductName" style="height: 180px; object-fit: cover;">
+
+                        @* Thân thẻ Card chứa tên, danh mục, giá và nút mua *@
+                        <div class="card-body d-flex flex-column">
+                            @* Tiêu đề tên món ăn *@
+                            <h5 class="card-title fw-bold text-dark mb-1">@item.ProductName</h5>
+                            @* Dòng hiển thị tên danh mục liên kết *@
+                            <p class="card-text text-muted small flex-grow-1">Danh mục: @(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</p>
+
+                            @* Khung chân thẻ Card chứa giá tiền và các nút thao tác *@
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                @* Giá bán món ăn được định dạng dấu phân cách hàng nghìn N0 *@
+                                <span class="text-danger fw-bold fs-5">@item.Price.ToString("N0") VNĐ</span>
+                            </div>
+
+                            @* Khung bọc nút Xem chi tiết và nút Đặt món *@
+                            <div class="d-flex gap-2 mt-2">
+                                @* Nút chuyển sang trang xem chi tiết món ăn (Barem Dòng 35) *@
+                                <a href="@Url.Action("Detail", "Product", new { id = item.ProductID })" class="btn btn-outline-secondary btn-sm flex-fill fw-bold">
+                                    Chi tiết
+                                </a>
+                                @* Nút đặt mua món ăn thêm nhanh vào giỏ hàng (Barem Dòng 36) *@
+                                <a href="@Url.Action("AddToCart", "Cart", new { id = item.ProductID, quantity = 1 })" class="btn btn-danger btn-sm flex-fill fw-bold">
+                                    <i class="fas fa-cart-plus me-1"></i> Đặt món
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            @* Khung thông báo khi không tìm thấy món ăn phù hợp với bộ lọc *@
+            <div class="col-12 text-center py-5">
+                @* Thẻ cảnh báo màu vàng *@
+                <div class="alert alert-warning py-4 shadow-sm">
+                    @* Biểu tượng cảnh báo và dòng thông báo không có món ăn *@
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Không tìm thấy món ăn nào phù hợp với điều kiện tìm kiếm!</strong>
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Khung hiển thị nút phân trang kết quả tìm kiếm/lọc (Barem Dòng 32) *@
+    @if (totalPages > 1)
+    {
+        @* Thanh điều hướng danh sách trang *@
+        <nav class="mt-4">
+            @* Thẻ danh sách các nút số trang *@
+            <ul class="pagination justify-content-center">
+                @* Nút chuyển về trang trước *@
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    @* Đường dẫn chuyển về trang trước kèm giữ nguyên thông số lọc *@
+                    <a class="page-link" href="@Url.Action("Index", "Product", new { page = currentPage - 1, searchString = searchString, categoryId = selectedCatId })">Trước</a>
+                </li>
+
+                @* Vòng lặp xuất ra danh sách các số trang *@
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    @* Thẻ nút chứa số trang tương ứng *@
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        @* Đường dẫn đến trang số i kèm giữ nguyên thông số lọc *@
+                        <a class="page-link" href="@Url.Action("Index", "Product", new { page = i, searchString = searchString, categoryId = selectedCatId })">@i</a>
+                    </li>
+                }
+
+                @* Nút chuyển tới trang sau *@
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    @* Đường dẫn chuyển tới trang kế tiếp kèm giữ nguyên thông số lọc *@
+                    <a class="page-link" href="@Url.Action("Index", "Product", new { page = currentPage + 1, searchString = searchString, categoryId = selectedCatId })">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

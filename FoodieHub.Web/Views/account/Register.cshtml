@@ -1,0 +1,106 @@
+﻿@* Khai báo Model liên kết trực tiếp với View là đối tượng User *@
+@model FoodieHub.Web.Models.User
+@{
+    @* Thiết lập tiêu đề hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Đăng ký tài khoản";
+    @* Chỉ định sử dụng khung giao diện MasterLayout của phân hệ khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+@* Thẻ div bọc ngoài căn giữa và giới hạn độ rộng form đăng ký *@
+<div class="container my-5" style="max-width: 500px;">
+    @* Khung Card Bootstrap tạo hiệu ứng đổ bóng cho form *@
+    <div class="card shadow border-0 p-4">
+        @* Tiêu đề trang Đăng ký hiển thị dạng chữ in đậm màu đỏ *@
+        <h2 class="text-center mb-4 text-danger fw-bold">ĐĂNG KÝ TÀI KHOẢN</h2>
+        @* Kiểm tra nếu Controller có truyền thông báo lỗi qua ViewBag.Error *@
+        @if (ViewBag.Error != null)
+        {
+            @* Khung hiển thị thông báo lỗi màu đỏ nếu đăng ký thất bại (Barem Dòng 52) *@
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                @* Biểu tượng hình tròn dấu chấm cảm cảnh báo *@
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                @* Đổ nội dung câu thông báo lỗi từ ViewBag.Error ra giao diện *@
+                @ViewBag.Error
+                @* Nút bấm góc phải cho phép tắt khung alert thông báo lỗi *@
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @* Tạo Form HTML Helper gửi dữ liệu phương thức POST về Action Register của AccountController *@
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+        {
+            @* Khởi tạo mã Token chống tấn công giả mạo CSRF (Khắc phục triệt để lỗi 400 trong file txt) *@
+            @Html.AntiForgeryToken()
+            @* Hiển thị tổng hợp các thông báo lỗi Validation của Model *@
+            @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+            @* Khung nhập liệu Họ và tên *@
+            <div class="mb-3">
+                @* Hiển thị nhãn Họ và tên lấy từ DataAnnotation trong UserMetadata *@
+                @Html.LabelFor(model => model.FullName, new { @class = "form-label fw-semibold" })
+                @* Ô nhập liệu văn bản liên kết với thuộc tính FullName *@
+                @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Nhập họ và tên đầy đủ của bạn..." })
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ nếu bỏ trống Họ và tên (Barem Dòng 51) *@
+                @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger small" })
+            </div>
+            @* Khung nhập liệu Địa chỉ Email *@
+            <div class="mb-3">
+                @* Hiển thị nhãn Địa chỉ Email lấy từ UserMetadata *@
+                @Html.LabelFor(model => model.Email, new { @class = "form-label fw-semibold" })
+                @* Ô nhập liệu định dạng Email liên kết với thuộc tính Email *@
+                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "nguyenvana@gmail.com" })
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ nếu Email bị trùng hoặc sai định dạng (Barem Dòng 51) *@
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+            </div>
+            @* Khung nhập liệu Mật khẩu *@
+            <div class="mb-3">
+                @* Hiển thị nhãn Mật khẩu lấy từ UserMetadata *@
+                @Html.LabelFor(model => model.Password, new { @class = "form-label fw-semibold" })
+                @* Khung nhóm ô nhập và nút bấm ẩn/hiện mật khẩu *@
+                <div class="input-group">
+                    @* Ô nhập mật khẩu dạng ẩn ký tự liên kết với thuộc tính Password *@
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", id = "txtPassword", placeholder = "Nhập mật khẩu (tối thiểu 6 ký tự)..." })
+                    @* Nút bấm biểu tượng con mắt để kích hoạt JavaScript ẩn/hiện mật khẩu *@
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        @* Biểu tượng con mắt mở mặc định của FontAwesome *@
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ nếu mật khẩu dưới 6 ký tự (Barem Dòng 51) *@
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger small" })
+            </div>
+            @* Nút submit kích hoạt gửi dữ liệu form đăng ký *@
+            <button type="submit" class="btn btn-danger w-100 py-2 fw-bold mb-3 shadow-sm">
+                @* Biểu tượng dấu cộng tài khoản *@
+                <i class="fa-solid fa-user-plus me-1"></i> ĐĂNG KÝ NGAY
+            </button>
+            @* Khung chứa liên kết chuyển hướng sang trang đăng nhập *@
+            <div class="text-center mt-2">
+                @* Câu chữ hỏi người dùng đã có tài khoản chưa *@
+                <span class="text-muted">Đã có tài khoản?</span>
+                @* Đường dẫn chuyển hướng về trang Đăng nhập *@
+                <a href="@Url.Action("Login", "Account")" class="text-danger text-decoration-none fw-semibold ms-1">Đăng nhập ngay</a>
+            </div>
+        }
+    </div>
+</div>
+@* Khu vực nạp kịch bản JavaScript xử lý sự kiện cho trang *@
+@section scripts {
+    <script>
+        // Khai báo biến lấy phần tử nút bấm con mắt togglePassword
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        // Khai báo biến lấy phần tử ô nhập mật khẩu txtPassword
+        const passwordInput = document.getElementById('txtPassword');
+        // Khai báo biến lấy phần tử thẻ icon eyeIcon
+        const eyeIcon = document.getElementById('eyeIcon');
+        // Lắng nghe sự kiện click trên nút bấm con mắt
+        togglePasswordBtn.addEventListener('click', function () {
+            // Kiểm tra nếu type đang là password thì đổi sang text và ngược lại
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            // Gán lại thuộc tính type mới cho ô nhập mật khẩu
+            passwordInput.setAttribute('type', type);
+            // Chuyển đổi trạng thái hiển thị class fa-eye của icon
+            eyeIcon.classList.toggle('fa-eye');
+            // Chuyển đổi trạng thái hiển thị class fa-eye-slash của icon
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+    </script>
+}

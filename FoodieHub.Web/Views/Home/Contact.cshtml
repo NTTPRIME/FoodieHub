@@ -1,0 +1,112 @@
+﻿@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Liên Hệ - FoodieHub";
+    @* Kế thừa khung giao diện chung _MasterLayout.cshtml *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+@* Vùng chứa nội dung trang liên hệ *@
+<div class="container my-5">
+    @* Tiêu đề chính trang liên hệ *@
+    <div class="text-center mb-5">
+        @* Dòng chữ in đậm màu đỏ cam *@
+        <h2 class="fw-bold text-danger text-uppercase mb-2">Liên Hệ Với Chúng Tôi</h2>
+        @* Dòng thông điệp chăm sóc khách hàng *@
+        <p class="text-muted fs-5">FoodieHub luôn sẵn sàng lắng nghe và hỗ trợ bạn mọi lúc 24/7</p>
+        @* Đường gạch chân trang trí *@
+        <hr class="w-25 mx-auto text-danger" style="height: 3px; opacity: 1;">
+    </div>
+
+    @* Bố cục 2 cột chia form liên hệ và thông tin địa chỉ *@
+    <div class="row g-5">
+        @* CỘT BÊN TRÁI: FORM GỬI PHẢN HỒI KHÁCH HÀNG *@
+        <div class="col-md-7">
+            @* Thẻ Card chứa form nhập thông tin *@
+            <div class="card border-0 shadow-sm p-4 rounded-4">
+                <h4 class="fw-bold text-dark mb-4">Gửi Nhắn Cho FoodieHub</h4>
+
+                @* Form gửi dữ liệu phản hồi *@
+                <form action="#" method="post">
+                    @* Ô nhập họ tên *@
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Họ và tên của bạn (*)</label>
+                        <input type="text" class="form-control py-2" placeholder="Nhập họ và tên..." required>
+                    </div>
+
+                    @* Hàng ngang nhập Email và Số điện thoại *@
+                    <div class="row g-3 mb-3">
+                        @* Ô nhập Email *@
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Địa chỉ Email (*)</label>
+                            <input type="email" class="form-control py-2" placeholder="name@example.com" required>
+                        </div>
+                        @* Ô nhập Số điện thoại *@
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Số điện thoại liên hệ (*)</label>
+                            <input type="tel" class="form-control py-2" placeholder="Ví dụ: 0901234567" required>
+                        </div>
+                    </div>
+
+                    @* Ô nhập nội dung tin nhắn phản hồi *@
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Nội dung tin nhắn / Phản hồi (*)</label>
+                        <textarea class="form-control" rows="4" placeholder="Nhập nội dung bạn cần hỗ trợ hoặc góp ý..." required></textarea>
+                    </div>
+
+                    @* Nút Submit gửi phản hồi *@
+                    <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm">
+                        <i class="fas fa-paper-plane me-2"></i>Gửi Tin Nhắn Cho Chúng Tôi
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        @* CỘT BÊN PHẢI: THÔNG TIN LIÊN HỆ VÀ TRỤ SỞ *@
+        <div class="col-md-5">
+            @* Thẻ Card chứa danh sách kênh liên lạc *@
+            <div class="card border-0 shadow-sm p-4 rounded-4 bg-light">
+                <h4 class="fw-bold text-dark mb-4">Thông Tin Trung Tâm</h4>
+
+                @* Danh sách các kênh liên hệ *@
+                <div class="d-flex align-items-start mb-4">
+                    @* Icon địa chỉ trụ sở *@
+                    <div class="badge bg-danger p-3 rounded-circle me-3 fs-5"><i class="fas fa-location-dot"></i></div>
+                    <div>
+                        <h6 class="fw-bold m-0">Địa Chỉ Trụ Sở Main Office</h6>
+                        <small class="text-muted">155 Sư Vạn Hạnh, Phường 12, Quận 10, TP. Hồ Chí Minh</small>
+                    </div>
+                </div>
+
+                @* Kênh Hotline tổng đài *@
+                <div class="d-flex align-items-start mb-4">
+                    @* Icon tổng đài điện thoại *@
+                    <div class="badge bg-danger p-3 rounded-circle me-3 fs-5"><i class="fas fa-phone"></i></div>
+                    <div>
+                        <h6 class="fw-bold m-0">Tổng Đài Hỗ Trợ Hotline</h6>
+                        <small class="text-muted">1900 6868 (Phím 1 gặp Chăm sóc khách hàng)</small>
+                    </div>
+                </div>
+
+                @* Kênh Email hỗ trợ *@
+                <div class="d-flex align-items-start mb-4">
+                    @* Icon thư điện tử Email *@
+                    <div class="badge bg-danger p-3 rounded-circle me-3 fs-5"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <h6 class="fw-bold m-0">Email Hỗ Trợ Khách Hàng</h6>
+                        <small class="text-muted">support@foodiehub.vn / cskh@foodiehub.vn</small>
+                    </div>
+                </div>
+
+                @* Kênh giờ làm việc *@
+                <div class="d-flex align-items-start">
+                    @* Icon đồng hồ thời gian *@
+                    <div class="badge bg-danger p-3 rounded-circle me-3 fs-5"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <h6 class="fw-bold m-0">Thời Gian Hoạt Động</h6>
+                        <small class="text-muted">Thứ Hai - Chủ Nhật: 07:00 AM - 22:00 PM</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

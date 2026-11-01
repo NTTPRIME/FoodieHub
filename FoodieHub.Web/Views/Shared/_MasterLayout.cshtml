@@ -1,0 +1,491 @@
+﻿@* Khai báo kiểu tài liệu HTML5 chuẩn *@
+<!DOCTYPE html>
+@* Thiết lập ngôn ngữ hiển thị chính của website là tiếng Việt *@
+<html lang="vi">
+<head>
+    @* Khai báo bảng mã ký tự UTF-8 giúp hiển thị tiếng Việt không bị lỗi font *@
+    <meta charset="UTF-8">
+    @* Cấu hình Responsive tương thích trên mọi thiết bị Điện thoại, Tablet và PC *@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @* Đặt tiêu đề trang web động ghép từ ViewBag.Title của từng trang con *@
+    <title>@ViewBag.Title - FoodieHub - Đặt Món Ngon Giao Nhanh</title>
+
+    @* Nhúng thư viện Font Awesome v6.4.0 để dùng các biểu tượng Icon *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    @* Nhúng Font chữ Roboto trực tiếp từ Google Fonts *@
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    @* Nhúng thư viện CSS Bootstrap 5.3 từ CDN trực tuyến *@
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    @* Khối mã CSS tùy chỉnh riêng cho giao diện FoodieHub *@
+    <style>
+        /* === KHAI BÁO CÁC BIẾN MÀU SẮC DÙNG CHUNG (CSS VARIABLES) === */
+        :root {
+            --foodiehub-orange: #EE4D2D; /* Màu cam chủ đạo của thương hiệu FoodieHub */
+            --foodiehub-orange-hover: #d73a1e; /* Màu cam đậm khi rê chuột vào nút bấm */
+            --foodiehub-dark: #222222; /* Màu xám tối phủ nền khu vực Chân trang Footer */
+            --foodiehub-light-bg: #f5f5f5; /* Màu nền xám nhẹ của toàn bộ trang web */
+            --foodiehub-border: #e0e0e0; /* Màu đường viền khung kẻ nhẹ */
+        }
+
+        /* Reset lề margin và padding mặc định của toàn bộ các thẻ HTML */
+        * {
+            box-sizing: border-box; /* Đảm bảo kích thước thẻ bao gồm cả padding và border */
+            margin: 0; /* Xóa khoảng cách lề ngoài */
+            padding: 0; /* Xóa khoảng cách lề trong */
+            font-family: 'Roboto', sans-serif; /* Áp dụng font chữ Roboto cho toàn bộ trang */
+        }
+
+        /* Thiết lập bố cục chung cho thẻ Body dùng Flexbox dồn Footer xuống đáy */
+        body {
+            background-color: var(--foodiehub-light-bg); /* Thiết lập màu nền chung */
+            color: #333; /* Màu chữ mặc định */
+            display: flex; /* Dùng bố cục Flexbox dạng cột */
+            flex-direction: column; /* Sắp xếp các thành phần theo chiều dọc */
+            min-height: 100vh; /* Chiều cao tối thiểu bằng 100% màn hình */
+        }
+
+        /* === 1. ĐỊNH DẠNG HEADER (THANH THƯỜNG TRỰC TRÊN CÙNG) === */
+        .foodiehub-header {
+            background-color: var(--foodiehub-orange); /* Màu nền cam nổi bật */
+            color: white; /* Chữ màu trắng */
+            position: sticky; /* Cố định thanh Header khi cuộn trang */
+            top: 0; /* Vị trí dính sát đỉnh màn hình */
+            z-index: 1000; /* Thứ tự hiển thị nổi lên trên các thành phần khác */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Đổ bóng nhẹ phía dưới Header */
+        }
+
+        /* Định dạng khung chứa căn giữa nội dung Header */
+        .header-container {
+            max-width: 1200px; /* Chiều rộng tối đa 1200px */
+            margin: 0 auto; /* Căn giữa khung theo chiều ngang */
+            padding: 12px 20px; /* Lề trong trên dưới 12px, trái phải 20px */
+            display: flex; /* Bố cục hàng ngang Flexbox */
+            align-items: center; /* Căn chỉnh các thành phần theo chiều dọc */
+            justify-content: space-between; /* Phân bổ đều khoảng cách giữa các khối */
+            gap: 20px; /* Khoảng cách giữa các khối thành phần */
+        }
+
+        /* Định dạng Logo thương hiệu FoodieHub */
+        .logo {
+            font-size: 28px; /* Cỡ chữ logo 28px */
+            font-weight: 700; /* Chữ in đậm */
+            color: white; /* Màu chữ trắng */
+            text-decoration: none; /* Bỏ gạch chân đường dẫn */
+            display: flex; /* Căn hàng ngang Icon và Chữ */
+            align-items: center; /* Căn giữa theo chiều dọc */
+            gap: 8px; /* Khoảng cách giữa Icon muỗng nĩa và chữ */
+        }
+
+            /* Hiệu ứng khi rê chuột vào Logo */
+            .logo:hover {
+                color: white; /* Giữ nguyên chữ màu trắng */
+                text-decoration: none; /* Không hiển thị gạch chân */
+            }
+
+        /* Khung tìm kiếm món ăn trên Header */
+        .search-bar {
+            flex: 1; /* Tự động co giãn chiếm không gian trống còn lại */
+            max-width: 500px; /* Chiều rộng tối đa 500px */
+            display: flex; /* Bố cục hàng ngang cho input và button */
+            background: white; /* Nền màu trắng */
+            border-radius: 4px; /* Bo cong 4 góc khung tìm kiếm */
+            overflow: hidden; /* Cắt bỏ phần dư thừa tràn ra ngoài */
+        }
+
+            /* Ô nhập từ khóa tìm kiếm */
+            .search-bar input {
+                width: 100%; /* Chiếm 100% chiều rộng khung */
+                padding: 10px 14px; /* Lề trong ô nhập liệu */
+                border: none; /* Bỏ đường viền border */
+                outline: none; /* Bỏ viền xanh khi con trỏ nhấp vào */
+                font-size: 14px; /* Cỡ chữ nhập 14px */
+            }
+
+            /* Nút bấm gửi form tìm kiếm */
+            .search-bar button {
+                background: #ff6b4a; /* Màu cam nhạt hơn một chút */
+                border: none; /* Bỏ đường viền button */
+                color: white; /* Biểu tượng Kính kính màu trắng */
+                padding: 0 18px; /* Khoảng cách lề trong nút tìm kiếm */
+                cursor: pointer; /* Đổi biểu tượng con trỏ chuột thành bàn tay */
+                transition: 0.2s; /* Hiệu ứng chuyển màu mượt mà */
+            }
+
+                /* Hiệu ứng khi rê chuột vào nút tìm kiếm */
+                .search-bar button:hover {
+                    background: var(--foodiehub-orange-hover); /* Đổi sang cam đậm */
+                }
+
+        /* Khu vực chứa các nút chức năng Giỏ hàng và Tài khoản */
+        .header-actions {
+            display: flex; /* Bố cục hàng ngang Flexbox */
+            align-items: center; /* Căn giữa các icon theo chiều dọc */
+            gap: 24px; /* Khoảng cách giữa Giỏ hàng và Tài khoản */
+        }
+
+        /* Icon Giỏ hàng kèm Badge hiển thị số lượng món */
+        .cart-icon-btn {
+            color: white; /* Màu icon trắng */
+            text-decoration: none; /* Bỏ gạch chân */
+            position: relative; /* Định vị tương đối để làm neo cho Badge số lượng */
+            font-size: 22px; /* Cỡ icon 22px */
+        }
+
+            /* Hiệu ứng khi rê chuột vào Icon giỏ hàng */
+            .cart-icon-btn:hover {
+                color: #fff; /* Giữ màu trắng */
+            }
+
+        /* Badge màu trắng chữ cam hiển thị số lượng món trong giỏ */
+        .cart-badge {
+            position: absolute; /* Định vị tuyệt đối trên góc icon */
+            top: -8px; /* Đẩy lên phía trên 8px */
+            right: -10px; /* Đẩy sang phải 10px */
+            background: white; /* Nền màu trắng */
+            color: var(--foodiehub-orange); /* Chữ màu cam */
+            font-size: 11px; /* Cỡ chữ 11px */
+            font-weight: bold; /* Chữ in đậm */
+            padding: 2px 6px; /* Lề trong của badge */
+            border-radius: 10px; /* Bo tròn tạo hình viên thuốc */
+            border: 2px solid var(--foodiehub-orange); /* Viền màu cam */
+        }
+
+        /* Định dạng khu vực nút bấm Đăng nhập / Đăng ký */
+        .auth-buttons {
+            display: flex; /* Bố cục hàng ngang */
+            align-items: center; /* Căn giữa theo chiều dọc */
+            gap: 12px; /* Khoảng cách giữa 2 nút */
+        }
+
+        /* Định dạng chung cho nút bấm xác thực */
+        .btn-auth {
+            color: white; /* Chữ màu trắng */
+            text-decoration: none; /* Bỏ gạch chân */
+            font-size: 14px; /* Cỡ chữ 14px */
+            font-weight: 500; /* Độ đậm vừa phải */
+            padding: 6px 12px; /* Lề trong nút bấm */
+            border-radius: 4px; /* Bo góc nút 4px */
+            transition: 0.2s; /* Hiệu ứng chuyển cảnh */
+            display: inline-block; /* Hiển thị dạng khối nội dòng */
+        }
+
+            /* Hiệu ứng khi rê chuột vào nút xác thực */
+            .btn-auth:hover {
+                color: white; /* Giữ chữ trắng */
+                text-decoration: none; /* Bỏ gạch chân */
+            }
+
+        /* Định dạng nút dạng viền trắng (Outline) */
+        .btn-auth-outline {
+            border: 1px solid white; /* Đường viền trắng xung quanh nút */
+        }
+
+            /* Hiệu ứng khi rê chuột vào nút dạng viền */
+            .btn-auth-outline:hover {
+                background: rgba(255, 255, 255, 0.2); /* Nền mờ trắng nhẹ */
+            }
+
+        /* Định dạng khối thông tin khi người dùng đã đăng nhập */
+        .user-logged-info {
+            display: flex; /* Bố cục hàng ngang */
+            align-items: center; /* Căn giữa các phần tử */
+            gap: 10px; /* Khoảng cách giữa tên và các nút bấm */
+            color: white; /* Chữ màu trắng */
+            font-size: 14px; /* Cỡ chữ 14px */
+            font-weight: 500; /* Chữ đậm vừa */
+        }
+
+            /* Định dạng thẻ liên kết chữ trong khối thông tin người dùng */
+            .user-logged-info a {
+                color: white; /* Chữ màu trắng */
+                text-decoration: none; /* Bỏ gạch chân */
+            }
+
+                /* Hiệu ứng gạch chân khi rê chuột */
+                .user-logged-info a:hover {
+                    text-decoration: underline; /* Hiện gạch chân */
+                }
+
+        /* === 2. ĐỊNH DẠNG NAVIGATION BAR (THANH MENU DANH MỤC) === */
+        .foodiehub-nav {
+            background-color: white; /* Nền màu trắng */
+            border-bottom: 1px solid var(--foodiehub-border); /* Đường kẻ xám bên dưới */
+            position: relative; /* Định vị tương đối */
+            z-index: 10; /* Thứ tự hiển thị */
+        }
+
+        /* Khung chứa danh mục thực đơn */
+        .nav-container {
+            max-width: 1200px; /* Chiều rộng tối đa 1200px */
+            margin: 0 auto; /* Căn giữa màn hình */
+            padding: 0 20px; /* Lề trong trái phải 20px */
+            display: flex; /* Bố cục hàng ngang */
+            gap: 30px; /* Khoảng cách giữa các mục menu */
+        }
+
+        /* Định dạng từng mục danh mục thực đơn */
+        .nav-item {
+            padding: 12px 0; /* Lề trên dưới 12px */
+            text-decoration: none; /* Bỏ gạch chân */
+            color: #444; /* Màu chữ xám đậm */
+            font-weight: 500; /* Chữ đậm vừa */
+            font-size: 15px; /* Cỡ chữ 15px */
+            border-bottom: 3px solid transparent; /* Viền dưới trong suốt */
+            transition: 0.2s; /* Hiệu ứng mượt */
+            position: relative; /* Định vị tương đối */
+            z-index: 12; /* Thứ tự hiển thị */
+            cursor: pointer; /* Con trỏ hình bàn tay */
+        }
+
+            /* Hiệu ứng khi rê chuột hoặc mục menu đang được chọn (Active) */
+            .nav-item:hover, .nav-item.active {
+                color: var(--foodiehub-orange); /* Đổi sang chữ màu cam */
+                border-bottom-color: var(--foodiehub-orange); /* Hiện gạch chân màu cam */
+                text-decoration: none; /* Bỏ gạch chân liên kết */
+            }
+
+        /* === 3. ĐỊNH DẠNG KHU VỰC NỘI DUNG CHÍNH (MAIN) === */
+        .main-content {
+            max-width: 1200px; /* Chiều rộng tối đa 1200px */
+            margin: 20px auto; /* Căn giữa màn hình và lề trên dưới 20px */
+            padding: 0 20px; /* Lề trong trái phải 20px */
+            width: 100%; /* Chiếm 100% chiều rộng khả dụng */
+            flex: 1; /* Tự động co giãn lấp đầy khoảng trống */
+        }
+
+        /* === 4. ĐỊNH DẠNG FOOTER (CHÂN TRANG) === */
+        .foodiehub-footer {
+            background-color: var(--foodiehub-dark); /* Nền màu tối */
+            color: #ccc; /* Chữ màu xám nhạt */
+            margin-top: 40px; /* Khoảng cách lề trên 40px */
+            padding: 40px 0 20px; /* Lề trong trên 40px, dưới 20px */
+        }
+
+        /* Khung chứa các cột thông tin Footer */
+        .footer-container {
+            max-width: 1200px; /* Chiều rộng tối đa 1200px */
+            margin: 0 auto; /* Căn giữa màn hình */
+            padding: 0 20px; /* Lề trong trái phải 20px */
+            display: grid; /* Bố cục chia lưới Grid */
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Tự động chia cột linh hoạt */
+            gap: 30px; /* Khoảng cách giữa các cột */
+        }
+
+        /* Tiêu đề từng cột ở Footer */
+        .footer-col h4 {
+            color: white; /* Tiêu đề chữ trắng */
+            font-size: 16px; /* Cỡ chữ 16px */
+            margin-bottom: 16px; /* Khoảng cách lề dưới */
+            border-left: 3px solid var(--foodiehub-orange); /* Viền màu cam bên trái tiêu đề */
+            padding-left: 8px; /* Lề trong bên trái tiêu đề */
+        }
+
+        /* Danh sách liên kết Footer */
+        .footer-col ul {
+            list-style: none; /* Bỏ dấu chấm đầu dòng */
+        }
+
+            /* Từng dòng liên kết */
+            .footer-col ul li {
+                margin-bottom: 10px; /* Khoảng cách giữa các dòng */
+            }
+
+                /* Thẻ liên kết trong Footer */
+                .footer-col ul li a {
+                    color: #aaa; /* Màu chữ xám */
+                    text-decoration: none; /* Bỏ gạch chân */
+                    font-size: 14px; /* Cỡ chữ 14px */
+                    transition: 0.2s; /* Hiệu ứng chuyển màu */
+                }
+
+                    /* Hiệu ứng khi rê chuột vào link Footer */
+                    .footer-col ul li a:hover {
+                        color: var(--foodiehub-orange); /* Đổi sang màu cam */
+                    }
+
+        /* Dòng bản quyền dưới cùng của Footer */
+        .footer-bottom {
+            text-align: center; /* Căn giữa dòng chữ */
+            padding-top: 20px; /* Khoảng cách lề trong phía trên */
+            margin-top: 30px; /* Khoảng cách lề ngoài phía trên */
+            border-top: 1px solid #333; /* Đường kẻ phân cách xám tối */
+            font-size: 13px; /* Cỡ chữ nhỏ 13px */
+            color: #777; /* Màu chữ xám mờ */
+        }
+
+        /* === 5. MEDIA QUERIES (RESPONSIVE DÀNH CHO ĐIỆN THOẠI) === */
+        @@media (max-width: 768px) {
+            /* Co dãn khối Header container khi trên màn hình nhỏ */
+            .header-container {
+                flex-wrap: wrap; /* Tự động xuống dòng khi thiếu không gian */
+            }
+            /* Chuyển thanh tìm kiếm xuống dòng riêng trên điện thoại */
+            .search-bar {
+                order: 3; /* Đặt thứ tự hiển thị xuống cuối */
+                max-width: 100%; /* Chiếm toàn bộ chiều rộng */
+                width: 100%; /* Đảm bảo tràn đều 100% */
+            }
+            /* Thanh menu danh mục cho phép cuộn ngang trên thiết bị di động */
+            .nav-container {
+                overflow-x: auto; /* Hiện thanh cuộn ngang khi tràn */
+                white-space: nowrap; /* Không cho chữ xuống dòng */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    @* Khối mã C# xử lý logic tính toán tổng số lượng sản phẩm có trong giỏ hàng *@
+    @{
+        int cartCount = 0; // Khởi tạo biến đếm số lượng giỏ hàng mặc định bằng 0
+        var cartList = Session["Cart"] as List<FoodieHub.Web.Models.ViewModels.CartItem>; // Lấy danh sách giỏ hàng từ Session
+        if (cartList != null && cartList.Any()) // Kiểm tra nếu giỏ hàng tồn tại và có chứa sản phẩm
+        {
+            cartCount = cartList.Sum(item => item.Quantity); // Tính tổng số lượng của tất cả món ăn trong giỏ
+        }
+        var currentUser = Session["User"] as FoodieHub.Web.Models.User; // Lấy thông tin tài khoản người dùng đang đăng nhập từ Session
+    }
+
+    <!-- KHỐI HEADER TRÊN CÙNG CỦA TRANG WEB -->
+    <header class="foodiehub-header">
+        <div class="header-container">
+            @* Thẻ liên kết Logo thương hiệu FoodieHub quay về Trang chủ *@
+            <a href="@Url.Action("Index", "Home")" class="logo">
+                <i class="fa-solid fa-utensils"></i> FoodieHub
+            </a>
+
+            @* Form gửi từ khóa tìm kiếm món ăn về ProductController / Index *@
+            <form method="get" action="@Url.Action("Index", "Product")" class="search-bar">
+                @* Ô nhập từ khóa tìm kiếm, tự lưu lại giá trị đã tìm từ Request QueryString *@
+                <input type="text" name="searchString" placeholder="Tìm món ăn, trà sữa, quán ăn..." value="@Request.QueryString["searchString"]">
+                @* Nút gửi form tìm kiếm với icon Kính kính *@
+                <button type="submit" aria-label="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
+
+            @* Khối chứa icon Giỏ hàng và nút bấm Quản lý tài khoản *@
+            <div class="header-actions">
+                @* Nút liên kết chuyển hướng tới trang Giỏ hàng *@
+                <a href="@Url.Action("Index", "Cart")" class="cart-icon-btn" title="Giỏ hàng">
+                    @* Icon giỏ hàng *@
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    @* Badge màu trắng hiển thị tổng số lượng món ăn trong giỏ *@
+                    <span class="cart-badge" id="cartCount">@cartCount</span>
+                </a>
+
+                @* Kiểm tra nếu người dùng đã đăng nhập thành công vào hệ thống *@
+                @if (currentUser != null)
+                {
+                    @* Khối hiển thị thông tin tài khoản và menu cá nhân khi đã đăng nhập *@
+                    <div class="user-logged-info">
+                        @* Icon ảnh đại diện người dùng *@
+                        <i class="fa-solid fa-user-circle fs-5"></i>
+                        @* Hiển thị câu xin chào kèm Họ và tên đầy đủ của người dùng *@
+                        <span>Xin chào, <strong>@currentUser.FullName</strong></span>
+
+                        @* Nút 1: Liên kết chuyển hướng đến trang Lịch sử giao dịch / Đơn mua *@
+                        <a href="@Url.Action("TransactionHistory", "Customer")" class="btn-auth btn-auth-outline ms-2" title="Lịch sử mua hàng">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Đơn mua
+                        </a>
+
+                        @* Nút 2: Liên kết chuyển hướng đến trang Hồ sơ cá nhân của khách hàng *@
+                        <a href="#" class="btn-auth btn-auth-outline ms-1" title="Hồ sơ cá nhân">
+                            <i class="fa-solid fa-id-card"></i> Hồ sơ
+                        </a>
+
+                        @* Nút 3: Liên kết thực hiện Đăng xuất thoát khỏi tài khoản hiện tại *@
+                        <a href="@Url.Action("Logout", "Account")" class="btn-auth ms-1" title="Đăng xuất">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    @* Khối hiển thị 2 nút Đăng ký / Đăng nhập khi chưa đăng nhập tài khoản *@
+                    <div class="auth-buttons">
+                        @* Nút chuyển sang trang Đăng nhập *@
+                        <a href="@Url.Action("Login", "Account")" class="btn-auth btn-auth-outline">Đăng Nhập</a>
+                        @* Nút chuyển sang trang Đăng ký *@
+                        <a href="@Url.Action("Register", "Account")" class="btn-auth">Đăng Ký</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </header>
+
+    <!-- KHỐI NAVIGATION (THANH MENU DANH MỤC THỰC ĐƠN) -->
+    <nav class="foodiehub-nav">
+        <div class="nav-container">
+            @* Mục Menu Trang chủ (Tự động Active nếu đang ở HomeController) *@
+            <a href="@Url.Action("Index", "Home")" class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")">Trang Chủ</a>
+            @* Mục Menu Cơm Tấm & Đồ Ăn Trưa *@
+            <a href="@Url.Action("Index", "Product", new { categoryId = 1 })" class="nav-item">Cơm Tấm & Đồ Ăn Trưa</a>
+            @* Mục Menu Trà Sữa & Đồ Uống *@
+            <a href="@Url.Action("Index", "Product", new { categoryId = 2 })" class="nav-item">Trà Sữa & Đồ Uống</a>
+            @* Mục Menu Bún / Phở / Mì *@
+            <a href="@Url.Action("Index", "Product", new { categoryId = 3 })" class="nav-item">Bún / Phở / Mì</a>
+            @* Mục Menu Ăn Vặt & Ăn Nhẹ *@
+            <a href="@Url.Action("Index", "Product", new { categoryId = 4 })" class="nav-item">Ăn Vặt & Ăn Nhẹ</a>
+        </div>
+    </nav>
+
+    <!-- KHỐI CHỨA NỘI DUNG CHÍNH CỦA TỪNG VIEW CON -->
+    <main class="main-content">
+        @* Lệnh nhúng toàn bộ nội dung của View con kế thừa MasterLayout *@
+        @RenderBody()
+    </main>
+
+    <!-- KHỐI FOOTER CHÂN TRANG WEB -->
+    <footer class="foodiehub-footer">
+        <div class="footer-container">
+            @* Cột 1 Footer: Thông tin giới thiệu về FoodieHub *@
+            <div class="footer-col">
+                <h4>Về FoodieHub</h4>
+                <ul>
+                    @* Sửa từ href="#" thành Url.Action("About", "Home") trỏ đến trang Giới thiệu *@
+                    <li><a href="@Url.Action("About", "Home")">Giới thiệu</a></li>
+                    @* Sửa từ href="#" thành Url.Action("Contact", "Home") trỏ đến trang Liên hệ & Trợ giúp *@
+                    <li><a href="@Url.Action("Contact", "Home")">Liên hệ & Trợ giúp</a></li>
+                    @* Đường liên kết xem Chính sách bảo mật người dùng *@
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+            @* Cột 2 Footer: Các danh mục món ngon phổ biến *@
+            <div class="footer-col">
+                <h4>Danh Mục Món Ngon</h4>
+                <ul>
+                    <li><a href="#">Cơm Văn Phòng</a></li>
+                    <li><a href="#">Trà Sữa - Trái Cây</a></li>
+                    <li><a href="#">Gà Rán - Burger</a></li>
+                </ul>
+            </div>
+            @* Cột 3 Footer: Thông tin đăng ký hợp tác *@
+            <div class="footer-col">
+                <h4>Hợp Tác</h4>
+                <ul>
+                    <li><a href="#">Đăng ký làm Đối tác Quán ăn</a></li>
+                    <li><a href="#">Đăng ký làm Tài xế Giao hàng</a></li>
+                </ul>
+            </div>
+            @* Cột 4 Footer: Tải ứng dụng trên điện thoại *@
+            <div class="footer-col">
+                <h4>Tải Ứng Dụng</h4>
+                <p style="font-size: 13px; color: #999; margin-top: 5px;">Đặt món cực nhanh ngay trên điện thoại của bạn.</p>
+            </div>
+        </div>
+        @* Dòng thông tin bản quyền cuối cùng của trang *@
+        <div class="footer-bottom">
+            <p>&copy; 2026 FoodieHub Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Tải thư viện jQuery CDN hỗ trợ xử lý Javascript -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Tải thư viện JS Bootstrap 5.3 CDN hỗ trợ Modal, Dropdown, Carousel -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @* Lệnh cho phép các View con nhúng script riêng nếu cần *@
+    @RenderSection("scripts", required: false)
+</body>
+</html>

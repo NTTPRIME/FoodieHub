@@ -1,0 +1,78 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào Partial View là danh sách các đối tượng Order *@
+@model IEnumerable<FoodieHub.Web.Models.Order>
+
+@* Khung bọc bảng dữ liệu hỗ trợ cuộn ngang trên thiết bị di động *@
+<div class="table-responsive">
+    @* Thẻ bảng HTML hiển thị danh sách đơn hàng với định dạng Bootstrap *@
+    <table class="table table-hover table-bordered align-middle mb-0">
+        @* Đầu bảng chứa thông tin tên các cột dữ liệu *@
+        <thead class="table-dark">
+            @* Dòng tiêu đề của bảng dữ liệu *@
+            <tr>
+                @* Cột hiển thị Mã đơn hàng *@
+                <th style="width: 100px;">Mã đơn</th>
+                @* Cột hiển thị Tên khách hàng đặt hàng *@
+                <th>Khách hàng</th>
+                @* Cột hiển thị Ngày và giờ đặt hàng *@
+                <th style="width: 180px;">Thời gian đặt</th>
+                @* Cột hiển thị Tổng giá trị đơn hàng *@
+                <th style="width: 160px;" class="text-end">Tổng tiền</th>
+                @* Cột hiển thị Trạng thái hóa đơn *@
+                <th style="width: 140px;" class="text-center">Trạng thái</th>
+                @* Cột hiển thị nút thao tác xem chi tiết hóa đơn (Không có Thêm/Sửa/Xóa theo Barem Dòng 24) *@
+                <th style="width: 140px;" class="text-center">Thao tác</th>
+            </tr>
+        </thead>
+        @* Thân bảng chứa dữ liệu chi tiết của từng đơn hàng *@
+        <tbody>
+            @* Kiểm tra xem danh sách Model truyền vào có hợp lệ và có dữ liệu hay không *@
+            @if (Model != null && Model.Any())
+            {
+                @* Vòng lặp duyệt qua từng đơn hàng trong danh sách *@
+                foreach (var item in Model)
+                {
+                    @* Dòng hiển thị thông tin của một đơn hàng *@
+                    <tr>
+                        @* Ô hiển thị mã đơn hàng in đậm *@
+                        <td class="fw-bold text-dark">#@item.OrderID</td>
+                        @* Ô hiển thị tên khách hàng (ưu tiên lấy tên tài khoản, nếu không lấy tên người nhận) *@
+                        <td>
+                            @* Khung linh hoạt sắp xếp tên khách hàng *@
+                            <div class="d-flex align-items-center">
+                                @* Biểu tượng đại diện khách hàng *@
+                                <i class="fa-solid fa-user-circle me-2 text-secondary fs-5"></i>
+                                @* Thẻ chứa tên hiển thị khách hàng *@
+                                <span class="fw-semibold">@(item.User != null ? item.User.FullName : (!string.IsNullOrEmpty(item.CustomerName) ? item.CustomerName : "Khách vãng lai"))</span>
+                            </div>
+                        </td>
+                        @* Ô hiển thị ngày giờ đặt hàng định dạng ngày/tháng/năm giờ:phút *@
+                        <td>@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                        @* Ô hiển thị tổng giá trị tiền đơn hàng màu đỏ in đậm *@
+                        <td class="text-end text-danger fw-bold fs-6">@item.TotalAmount.ToString("N0") VNĐ</td>
+                        @* Ô hiển thị nhãn trạng thái đã ghi nhận của đơn hàng *@
+                        <td class="text-center">
+                            @* Thẻ badge màu xanh thể hiện đơn hàng đã ghi nhận *@
+                            <span class="badge bg-success">Đã hoàn thành</span>
+                        </td>
+                        @* Ô chứa nút Xem Hóa Đơn chuyển hướng đến Action Details của AdminOrderController *@
+                        <td class="text-center">
+                            @* Thẻ liên kết mở trang chi tiết hóa đơn của đơn hàng tương ứng *@
+                            <a href="@Url.Action("Details", "AdminOrder", new { id = item.OrderID })" class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết hóa đơn">
+                                @* Biểu tượng tờ hóa đơn *@
+                                <i class="fa-solid fa-file-invoice me-1"></i> Xem Hóa Đơn
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                @* Dòng hiển thị thông báo khi chưa có đơn hàng nào trong CSDL *@
+                <tr>
+                    @* Ô gộp 6 cột hiển thị dòng thông báo rỗng *@
+                    <td colspan="6" class="text-center text-muted py-4">Chưa có đơn hàng nào trong hệ thống.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

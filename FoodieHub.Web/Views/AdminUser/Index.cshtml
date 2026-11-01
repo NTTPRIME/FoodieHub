@@ -1,0 +1,86 @@
+﻿@* Khai báo kiểu dữ liệu Model nhận vào View là danh sách các đối tượng người dùng User *@
+@model IEnumerable<FoodieHub.Web.Models.User>
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab của trình duyệt web *@
+    ViewBag.Title = "Quản lý người dùng hệ thống";
+    @* Chỉ định sử dụng trang giao diện quản trị chung _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Thẻ tiêu đề chính trang danh sách tài khoản người dùng Admin *@
+<h2 class="mt-4 mb-3 text-primary fw-bold">Danh sách người dùng Admin</h2>
+
+@* Thẻ Card Bootstrap tạo khung bao phủ danh sách dữ liệu *@
+<div class="card shadow p-4 mb-4">
+    @* Khung chứa nút tạo mới tài khoản người dùng *@
+    <div class="mb-3">
+        @* Thẻ liên kết chuyển hướng sang giao diện thêm mới người dùng *@
+        <a href="@Url.Action("Create", "AdminUser")" class="btn btn-success">
+            @* Biểu tượng dấu cộng xanh cho nút thêm mới *@
+            <i class="bi bi-plus-circle me-1"></i> Thêm người dùng mới
+        </a>
+    </div>
+
+    @* Khung cuộn ngang bảo vệ giao diện khi hiển thị trên thiết bị nhỏ *@
+    <div class="table-responsive">
+        @* Thẻ bảng hiển thị danh sách người dùng với viền và hiệu ứng rê chuột *@
+        <table class="table table-bordered table-hover align-middle">
+            @* Đầu bảng định nghĩa tên các cột thông tin *@
+            <thead class="table-dark">
+                @* Dòng tiêu đề các cột *@
+                <tr>
+                    @* Cột hiển thị Mã số người dùng *@
+                    <th>Mã số</th>
+                    @* Cột hiển thị Họ và tên người dùng *@
+                    <th>Họ và tên</th>
+                    @* Cột hiển thị Địa chỉ Email đăng nhập *@
+                    <th>Địa chỉ Email</th>
+                    @* Cột chứa các nút thao tác chỉnh sửa và xóa *@
+                    <th class="text-center" style="width: 180px;">Thao tác</th>
+                </tr>
+            </thead>
+            @* Thân bảng chứa danh sách dòng dữ liệu người dùng *@
+            <tbody>
+                @* Kiểm tra xem danh sách Model truyền vào có dữ liệu hay không *@
+                @if (Model != null && Model.Any())
+                {
+                    @* Vòng lặp duyệt qua từng đối tượng người dùng User trong danh sách *@
+                    foreach (var item in Model)
+                    {
+                        @* Dòng hiển thị thông tin của một tài khoản người dùng *@
+                        <tr>
+                            @* Ô hiển thị mã định danh UserID *@
+                            <td>@item.UserID</td>
+                            @* Ô hiển thị Họ và tên người dùng in đậm *@
+                            <td class="fw-bold text-dark">@item.FullName</td>
+                            @* Ô hiển thị địa chỉ Email của người dùng *@
+                            <td>@item.Email</td>
+                            @* Ô chứa nút bấm chỉnh sửa và nút xóa tài khoản *@
+                            <td class="text-center">
+                                @* Nút liên kết chuyển sang trang Chỉnh sửa tài khoản *@
+                                <a href="@Url.Action("Edit", "AdminUser", new { id = item.UserID })" class="btn btn-warning btn-sm me-1" title="Chỉnh sửa">
+                                    @* Biểu tượng bút viết chỉnh sửa *@
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </a>
+                                @* Nút liên kết chuyển sang trang Xác nhận xóa tài khoản *@
+                                <a href="@Url.Action("Delete", "AdminUser", new { id = item.UserID })" class="btn btn-danger btn-sm" title="Xóa">
+                                    @* Biểu tượng thùng rác xóa *@
+                                    <i class="bi bi-trash"></i> Xóa
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    @* Dòng thông báo khi hệ thống chưa có tài khoản người dùng nào *@
+                    <tr>
+                        @* Ô gộp 4 cột hiển thị thông báo rỗng *@
+                        <td colspan="4" class="text-center text-muted">Chưa có tài khoản người dùng nào trong hệ thống.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

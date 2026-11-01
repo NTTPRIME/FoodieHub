@@ -1,0 +1,168 @@
+﻿@* Khai báo kiểu tài liệu HTML5 chuẩn *@
+<!DOCTYPE html>
+<html>
+<head>
+    @* Thiết lập bảng mã ký tự UTF-8 hỗ trợ tiếng Việt có dấu *@
+    <meta charset="utf-8" />
+    @* Cấu hình Viewport giúp giao diện hiển thị co giãn chuẩn trên thiết bị di động *@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @* Tiêu đề trang động kết hợp giữa ViewBag.Title từ View con và tên hệ thống FoodieHub Admin *@
+    <title>@ViewBag.Title - FoodieHub Admin</title>
+
+    @* Nhúng thư viện Bootstrap 5 CSS từ CDN để dựng khung giao diện *@
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    @* Nhúng thư viện FontAwesome 6 cho các biểu tượng icon trang quản trị *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    @* Khối mã CSS tùy chỉnh bố cục trang Admin *@
+    <style>
+        /* Thiết lập font chữ nhỏ gọn và màu nền xám nhạt chung cho trang Admin */
+        body {
+            font-size: 0.9rem;
+            background-color: #f8f9fa;
+        }
+
+        /* Khung chứa toàn bộ trang Admin xếp theo dạng Flexbox nằm ngang */
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Thanh Menu bên trái (Sidebar) cố định chiều rộng 260px và màu nền tối */
+        .sidebar {
+            width: 260px;
+            background-color: #212529;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+            /* Định dạng màu sắc và khoảng cách padding cho từng thẻ Link điều hướng */
+            .sidebar .nav-link {
+                color: #adb5bd;
+                padding: 12px 20px;
+                transition: 0.2s;
+            }
+
+                /* Đổi màu nền đỏ cam khi rê chuột hoặc khi thẻ link đang được kích hoạt (Active) */
+                .sidebar .nav-link:hover, .sidebar .nav-link.active {
+                    color: #fff;
+                    background-color: #ff6b6b;
+                }
+
+        /* Vùng nội dung chính bên phải tự động dãn rộng lấp đầy khoảng trống */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Thanh Topbar phía trên cùng chứa thông tin tài khoản người dùng */
+        .topbar {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+        }
+
+        /* Thẻ chứa nội dung động truyền từ View con vào */
+        .content-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    @* Thẻ div bọc toàn bộ khung giao diện Admin *@
+    <div class="admin-wrapper">
+        @* BEGIN: Thanh điều hướng Sidebar bên trái *@
+        <nav class="sidebar d-flex flex-column p-3">
+            @* Tiêu đề bảng điều khiển Admin có biểu tượng chiếc thìa dĩa *@
+            <h4 class="text-white text-center py-3"><i class="fa-solid fa-utensils"></i> Admin Panel</h4>
+            @* Đường gạch ngang phân cách tiêu đề *@
+            <hr class="text-secondary">
+
+            @* Danh sách menu điều hướng các chức năng quản trị trong hệ thống *@
+            <ul class="nav nav-pills flex-column mb-auto">
+                @* Mục 1: Quản lý danh mục sản phẩm (Trỏ tới AdminCategory/Index) *@
+                <li class="nav-item mb-1">
+                    <a href="@Url.Action("Index", "AdminCategory")" class="nav-link">
+                        <i class="fa-solid fa-list me-2"></i> Quản lý danh mục
+                    </a>
+                </li>
+
+                @* Mục 2: Quản lý món ăn/hàng hóa (Trỏ tới AdminProduct/Index) *@
+                <li class="nav-item mb-1">
+                    <a href="@Url.Action("Index", "AdminProduct")" class="nav-link">
+                        <i class="fa-solid fa-burger me-2"></i> Quản lý hàng hóa
+                    </a>
+                </li>
+
+                @* Mục 3: Quản lý thống kê kho hàng tồn/cần nhập (Trỏ tới AdminWarehouse/Index) *@
+                <li class="nav-item mb-1">
+                    <a href="@Url.Action("Index", "AdminWarehouse")" class="nav-link">
+                        <i class="fa-solid fa-warehouse me-2"></i> Quản lý kho hàng
+                    </a>
+                </li>
+
+                @* Mục 4: Quản lý tài khoản quản trị viên (Trỏ tới AdminUser/Index) *@
+                <li class="nav-item mb-1">
+                    <a href="@Url.Action("Index", "AdminUser")" class="nav-link">
+                        <i class="fa-solid fa-user-shield me-2"></i> Quản lý người dùng Admin
+                    </a>
+                </li>
+
+                @* Mục 5: Quản lý danh sách khách hàng (Trỏ tới AdminCustomer/Index) *@
+                <li class="nav-item mb-1">
+                    <a href="@Url.Action("Index", "AdminCustomer")" class="nav-link">
+                        <i class="fa-solid fa-user-group me-2"></i> Quản lý khách hàng
+                    </a>
+                </li>
+
+                @* Mục 6: Quản lý đơn hàng dịch vụ (Trỏ tới AdminOrder/Index) *@
+                <li class="nav-item mb-1">
+                    <a href="@Url.Action("Index", "AdminOrder")" class="nav-link">
+                        <i class="fa-solid fa-receipt me-2"></i> Quản lý đơn hàng
+                    </a>
+                </li>
+            </ul>
+            @* END Khối danh sách menu điều hướng *@
+        </nav>
+        @* END: Sidebar *@
+
+        @* BEGIN: Vùng nội dung làm việc chính *@
+        <div class="main-content">
+            @* Topbar hiển thị góc trên bên phải *@
+            <header class="topbar">
+                @* Menu thả xuống chứa thông tin tài khoản Admin *@
+                <div class="dropdown">
+                    @* Nút kích hoạt Dropdown hiển thị tên người quản trị *@
+                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-circle-user fs-4 me-2"></i> <strong>Admin Hệ Thống</strong>
+                    </a>
+                    @* Danh sách tùy chọn tài khoản cá nhân *@
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" href="#">Hồ sơ cá nhân</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#">Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </header>
+
+            @* Thẻ div chứa nội dung động được render từ các View con *@
+            <div class="content-body">
+                @* Lệnh Razor nhúng toàn bộ giao diện HTML của các View Admin con *@
+                @RenderBody()
+            </div>
+        </div>
+        @* END: Main Content *@
+    </div>
+
+    @* Nhúng file JavaScript của Bootstrap 5 để xử lý sự kiện tương tác (Dropdown, Modal, Alert) *@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @* Khai báo Section Script cho phép các View con nạp thêm file JavaScript riêng nếu cần *@
+    @RenderSection("scripts", required: false)
+</body>
+</html>

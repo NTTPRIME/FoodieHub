@@ -1,0 +1,104 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là đối tượng Order *@
+@model FoodieHub.Web.Models.Order
+
+@{
+    @* Thiết lập tiêu đề hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Chi tiết đơn hàng #" + (Model != null ? Model.OrderID.ToString() : "");
+    @* Chỉ định khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung bọc toàn bộ giao diện chi tiết đơn hàng *@
+<div class="container-fluid mt-3">
+    @* Khung chứa tiêu đề trang và các nút thao tác in hóa đơn/quay lại *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        @* Tiêu đề chi tiết đơn hàng kèm Mã đơn *@
+        <h2 class="fw-bold text-dark m-0">
+            @* Biểu tượng tờ hóa đơn *@
+            <i class="fa-solid fa-file-invoice text-info me-2"></i>Chi Tiết Đơn Hàng #@Model.OrderID
+        </h2>
+        @* Khung nhóm các nút thao tác *@
+        <div>
+            @* Nút gọi hàm in hóa đơn trực tiếp của trình duyệt *@
+            <button type="button" class="btn btn-danger me-2 shadow-sm" onclick="window.print();">
+                @* Biểu tượng máy in *@
+                <i class="fa-solid fa-print me-1"></i> In Hóa Đơn
+            </button>
+            @* Nút chuyển hướng quay về trang danh sách đơn hàng *@
+            <a href="@Url.Action("Index", "AdminOrder")" class="btn btn-secondary shadow-sm">
+                @* Biểu tượng mũi tên quay lại *@
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    @* Thẻ Card Bootstrap chứa thông tin khách hàng và thông tin đơn hàng *@
+    <div class="card shadow-sm border-0 mb-4">
+        @* Đầu thẻ Card ghi thông tin chung đơn hàng *@
+        <div class="card-header bg-dark text-white fw-bold">
+            @* Biểu tượng thông tin người dùng *@
+            <i class="fa-solid fa-circle-info me-2"></i>Thông Tin Khách Hàng & Đơn Hàng
+        </div>
+        @* Thân thẻ Card chứa bảng lưới thông tin chi tiết *@
+        <div class="card-body p-4">
+            @* Khung dòng định dạng lưới Grid *@
+            <div class="row g-3">
+                @* Cột 1: Mã đơn hàng *@
+                <div class="col-md-4">
+                    @* Thẻ ghi chú tiêu đề Mã đơn hàng *@
+                    <strong class="text-muted d-block">Mã đơn hàng:</strong>
+                    @* Thẻ hiển thị giá trị Mã đơn hàng *@
+                    <span class="fw-bold text-dark fs-5">#@Model.OrderID</span>
+                </div>
+                @* Cột 2: Tên khách hàng *@
+                <div class="col-md-4">
+                    @* Thẻ ghi chú tiêu đề Khách hàng *@
+                    <strong class="text-muted d-block">Tên khách hàng:</strong>
+                    @* Thẻ hiển thị Họ tên khách hàng *@
+                    <span class="fw-bold text-primary fs-6">
+                        @(Model.User != null ? Model.User.FullName : (!string.IsNullOrEmpty(Model.CustomerName) ? Model.CustomerName : "Khách vãng lai"))
+                    </span>
+                </div>
+                @* Cột 3: Thời gian đặt hàng *@
+                <div class="col-md-4">
+                    @* Thẻ ghi chú tiêu đề Thời gian đặt *@
+                    <strong class="text-muted d-block">Thời gian đặt hàng:</strong>
+                    @* Thẻ hiển thị ngày giờ đặt hàng *@
+                    <span class="fw-semibold text-dark">
+                        @(Model.OrderDate.HasValue ? Model.OrderDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "N/A")
+                    </span>
+                </div>
+                @* Cột 4: Địa chỉ giao hàng *@
+                <div class="col-md-8">
+                    @* Thẻ ghi chú tiêu đề Địa chỉ giao *@
+                    <strong class="text-muted d-block">Địa chỉ giao hàng:</strong>
+                    @* Thẻ hiển thị địa chỉ nhận hàng *@
+                    <span class="fw-semibold text-dark">
+                        @(!string.IsNullOrEmpty(Model.Address) ? Model.Address : "Giao trực tiếp tại cửa hàng")
+                    </span>
+                </div>
+                @* Cột 5: Tổng trị giá đơn hàng *@
+                <div class="col-md-4">
+                    @* Thẻ ghi chú tiêu đề Tổng tiền *@
+                    <strong class="text-muted d-block">Tổng trị giá đơn hàng:</strong>
+                    @* Thẻ hiển thị giá trị tổng tiền in đỏ đậm *@
+                    <span class="fw-bold text-danger fs-5">@Model.TotalAmount.ToString("N0") VNĐ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Thẻ Card Bootstrap chứa giao diện Hóa đơn chi tiết các món ăn *@
+    <div class="card shadow-sm border-0 mb-4">
+        @* Đầu thẻ Card ghi nhãn Chi tiết danh mục món *@
+        <div class="card-header bg-danger text-white fw-bold">
+            @* Biểu tượng danh sách món *@
+            <i class="fa-solid fa-utensils me-2"></i>Chi Tiết Các Món Ăn Trong Đơn Hàng
+        </div>
+        @* Thân thẻ Card chứa Partial View Hóa đơn chi tiết *@
+        <div class="card-body p-4">
+            @* Gọi nhúng Partial View _OrderDetail.cshtml theo Barem Dòng 25 để hiển thị hóa đơn mua hàng *@
+            @Html.Partial("_OrderDetail", Model.OrderDetails)
+        </div>
+    </div>
+</div>

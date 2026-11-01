@@ -1,0 +1,134 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là danh sách các sản phẩm Product *@
+@model IEnumerable<FoodieHub.Web.Models.Product>
+
+@{
+    @* Thiết lập tiêu đề hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Quản lý hàng hóa";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung bọc toàn bộ giao diện quản lý hàng hóa *@
+<div class="container-fluid mt-3">
+    @* Khung chứa tiêu đề trang và nút thêm mới sản phẩm *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        @* Tiêu đề chính của phân hệ Quản lý hàng hóa *@
+        <h2 class="fw-bold text-dark m-0">
+            @* Biểu tượng sản phẩm món ăn *@
+            <i class="fa-solid fa-burger text-danger me-2"></i>Quản Lý Hàng Hóa (Món Ăn)
+        </h2>
+        @* Nút chuyển hướng sang trang tạo mới món ăn Create *@
+        <a href="@Url.Action("Create", "AdminProduct")" class="btn btn-danger shadow-sm fw-bold">
+            @* Biểu tượng dấu cộng thêm mới *@
+            <i class="fa-solid fa-plus me-1"></i> Thêm Món Ăn Mới
+        </a>
+    </div>
+
+    @* Thẻ Card Bootstrap chứa bảng danh sách món ăn *@
+    <div class="card shadow-sm border-0">
+        @* Thân thẻ Card chứa bảng dữ liệu *@
+        <div class="card-body p-3">
+            @* Khung chứa bảng dữ liệu có hỗ trợ cuộn ngang *@
+            <div class="table-responsive">
+                @* Thẻ bảng Bootstrap hiển thị danh sách sản phẩm với 5 cột chính theo Barem Dòng 13 *@
+                <table class="table table-hover table-bordered align-middle mb-0">
+                    @* Đầu bảng chứa danh sách tên các cột tiêu đề *@
+                    <thead class="table-dark">
+                        @* Dòng tiêu đề cột *@
+                        <tr>
+                            @* Cột 1: Hình ảnh sản phẩm *@
+                            <th class="text-center" style="width: 90px;">Hình Ảnh</th>
+                            @* Cột 2: Tên món ăn *@
+                            <th>Tên Món Ăn</th>
+                            @* Cột 3: Danh mục / Chủng loại món ăn *@
+                            <th>Danh Mục</th>
+                            @* Cột 4: Giá bán món ăn *@
+                            <th class="text-end" style="width: 140px;">Giá Bán</th>
+                            @* Cột 5: Số lượng tồn kho *@
+                            <th class="text-center" style="width: 120px;">Số Lượng Tồn</th>
+                            @* Cột Thao tác quản trị *@
+                            <th class="text-center" style="width: 220px;">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    @* Thân bảng duyệt hiển thị dữ liệu động từng món ăn *@
+                    <tbody>
+                        @* Kiểm tra xem danh sách sản phẩm từ CSDL có chứa dữ liệu hay không *@
+                        @if (Model != null && Model.Any())
+                        {
+                            @* Vòng lặp duyệt qua từng đối tượng sản phẩm trong Model *@
+                            foreach (var item in Model)
+                            {
+                                @* Dòng chứa dữ liệu của 1 sản phẩm *@
+                                <tr>
+                                    @* Ô 1: Hiển thị hình ảnh thu nhỏ của món ăn *@
+                                    <td class="text-center">
+                                        @* Kiểm tra nếu sản phẩm có đường dẫn ảnh hợp lệ *@
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            @* Thẻ hiển thị ảnh đại diện sản phẩm bo góc *@
+                                            <img src="@Url.Content(item.ImageUrl)" alt="@item.ProductName" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            @* Thẻ hiển thị ảnh mặc định nếu sản phẩm chưa có ảnh *@
+                                            <img src="https://via.placeholder.com/50?text=No+Img" alt="No image" class="rounded" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        }
+                                    </td>
+                                    @* Ô 2: Hiển thị tên món ăn in đậm *@
+                                    <td class="fw-bold text-dark">@item.ProductName</td>
+                                    @* Ô 3: Hiển thị tên danh mục liên kết của sản phẩm *@
+                                    <td>
+                                        @* Nhãn badge thể hiện tên danh mục món ăn *@
+                                        <span class="badge bg-secondary">@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</span>
+                                    </td>
+                                    @* Ô 4: Hiển thị giá bán sản phẩm định dạng phân cách hàng nghìn *@
+                                    <td class="text-end text-danger fw-bold fs-6">@item.Price.ToString("N0") VNĐ</td>
+                                    @* Ô 5: Hiển thị số lượng tồn kho của món ăn *@
+                                    <td class="text-center">
+                                        @* Kiểm tra nếu còn tồn kho thì hiện màu xanh, hết hàng hiện màu đỏ *@
+                                        @if (item.Stock > 0)
+                                        {
+                                            @* Thẻ badge xanh lá hiển thị số lượng tồn *@
+                                            <span class="badge bg-success">@item.Stock món</span>
+                                        }
+                                        else
+                                        {
+                                            @* Thẻ badge đỏ báo hết hàng *@
+                                            <span class="badge bg-danger">Hết hàng (0)</span>
+                                        }
+                                    </td>
+                                    @* Ô 6: Nhóm các nút thao tác Chi tiết, Sửa, Xóa *@
+                                    <td class="text-center">
+                                        @* Nút xem chi tiết sản phẩm *@
+                                        <a href="@Url.Action("Details", "AdminProduct", new { id = item.ProductID })" class="btn btn-sm btn-info text-white me-1" title="Chi tiết">
+                                            @* Icon mắt xem chi tiết *@
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        @* Nút chỉnh sửa thông tin sản phẩm *@
+                                        <a href="@Url.Action("Edit", "AdminProduct", new { id = item.ProductID })" class="btn btn-sm btn-warning text-white me-1" title="Chỉnh sửa">
+                                            @* Icon bút chỉnh sửa *@
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        @* Nút xác nhận xóa sản phẩm *@
+                                        <a href="@Url.Action("Delete", "AdminProduct", new { id = item.ProductID })" class="btn btn-sm btn-danger" title="Xóa">
+                                            @* Icon thùng rác xóa *@
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            @* Dòng hiển thị thông báo rỗng khi cơ sở dữ liệu chưa có sản phẩm nào *@
+                            <tr>
+                                @* Ô gộp 6 cột hiển thị dòng chữ thông báo *@
+                                <td colspan="6" class="text-center text-muted py-4">Chưa có món ăn nào trong cơ sở dữ liệu.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

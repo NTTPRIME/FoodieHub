@@ -1,0 +1,110 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là danh sách các danh mục Category *@
+@model IEnumerable<FoodieHub.Web.Models.Category>
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thanh tab trình duyệt *@
+    ViewBag.Title = "Quản lý danh mục món ăn";
+    @* Chỉ định khung giao diện chung của trang quản trị *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@* Thẻ container bọc toàn bộ nội dung trang quản lý danh mục *@
+<div class="container-fluid py-4">
+    @* Khung tiêu đề trang và nút thêm mới danh mục *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        @* Tiêu đề chính của trang quản lý danh mục món ăn *@
+        <h2 class="fw-bold text-dark m-0">
+            @* Biểu tượng thẻ danh mục món ăn *@
+            <i class="fa-solid fa-list text-primary me-2"></i>QUẢN LÝ DANH MỤC MÓN ĂN
+        </h2>
+        @* Nút chuyển hướng sang trang tạo mới danh mục *@
+        <a href="@Url.Action("Create", "AdminCategory")" class="btn btn-primary fw-bold shadow-sm">
+            @* Biểu tượng dấu cộng thêm mới *@
+            <i class="fa-solid fa-plus me-1"></i> Thêm Danh Mục Mới
+        </a>
+    </div>
+
+    @* Khung Card bọc bảng danh sách danh mục *@
+    <div class="card shadow border-0 rounded-3">
+        @* Thân thẻ Card chứa bảng dữ liệu *@
+        <div class="card-body p-0">
+            @* Thẻ bảng hiển thị danh sách danh mục món ăn *@
+            <div class="table-responsive">
+                @* Bảng Bootstrap hỗ trợ hiệu ứng hover và căn giữa hàng *@
+                <table class="table table-hover align-middle mb-0">
+                    @* Đầu bảng chứa các tiêu đề cột *@
+                    <thead class="table-dark">
+                        @* Hàng tiêu đề các cột *@
+                        <tr>
+                            @* Cột hiển thị Mã danh mục *@
+                            <th style="width: 120px;" class="ps-3">Mã số</th>
+                            @* Cột hiển thị Tên danh mục món ăn *@
+                            <th>Tên Danh Mục</th>
+                            @* Cột hiển thị Tổng số lượng sản phẩm (Barem Dòng 13) *@
+                            <th style="width: 200px;" class="text-center">Số Món Ăn</th>
+                            @* Cột chứa các nút chức năng thao tác *@
+                            <th style="width: 250px;" class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    @* Thân bảng duyệt đổ dữ liệu danh mục *@
+                    <tbody>
+                        @* Kiểm tra xem danh sách Model truyền sang có dữ liệu hay không *@
+                        @if (Model != null && Model.Any())
+                        {
+                            @* Vòng lặp duyệt qua từng đối tượng Category trong Model *@
+                            foreach (var item in Model)
+                            {
+                                @* Dòng chứa thông tin của một danh mục món ăn *@
+                                <tr>
+                                    @* Mã định danh của danh mục *@
+                                    <td class="ps-3 fw-bold text-secondary">#@item.CategoryID</td>
+                                    @* Tên danh mục món ăn hiển thị màu xanh in đậm *@
+                                    <td class="fw-bold text-primary fs-6">@item.CategoryName</td>
+                                    @* Hiển thị tổng số lượng hàng hóa thuộc danh mục (Barem Dòng 13) *@
+                                    <td class="text-center">
+                                        @* Thẻ badge xanh dương đếm số món ăn từ tập hợp Products *@
+                                        <span class="badge bg-info text-dark px-3 py-2 fs-6">
+                                            @* Biểu tượng món ăn *@
+                                            <i class="fa-solid fa-utensils me-1"></i>
+                                            @* Đếm số lượng sản phẩm liên kết *@
+                                            @(item.Products != null ? item.Products.Count : 0) món
+                                        </span>
+                                    </td>
+                                    @* Khu vực chứa các nút chức năng xem chi tiết, sửa và xóa *@
+                                    <td class="text-center">
+                                        @* Nút chuyển hướng tới trang Chi tiết danh mục và sản phẩm liên quan (Barem Dòng 10) *@
+                                        <a href="@Url.Action("Details", "AdminCategory", new { id = item.CategoryID })" class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết">
+                                            @* Biểu tượng con mắt *@
+                                            <i class="fa-solid fa-eye me-1"></i> Chi tiết
+                                        </a>
+                                        @* Nút chuyển hướng tới trang Chỉnh sửa danh mục *@
+                                        <a href="@Url.Action("Edit", "AdminCategory", new { id = item.CategoryID })" class="btn btn-sm btn-warning text-white me-1" title="Chỉnh sửa">
+                                            @* Biểu tượng cây bút *@
+                                            <i class="fa-solid fa-pen-to-square me-1"></i> Sửa
+                                        </a>
+                                        @* Nút chuyển hướng tới trang Xác nhận xóa danh mục *@
+                                        <a href="@Url.Action("Delete", "AdminCategory", new { id = item.CategoryID })" class="btn btn-sm btn-danger" title="Xóa danh mục">
+                                            @* Biểu tượng thùng rác *@
+                                            <i class="fa-solid fa-trash me-1"></i> Xóa
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            @* Hàng thông báo khi chưa có danh mục nào trong CSDL *@
+                            <tr>
+                                @* Gộp 4 cột hiển thị thông báo rỗng *@
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    @* Biểu tượng hộp rỗng *@
+                                    <i class="fa-solid fa-folder-open fs-3 d-block mb-2"></i>
+                                    @* Câu chữ thông báo rỗng *@
+                                    Chưa có danh mục món ăn nào trong hệ thống.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

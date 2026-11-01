@@ -1,0 +1,113 @@
+﻿/* =========================================================
+   LỘT XÁC GIAO DIỆN FOODIEHUB - CHÚ THÍCH CHI TIẾT TỪNG DÒNG
+   ========================================================= */
+
+/* Định dạng cấu trúc nền tảng cho toàn bộ trang web */
+body {
+    /* Đẩy phần nội dung xuống 60px để không bị thanh menu trên cùng đè lên */
+    padding-top: 60px;
+    /* Dùng phông chữ hiện đại, mượt mà không chân */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    /* Đổi màu nền từ trắng toát sang xám nhạt để làm nổi bật các thẻ món ăn */
+    background-color: #f4f7f6;
+    /* Màu chữ xám đen dễ đọc, không gắt mắt */
+    color: #2b2b2b;
+}
+
+/* Định dạng căn lề và giới hạn độ rộng cho vùng chứa nội dung chính */
+.body-content {
+    /* Khoảng cách bên trong: trên/dưới 20px, trái/phải 15px */
+    padding: 20px 15px;
+    /* Giới hạn chiều rộng tối đa không vượt quá 1200px trên màn hình to */
+    max-width: 1200px;
+    /* Căn giữa màn hình hoàn toàn */
+    margin: 0 auto;
+}
+
+/* =========================================================
+   THIẾT KẾ KHUNG MÓN ĂN (CARD) ĐẸP NHƯ APP ĐẶT ĐỒ ĂN
+   ========================================================= */
+.card {
+    /* Xóa bỏ đường viền đen mặc định xấu xí của Bootstrap */
+    border: none;
+    /* Bo cong các góc thẻ card 15px cho mềm mại */
+    border-radius: 15px;
+    /* Đổ bóng xám nhẹ tạo cảm giác thẻ đang nổi khối 3D trên nền web */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    /* Tạo độ trễ 0.3s khi có thay đổi (dùng cho hiệu ứng hover ở dưới) */
+    transition: all 0.3s ease;
+    /* Nền thẻ màu trắng tinh */
+    background: #ffffff;
+    /* Giấu đi những phần ảnh hoặc nội dung chọc ra ngoài khu vực bo tròn */
+    overflow: hidden;
+}
+
+    /* Hiệu ứng khi người dùng di chuột (hover) vào thẻ món ăn */
+    .card:hover {
+        /* Đẩy thẻ nảy lên trên 8 pixel */
+        transform: translateY(-8px);
+        /* Chuyển màu bóng đổ sang tone cam/đỏ mờ để gây sự chú ý */
+        box-shadow: 0 12px 25px rgba(220, 53, 69, 0.15);
+    }
+
+/* Ép khung hình ảnh món ăn để không bị khổng lồ hoặc méo mó */
+.card-img-top {
+    /* Bắt buộc ảnh trải rộng 100% theo chiều ngang của khung */
+    width: 100%;
+    /* Ép chết chiều cao ảnh đúng 200px, không cho phép ảnh thò thụt cao thấp */
+    height: 200px;
+    /* Cắt tỷ lệ ảnh tự động cho vừa khung 100%x200px mà KHÔNG BỊ MÉO */
+    object-fit: cover;
+}
+
+/* Định dạng Tên món ăn */
+.card-title {
+    /* In đậm tên món */
+    font-weight: 700;
+    /* Cỡ chữ to hơn bình thường 1 chút */
+    font-size: 1.15rem;
+    color: #333;
+    /* Nếu tên món quá dài (2 dòng), sẽ tự động cắt và hiện dấu "..." ở cuối */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Định dạng chữ hiển thị Giá tiền */
+.price-text {
+    /* Màu cam đỏ đặc trưng của ngành F&B (GrabFood/ShopeeFood) */
+    color: #e63946;
+    /* In đậm mạnh nhất */
+    font-weight: 800;
+    /* Phóng to cỡ chữ giá tiền */
+    font-size: 1.25rem;
+}
+
+/* =========================================================
+   THIẾT KẾ NÚT BẤM (BUTTONS) - NÚT ĐẶT MÓN
+   ========================================================= */
+/* Thay đổi toàn bộ nút đỏ (btn-danger) và xanh (btn-primary) */
+.btn-danger, .btn-primary {
+    /* Đổ màu dốc (Gradient) từ cam nhạt sang cam đậm */
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    /* Bỏ viền nút */
+    border: none;
+    /* Bo tròn hoàn toàn 2 đầu nút như viên thuốc */
+    border-radius: 25px;
+    /* Tăng khoảng trống bên trong nút để nhìn nút mập mạp, dễ bấm hơn */
+    padding: 8px 20px;
+    /* In đậm chữ trong nút */
+    font-weight: 600;
+    /* Tự động viết hoa toàn bộ chữ trong nút (VD: ĐẶT MÓN) */
+    text-transform: uppercase;
+    /* Tạo hiệu ứng mượt khi di chuột */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    /* Hiệu ứng khi di chuột vào nút */
+    .btn-danger:hover, .btn-primary:hover {
+        /* Phóng to nút lên 5% */
+        transform: scale(1.05);
+        /* Đổ bóng màu cam cho nút phát sáng nhẹ */
+        box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+    }
