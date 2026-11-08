@@ -1,0 +1,91 @@
+﻿@{
+    @* Thiết lập tiêu đề trang hiển thị trên trình duyệt *@
+    ViewBag.Title = "Giới Thiệu Thương Hiệu - FoodieHub";
+    @* Kế thừa khung giao diện chung _MasterLayout.cshtml *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+@* Vùng chứa nội dung trang giới thiệu *@
+<div class="container my-5">
+    @* Khung banner tiêu đề trang giới thiệu *@
+    <div class="text-center mb-5">
+        @* Tiêu đề trang in đậm màu cam đỏ *@
+        <h2 class="fw-bold text-danger text-uppercase mb-2">Về Chúng Tôi - FoodieHub</h2>
+        @* Dòng thông điệp dẫn dắt *@
+        <p class="text-muted fs-5">Kết nối niềm đam mê ẩm thực Việt từ những món ăn ngon nhất</p>
+        @* Đường gạch chân trang trí *@
+        <hr class="w-25 mx-auto text-danger" style="height: 3px; opacity: 1;">
+    </div>
+
+    @* Khung bố cục chia 2 cột giới thiệu thương hiệu *@
+    <div class="row align-items-center g-5 mb-5">
+        @* Cột hình ảnh minh họa thương hiệu *@
+        <div class="col-md-6">
+            @* Thẻ card bo cong đổ bóng chứa hình ảnh *@
+            <div class="card border-0 shadow rounded-4 overflow-hidden">
+                @* Thẻ ảnh minh họa món ăn ngon chất lượng *@
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+                     class="img-fluid w-100" alt="Không gian FoodieHub" style="max-height: 380px; object-fit: cover;">
+            </div>
+        </div>
+
+        @* Cột thông tin bài viết sứ mệnh FoodieHub *@
+        <div class="col-md-6">
+            @* Tiêu đề câu chuyện thương hiệu *@
+            <h3 class="fw-bold text-dark mb-3">Sứ Mệnh Của FoodieHub</h3>
+            @* Đoạn văn bản 1 giới thiệu hoàn cảnh thành lập *@
+            <p class="text-secondary lh-lg">
+                Được thành lập với mục tiêu mang đến cho khách hàng trải nghiệm đặt món ăn nhanh chóng, tiện lợi và an toàn nhất,
+                <strong>FoodieHub</strong> tự hào là cầu nối giữa hàng ngàn quán ăn uy tín và thực khách trên toàn thành phố.
+            </p>
+            @* Đoạn văn bản 2 cam kết chất lượng *@
+            <p class="text-secondary lh-lg">
+                Chúng tôi không chỉ giao đồ ăn, chúng tôi mang đến niềm vui trong từng bữa ăn gia đình, sự tiện lợi cho giới văn phòng
+                và sự phục vụ tận tâm tuyệt đối.
+            </p>
+
+            @* Danh sách điểm mạnh cốt lõi *@
+            <ul class="list-unstyled mt-4">
+                @* Ý 1: Thực đơn phong phú *@
+                <li class="mb-2 d-flex align-items-center">
+                    <i class="fas fa-check-circle text-danger me-2 fs-5"></i>
+                    <span>Thực đơn đa dạng từ Cơm tấm, Trà sữa, Bún/Phở đến Đồ ăn vặt.</span>
+                </li>
+                @* Ý 2: Quy trình giao hàng nhanh *@
+                <li class="mb-2 d-flex align-items-center">
+                    <i class="fas fa-check-circle text-danger me-2 fs-5"></i>
+                    <span>Đối tác giao hàng chuyên nghiệp, giữ trọn độ nóng sốt của món ăn.</span>
+                </li>
+                @* Ý 3: Đảm bảo vệ sinh *@
+                <li class="mb-2 d-flex align-items-center">
+                    <i class="fas fa-check-circle text-danger me-2 fs-5"></i>
+                    <span>Đối tác nhà hàng được thẩm định kỹ lưỡng về an toàn vệ sinh.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    @* Khung thông số ấn tượng của FoodieHub *@
+    <div class="row text-center g-4 py-4 bg-light rounded-4 border shadow-sm">
+        @* Thống kê 1: Món ăn phục vụ *@
+        <div class="col-md-3 col-6">
+            <h2 class="fw-bold text-danger m-0">5,000+</h2>
+            <span class="text-muted small">Món ăn ngon mỗi ngày</span>
+        </div>
+        @* Thống kê 2: Khách hàng hài lòng *@
+        <div class="col-md-3 col-6">
+            <h2 class="fw-bold text-danger m-0">50,000+</h2>
+            <span class="text-muted small">Khách hàng tin tưởng</span>
+        </div>
+        @* Thống kê 3: Đơn hàng giao thành công *@
+        <div class="col-md-3 col-6">
+            <h2 class="fw-bold text-danger m-0">100,000+</h2>
+            <span class="text-muted small">Đơn hàng hoàn tất</span>
+        </div>
+        @* Thống kê 4: Tỷ lệ đánh giá 5 sao *@
+        <div class="col-md-3 col-6">
+            <h2 class="fw-bold text-danger m-0">99%</h2>
+            <span class="text-muted small">Đánh giá hài lòng 5★</span>
+        </div>
+    </div>
+</div>

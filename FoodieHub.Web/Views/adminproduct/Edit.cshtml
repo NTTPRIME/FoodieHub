@@ -1,0 +1,147 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là đối tượng sản phẩm Product *@
+@model FoodieHub.Web.Models.Product
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Chỉnh sửa món ăn";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung bọc toàn bộ giao diện chỉnh sửa sản phẩm *@
+<div class="container-fluid mt-3">
+    @* Tiêu đề trang chỉnh sửa thông tin món ăn *@
+    <h2 class="fw-bold text-dark mb-4">
+        @* Biểu tượng cây bút chỉnh sửa *@
+        <i class="fa-solid fa-pen-to-square text-warning me-2"></i>Chỉnh Sửa Món Ăn
+    </h2>
+
+    @* Mở Form HTML Helper hỗ trợ Upload File (enctype = multipart/form-data) gửi về Action Edit (Barem Dòng 15, 16) *@
+    @using (Html.BeginForm("Edit", "AdminProduct", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @* Tạo mã xác thực chống tấn công giả mạo yêu cầu chéo trang (CSRF Token) *@
+        @Html.AntiForgeryToken()
+
+        @* Trường ẩn lưu giữ khóa chính ProductID của sản phẩm *@
+        @Html.HiddenFor(model => model.ProductID)
+
+        @* Trường ẩn lưu giữ đường dẫn hình ảnh cũ nếu người dùng không chọn ảnh mới *@
+        <input type="hidden" name="OldImageUrl" value="@Model.ImageUrl" />
+
+        @* Thẻ Card Bootstrap tạo khung bao quanh form nhập liệu *@
+        <div class="card shadow-sm border-0 p-4">
+            @* Hiển thị tổng hợp các thông báo lỗi Validation nếu dữ liệu không hợp lệ *@
+            @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3 fw-bold" })
+
+            @* Khung nhập liệu Tên món ăn *@
+            <div class="mb-3">
+                @* Nhãn hiển thị tên trường Tên món ăn theo Data Annotation ở Metadata *@
+                @Html.LabelFor(model => model.ProductName, new { @class = "form-label fw-bold" })
+                @* Ô nhập liệu văn bản chứa Tên món ăn hiện tại *@
+                @Html.TextBoxFor(model => model.ProductName, new { @class = "form-control", placeholder = "Nhập tên món ăn..." })
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ riêng cho thuộc tính ProductName *@
+                @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger small" })
+            </div>
+
+            @* Khung chọn Danh mục món ăn *@
+            <div class="mb-3">
+                @* Nhãn hiển thị tên trường Danh mục món ăn *@
+                @Html.LabelFor(model => model.CategoryID, new { @class = "form-label fw-bold" })
+                @* DropdownList chọn danh mục từ ViewBag.CategoryID *@
+                @Html.DropDownList("CategoryID", null, "-- Chọn danh mục món ăn --", new { @class = "form-select" })
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ riêng cho thuộc tính CategoryID *@
+                @Html.ValidationMessageFor(model => model.CategoryID, "", new { @class = "text-danger small" })
+            </div>
+
+            @* Khung nhập liệu Giá bán *@
+            <div class="mb-3">
+                @* Nhãn hiển thị tên trường Giá bán *@
+                @Html.LabelFor(model => model.Price, new { @class = "form-label fw-bold" })
+                @* Ô nhập liệu kiểu số cho Giá bán món ăn *@
+                @Html.TextBoxFor(model => model.Price, new { @class = "form-control", type = "number", min = "0", placeholder = "Nhập giá bán..." })
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ riêng cho thuộc tính Price *@
+                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger small" })
+            </div>
+
+            @* Khung nhập liệu Số lượng tồn kho *@
+            <div class="mb-3">
+                @* Nhãn hiển thị tên trường Số lượng tồn kho *@
+                @Html.LabelFor(model => model.Stock, new { @class = "form-label fw-bold" })
+                @* Ô nhập liệu kiểu số cho Số lượng tồn kho *@
+                @Html.TextBoxFor(model => model.Stock, new { @class = "form-control", type = "number", min = "0", placeholder = "Nhập số lượng tồn kho..." })
+                @* Hiển thị dòng tin nhắn báo lỗi đỏ riêng cho thuộc tính Stock *@
+                @Html.ValidationMessageFor(model => model.Stock, "", new { @class = "text-danger small" })
+            </div>
+
+            @* Khung hiển thị ảnh đại diện hiện tại và chọn file tải lên ảnh mới (Barem Dòng 16) *@
+            <div class="mb-3">
+                @* Nhãn tiêu đề khu vực ảnh sản phẩm *@
+                <label class="form-label fw-bold">Hình ảnh sản phẩm hiện tại & Đổi ảnh mới</label>
+
+                @* Kiểm tra xem sản phẩm hiện tại đã có đường dẫn hình ảnh chưa *@
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    @* Khung chứa ảnh hiện tại của sản phẩm *@
+                    <div class="mb-2">
+                        @* Thẻ ảnh xem trước hình ảnh hiện tại *@
+                        <img id="currentImage" src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" class="rounded border shadow-sm" style="max-height: 150px; object-fit: cover;" />
+                        @* Dòng ghi chú báo tên ảnh hiện tại *@
+                        <small class="text-muted d-block mt-1">Ảnh hiện tại đang sử dụng</small>
+                    </div>
+                }
+
+                @* Thẻ input cho phép chọn tệp tin hình ảnh mới từ máy tính *@
+                <input type="file" name="ImageFile" id="imageInput" class="form-control" accept="image/*" />
+                @* Chú thích nhắc nhở người dùng giữ nguyên ảnh nếu để trống *@
+                <small class="text-muted">Để trống nếu không muốn thay đổi hình ảnh hiện tại.</small>
+            </div>
+
+            @* Khung xem trước hình ảnh mới khi người dùng chọn tệp tin mới (Image Preview JS) *@
+            <div class="mb-3 text-center">
+                @* Thẻ img hiển thị ảnh xem trước mới, ẩn mặc định bằng d-none *@
+                <img id="imagePreview" src="#" alt="Xem trước ảnh mới" class="rounded border shadow-sm d-none" style="max-height: 180px; object-fit: cover;" />
+            </div>
+
+            @* Khung chứa các nút bấm hành động Cập nhật hoặc Hủy *@
+            <div class="mt-4 pt-2 border-top">
+                @* Nút submit gửi lệnh cập nhật dữ liệu sản phẩm *@
+                <button type="submit" class="btn btn-warning fw-bold text-white me-2 px-4">
+                    @* Biểu tượng lưu chỉnh sửa *@
+                    <i class="fa-solid fa-check me-1"></i> Cập Nhật Thay Đổi
+                </button>
+                @* Nút chuyển hướng quay về lại trang danh sách món ăn *@
+                <a href="@Url.Action("Index", "AdminProduct")" class="btn btn-secondary px-4">
+                    Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@* Khai báo phần kịch bản JavaScript xử lý xem trước ảnh khi chọn file mới *@
+@section scripts {
+    <script>
+        // Lắng nghe sự kiện tài liệu DOM hoàn tất tải
+        $(document).ready(function () {
+            // Đăng ký sự kiện thay đổi file trên #imageInput
+            $('#imageInput').change(function (event) {
+                // Lấy tệp tin đầu tiên từ danh sách tệp chọn
+                var file = event.target.files[0];
+                // Kiểm tra xem tệp tin có hợp lệ không
+                if (file) {
+                    // Tạo đối tượng đọc file
+                    var reader = new FileReader();
+                    // Đăng ký sự kiện khi đọc file xong
+                    reader.onload = function (e) {
+                        // Nạp đường dẫn dữ liệu ảnh vào src của thẻ #imagePreview
+                        $('#imagePreview').attr('src', e.target.result);
+                        // Hiển thị thẻ ảnh xem trước mới lên
+                        $('#imagePreview').removeClass('d-none');
+                    };
+                    // Tiến hành đọc file ảnh
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+}

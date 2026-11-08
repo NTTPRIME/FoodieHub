@@ -1,0 +1,89 @@
+﻿@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Đăng nhập";
+    @* Chỉ định sử dụng khung giao diện MasterLayout của khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+@* Thẻ div bọc ngoài căn giữa và giới hạn độ rộng form đăng nhập *@
+<div class="container my-5" style="max-width: 450px;">
+    @* Khung Card Bootstrap tạo hiệu ứng đổ bóng cho form *@
+    <div class="card shadow border-0 p-4">
+        @* Tiêu đề trang Đăng nhập hiển thị dạng chữ in đậm màu đỏ *@
+        <h2 class="text-center mb-4 text-danger fw-bold">ĐĂNG NHẬP</h2>
+        @* Kiểm tra nếu Controller có truyền thông báo lỗi qua ViewBag.Error *@
+        @if (ViewBag.Error != null)
+        {
+            @* Khung hiển thị thông báo lỗi màu đỏ nếu đăng nhập thất bại (Barem Dòng 54) *@
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                @* Biểu tượng hình tam giác chấm cảm cảnh báo *@
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                @* Đổ nội dung câu thông báo lỗi từ ViewBag.Error ra giao diện *@
+                @ViewBag.Error
+                @* Nút bấm góc phải cho phép tắt khung alert thông báo lỗi *@
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @* Tạo Form HTML Helper gửi dữ liệu phương thức POST về Action Login của AccountController *@
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            @* Khởi tạo mã Token chống tấn công giả mạo CSRF (Khắc phục triệt để lỗi 400 trong file txt) *@
+            @Html.AntiForgeryToken()
+            @* Nhóm ô nhập liệu Email tài khoản *@
+            <div class="mb-3">
+                @* Nhãn hiển thị tên trường Email tài khoản *@
+                <label class="form-label fw-semibold">Email tài khoản</label>
+                @* Ô nhập liệu kiểu Email bắt buộc nhập dữ liệu *@
+                <input type="email" name="email" class="form-control" required placeholder="Nhập địa chỉ email của bạn..." />
+            </div>
+            @* Nhóm ô nhập liệu Mật khẩu *@
+            <div class="mb-3">
+                @* Nhãn hiển thị tên trường Mật khẩu *@
+                <label class="form-label fw-semibold">Mật khẩu</label>
+                @* Khung nhóm ô nhập và nút bấm ẩn/hiện mật khẩu *@
+                <div class="input-group">
+                    @* Ô nhập mật khẩu kiểu Password bắt buộc nhập dữ liệu *@
+                    <input type="password" name="password" id="loginPassword" class="form-control" required placeholder="Nhập mật khẩu..." />
+                    @* Nút bấm biểu tượng con mắt để kích hoạt JavaScript ẩn/hiện mật khẩu *@
+                    <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword">
+                        @* Biểu tượng con mắt mở mặc định của FontAwesome *@
+                        <i class="fa-solid fa-eye" id="loginEyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            @* Nút submit thực hiện gửi dữ liệu đăng nhập *@
+            <button type="submit" class="btn btn-danger w-100 py-2 fw-bold mb-3 shadow-sm">
+                @* Biểu tượng cánh cửa đăng nhập *@
+                <i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP
+            </button>
+            @* Khung chứa liên kết chuyển hướng sang trang đăng ký *@
+            <div class="text-center mt-2">
+                @* Câu chữ hỏi người dùng đã có tài khoản chưa *@
+                <span class="text-muted">Chưa có tài khoản?</span>
+                @* Đường dẫn chuyển hướng về trang Đăng ký tài khoản *@
+                <a href="@Url.Action("Register", "Account")" class="text-danger text-decoration-none fw-semibold ms-1">Đăng ký ngay</a>
+            </div>
+        }
+    </div>
+</div>
+@* Khu vực nạp kịch bản JavaScript xử lý sự kiện cho trang *@
+@section scripts {
+    <script>
+        // Khai báo biến lấy phần tử nút bấm con mắt toggleLoginPassword
+        const toggleLoginBtn = document.getElementById('toggleLoginPassword');
+        // Khai báo biến lấy phần tử ô nhập mật khẩu loginPassword
+        const loginPassInput = document.getElementById('loginPassword');
+        // Khai báo biến lấy phần tử thẻ icon loginEyeIcon
+        const loginEyeIcon = document.getElementById('loginEyeIcon');
+        // Lắng nghe sự kiện click trên nút bấm con mắt trang đăng nhập
+        toggleLoginBtn.addEventListener('click', function () {
+            // Kiểm tra nếu type đang là password thì đổi sang text và ngược lại
+            const type = loginPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            // Gán lại thuộc tính type mới cho ô nhập mật khẩu
+            loginPassInput.setAttribute('type', type);
+            // Chuyển đổi trạng thái hiển thị class fa-eye của icon
+            loginEyeIcon.classList.toggle('fa-eye');
+            // Chuyển đổi trạng thái hiển thị class fa-eye-slash của icon
+            loginEyeIcon.classList.toggle('fa-eye-slash');
+        });
+    </script>
+}

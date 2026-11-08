@@ -1,0 +1,125 @@
+﻿@* Khai báo Model nhận vào View là danh sách các món ăn trong Giỏ hàng *@
+@model IEnumerable<FoodieHub.Web.Models.ViewModels.CartItem>
+
+@{
+    @* Thiết lập tiêu đề hiển thị trên trình duyệt *@
+    ViewBag.Title = "Xác Nhận & Thanh Toán Đơn Hàng";
+    @* Kế thừa khung giao diện chung MasterLayout dành cho Khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+    @* Khởi tạo biến tính tổng tiền của toàn bộ giỏ hàng *@
+    decimal totalAmount = Model != null ? Model.Sum(x => x.TotalPrice) : 0;
+    @* Lấy thông tin tài khoản đang đăng nhập từ Session nếu có *@
+    var currentUser = Session["User"] as FoodieHub.Web.Models.User;
+}
+
+@* Khung vùng chứa chính của trang thanh toán *@
+<div class="container my-5">
+    @* Tiêu đề trang xác nhận thanh toán *@
+    <h3 class="fw-bold mb-4 text-success">
+        <i class="fas fa-credit-card me-2"></i>Xác Nhận & Thanh Toán Đơn Hàng
+    </h3>
+
+    @* Sử dụng Form HTML gửi dữ liệu phương thức POST về Action ProcessOrder trong CheckoutController *@
+    @using (Html.BeginForm("ProcessOrder", "Checkout", FormMethod.Post, new { @id = "checkoutForm" }))
+    {
+        @* Tạo mã AntiForgeryToken bảo mật chống tấn công giả mạo CSRF *@
+        @Html.AntiForgeryToken()
+
+        @* Bố cục 2 cột Bootstrap *@
+        <div class="row g-4">
+            @* CỘT TRÁI: ĐIỀN THÔNG TIN GIAO HÀNG *@
+            <div class="col-md-7">
+                <div class="card p-4 border-0 shadow-sm rounded-3">
+                    <h5 class="fw-bold text-success mb-3 border-bottom pb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>Thông tin người nhận & Địa chỉ giao hàng
+                    </h5>
+
+                    @* Ô nhập Họ và tên người nhận *@
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Họ và tên người nhận (*)</label>
+                        @* Tên attribute "CustomerName" trùng khớp với tham số truyền vào Action ProcessOrder *@
+                        <input type="text" name="CustomerName" class="form-control"
+                               value="@(currentUser != null ? currentUser.FullName : "")"
+                               placeholder="Nhập họ và tên người nhận..." required />
+                    </div>
+
+                    @* Ô nhập Địa chỉ giao hàng chi tiết *@
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Địa chỉ nhận hàng chi tiết (*)</label>
+                        @* Tên attribute "Address" trùng khớp với tham số truyền vào Action ProcessOrder *@
+                        <textarea name="Address" class="form-control" rows="3"
+                                  placeholder="Nhập số nhà, tên đường, phường/xã, quận/huyện..." required></textarea>
+                    </div>
+
+                    @* Ghi chú bổ sung dành cho đơn hàng *@
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ghi chú giao hàng (Tùy chọn)</label>
+                        <input type="text" name="Note" class="form-control"
+                               placeholder="Ví dụ: Giao giờ hành chính, gọi điện trước khi giao 5 phút..." />
+                    </div>
+                </div>
+            </div>
+
+            @* CỘT PHẢI: XEM LẠI DANH SÁCH MÓN ĂN & NÚT XÁC NHẬN *@
+            <div class="col-md-5">
+                <div class="card p-4 border-0 shadow-sm rounded-3">
+                    <h5 class="fw-bold text-success mb-3 border-bottom pb-2">
+                        <i class="fas fa-utensils me-2"></i>Danh sách món ăn đã chọn
+                    </h5>
+
+                    @* Khung cuộn hiển thị từng món ăn trong giỏ *@
+                    <div class="cart-summary-list mb-3" style="max-height: 300px; overflow-y: auto;">
+                        @if (Model != null && Model.Any())
+                        {
+                            @* Vòng lặp duyệt qua từng món ăn trong giỏ hàng *@
+                            foreach (var item in Model)
+                            {
+                                <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                                    @* Ảnh đại diện món ăn *@
+                                    <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content(item.ImageUrl) : "https://via.placeholder.com/50")"
+                                         class="rounded me-3" alt="@item.ProductName" style="width: 50px; height: 50px; object-fit: cover;">
+
+                                    @* Tên món và Số lượng chọn mua *@
+                                    <div class="flex-grow-1">
+                                        <h6 class="m-0 fw-bold text-dark">@item.ProductName</h6>
+                                        <small class="text-muted">Đơn giá: @item.Price.ToString("N0")đ x @item.Quantity</small>
+                                    </div>
+
+                                    @* Thành tiền của từng dòng món ăn *@
+                                    <span class="fw-bold text-danger">@item.TotalPrice.ToString("N0")đ</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            @* Dòng thông báo khi giỏ hàng trống *@
+                            <p class="text-muted text-center py-3">Không có sản phẩm nào trong giỏ hàng.</p>
+                        }
+                    </div>
+
+                    @* Chọn phương thức thanh toán giao dịch *@
+                    <h6 class="fw-bold mb-2">Phương thức thanh toán</h6>
+                    <div class="form-check mb-2 p-3 border rounded bg-light">
+                        <input class="form-check-input ms-0 me-2" type="radio" name="paymentMethod" id="cod" value="COD" checked>
+                        <label class="form-check-label fw-bold" for="cod">
+                            <i class="fas fa-money-bill-wave text-success me-1"></i> Thanh toán khi nhận hàng (COD)
+                        </label>
+                    </div>
+
+                    <hr />
+
+                    @* Hiển thị Tổng thành tiền cần thanh toán *@
+                    <div class="d-flex justify-content-between mb-4 fs-5 fw-bold text-danger">
+                        <span>Tổng tiền thanh toán:</span>
+                        <span>@totalAmount.ToString("N0") VNĐ</span>
+                    </div>
+
+                    @* Nút Submit form gửi yêu cầu tạo đơn hàng và trừ tồn kho *@
+                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm py-2">
+                        <i class="fas fa-check-circle me-1"></i> XÁC NHẬN ĐẶT HÀNG
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

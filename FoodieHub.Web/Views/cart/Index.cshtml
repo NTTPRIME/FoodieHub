@@ -1,0 +1,196 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là danh sách các món trong giỏ hàng (CartItem) *@
+@model IEnumerable<FoodieHub.Web.Models.ViewModels.CartItem>
+
+@* Mở khối xử lý kịch bản C# Razor *@
+@{
+    @* Thiết lập tiêu đề trang web hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Giỏ hàng của bạn";
+    @* Chỉ định file MasterLayout chung cho giao diện khách hàng *@
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+    @* Tính tổng tiền tất cả món ăn trong giỏ, nếu giỏ rỗng thì gán mặc định bằng 0 *@
+    decimal totalAmount = Model != null && Model.Any() ? Model.Sum(x => x.TotalPrice) : 0;
+    @* Đóng khối xử lý kịch bản C# Razor *@
+}
+
+@* Thẻ div bọc toàn bộ nội dung trang giỏ hàng với các lớp Bootstrap căn lề *@
+<div class="container my-5">
+    @* Tiêu đề chính trang giỏ hàng kèm biểu tượng icon giỏ hàng FontAwesome *@
+    <h3 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-cart-shopping me-2"></i>Giỏ Hàng Của Bạn</h3>
+
+    @* Kiểm tra xem trong TempData có chứa thông báo lỗi (khác null) gửi từ Controller hay không *@
+    @* Kiểm tra xem trong TempData có chứa thông báo lỗi (khác null) gửi từ Controller hay không *@
+    @if (TempData["Error"] != null)
+    {
+        @* Thẻ div tạo khung thông báo màu đỏ (alert-danger), hỗ trợ nút đóng alert-dismissible *@
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @* Thẻ i hiển thị icon hình dấu chấm cảm cảnh báo của FontAwesome *@
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            @* In nội dung chuỗi văn bản thông báo lỗi thực tế từ biến TempData["Error"] *@
+            @TempData["Error"]
+            @* Thẻ button tạo nút bấm biểu tượng dấu X góc phải để tắt thông báo *@
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            @* Đóng thẻ div chứa khung thông báo alert *@
+        </div>
+    }
+
+    @* Mở hàng chia lưới Bootstrap chứa danh sách món ăn và bảng tóm tắt *@
+    <div class="row g-4">
+        @* Cột bên trái chiếm 8/12 phần màn hình lớn chứa bảng chi tiết các món ăn *@
+        <div class="col-lg-8">
+            @* Thẻ Card bọc ngoài bảng tạo hiệu ứng đổ bóng mờ *@
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                @* Khung bọc bảng cho phép cuộn ngang khi xem trên màn hình nhỏ *@
+                <div class="table-responsive">
+                    @* Bảng HTML hiển thị thông tin món ăn trong giỏ hàng *@
+                    <table class="table table-hover align-middle mb-0">
+                        @* Tầng tiêu đề bảng định dạng màu xanh lá nhạt *@
+                        <thead class="table-success">
+                            @* Dòng chứa tiêu đề các cột dữ liệu *@
+                            <tr>
+                                @* Cột tiêu đề Tên món ăn *@
+                                <th>Món ăn</th>
+                                @* Cột tiêu đề Đơn giá *@
+                                <th>Đơn giá</th>
+                                @* Cột tiêu đề Số lượng có định độ rộng *@
+                                <th style="width: 160px;">Số lượng</th>
+                                @* Cột tiêu đề Thành tiền *@
+                                <th>Thành tiền</th>
+                                @* Cột tiêu đề Thao tác xóa *@
+                                <th class="text-center">Thao tác</th>
+                                @* Đóng dòng tiêu đề cột *@
+                            </tr>
+                            @* Đóng tầng tiêu đề bảng *@
+                        </thead>
+                        @* Thân bảng chứa dữ liệu chi tiết các món ăn *@
+                        <tbody>
+                            @* Kiểm tra xem danh sách giỏ hàng có dữ liệu và khác null hay không *@
+                            @if (Model != null && Model.Any())
+                            {
+                                @* Vòng lặp foreach duyệt qua từng sản phẩm trong giỏ hàng *@
+                                foreach (var item in Model)
+                                {
+                                    @* Dòng hiển thị thông tin chi tiết của 1 món ăn trong giỏ *@
+                                    <tr>
+                                        @* Ô hiển thị hình ảnh đại diện và tên món ăn *@
+                                        <td>
+                                            @* Khung flexbox căn chỉnh ảnh và tên món ăn nằm hàng ngang *@
+                                            <div class="d-flex align-items-center">
+                                                @* Thẻ ảnh đại diện món ăn có kiểm tra null để hiện ảnh mặc định *@
+                                                <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content(item.ImageUrl) : "https://via.placeholder.com/65")" class="rounded me-3" style="width: 65px; height: 65px; object-fit: cover;" alt="@item.ProductName" />
+                                                @* Thẻ hiển thị tên món ăn in đậm *@
+                                                <h6 class="mb-0 fw-bold text-dark">@item.ProductName</h6>
+                                                @* Đóng khung flexbox ảnh và tên món *@
+                                            </div>
+                                            @* Đóng ô thông tin món ăn *@
+                                        </td>
+                                        @* Ô hiển thị đơn giá sản phẩm định dạng phân cách hàng nghìn *@
+                                        <td class="fw-semibold">@item.Price.ToString("N0") VNĐ</td>
+                                        @* Ô chứa Form cập nhật số lượng món ăn *@
+                                        <td>
+                                            @* Form gửi dữ liệu POST đến Action UpdateQuantity trong CartController *@
+                                            <form action="@Url.Action("UpdateQuantity", "Cart")" method="post" class="d-flex align-items-center">
+                                                @* Trường ẩn gửi mã ID món ăn cần cập nhật *@
+                                                <input type="hidden" name="id" value="@item.ProductID" />
+                                                @* Ô nhập số lượng món ăn dạng number, có min=1, giới hạn max theo tồn kho và tự động submit form bằng JavaScript khi bấm tăng/giảm *@
+                                                <input type="number" name="quantity" class="form-control form-control-sm text-center fw-bold me-1 cart-qty-input" value="@item.Quantity" min="1" max="@item.Stock" onchange="this.form.submit();" />
+                                                @* Nút bấm Submit gửi form cập nhật số lượng mới *@
+                                                <button type="submit" class="btn btn-sm btn-outline-primary" title="Cập nhật số lượng"><i class="fa-solid fa-rotate"></i></button>
+                                                @* Đóng Form cập nhật số lượng *@
+                                            </form>
+                                            @* Đóng ô số lượng *@
+                                        </td>
+                                        @* Ô hiển thị tổng tiền = Đơn giá x Số lượng *@
+                                        <td class="fw-bold text-danger">@item.TotalPrice.ToString("N0") VNĐ</td>
+                                        @* Ô chứa nút xóa sản phẩm khỏi giỏ hàng *@
+                                        <td class="text-center">
+                                            @* Nút bấm gọi Action RemoveFromCart xóa món ăn theo ID *@
+                                            <a href="@Url.Action("RemoveFromCart", "Cart", new { id = item.ProductID })" class="btn btn-outline-danger btn-sm rounded-circle" title="Xóa món này khỏi giỏ"><i class="fa-solid fa-trash-can"></i></a>
+                                            @* Đóng ô thao tác xóa *@
+                                        </td>
+                                        @* Đóng dòng thông tin sản phẩm *@
+                                    </tr>
+                                    @* Đóng vòng lặp foreach *@
+                                }
+                                @* Đóng nhánh kiểm tra giỏ hàng có dữ liệu *@
+                            }
+                            @* Nhánh xử lý khi giỏ hàng hoàn toàn rỗng *@
+                            else
+                            {
+                                @* Dòng hiển thị thông báo giỏ hàng trống *@
+                                <tr>
+                                    @* Ô gộp 5 cột để căn giữa thông báo giỏ hàng rỗng *@
+                                    <td colspan="5" class="text-center py-5 text-muted fw-semibold">
+                                        @* Chèn icon giỏ hàng rỗng màu xám *@
+                                        <i class="fa-solid fa-basket-shopping fs-1 d-block mb-2 text-secondary"></i>
+                                        @* Nội dung thông báo giỏ hàng trống *@
+                                        Giỏ hàng của bạn đang rỗng! Hãy chọn món ăn yêu thích nhé.
+                                        @* Đóng ô thông báo *@
+                                    </td>
+                                    @* Đóng dòng thông báo *@
+                                </tr>
+                                @* Đóng nhánh else *@
+                            }
+                            @* Đóng phần thân bảng *@
+                        </tbody>
+                        @* Đóng bảng HTML *@
+                    </table>
+                    @* Đóng khung bọc cuộn bảng *@
+                </div>
+                @* Đóng thẻ Card bọc bảng *@
+            </div>
+            @* Khung chứa nút Tiếp tục mua hàng và Nút dọn sạch giỏ hàng *@
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                @* Link Barem Dòng 46: Nút Tiếp tục mua hàng trỏ về trang danh sách sản phẩm *@
+                <a href="@Url.Action("Index", "Product")" class="btn btn-outline-secondary fw-bold">
+                    @* Icon mũi tên quay lại *@
+                    <i class="fa-solid fa-arrow-left me-1"></i> Tiếp tục mua hàng
+                    @* Đóng thẻ link Tiếp tục mua hàng *@
+                </a>
+                @* Kiểm tra nếu có sản phẩm trong giỏ thì mới hiển thị nút Xóa tất cả giỏ hàng *@
+                @if (Model != null && Model.Any())
+                {
+                    @* Link gọi Action ClearCart xóa toàn bộ sản phẩm trong Session *@
+                    <a href="@Url.Action("ClearCart", "Cart")" class="btn btn-outline-danger btn-sm fw-semibold" onclick="return confirm('Bạn có chắc muốn xóa toàn bộ món ăn trong giỏ?');">
+                        @* Icon thùng rác xóa sạch *@
+                        <i class="fa-solid fa-trash-can me-1"></i> Xóa tất cả giỏ hàng
+                        @* Đóng thẻ link Xóa tất cả *@
+                    </a>
+                    @* Đóng khối kiểm tra nút xóa tất cả *@
+                }
+                @* Đóng khung chứa nút điều hướng bên dưới bảng *@
+            </div>
+            @* Đóng cột bên trái *@
+        </div>
+        @* Cột bên phải chiếm 4/12 phần màn hình hiển thị Tóm tắt đơn hàng và nút Thanh toán *@
+        <div class="col-lg-4">
+            @* Thẻ Card bọc ngoài vùng tóm tắt đơn hàng *@
+            <div class="card p-4 border-0 shadow-sm rounded-3">
+                @* Tiêu đề vùng tóm tắt đơn hàng có đường gạch chân *@
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Tóm tắt đơn hàng</h5>
+                @* Khung flexbox hiển thị nhãn và tổng số tiền thanh toán *@
+                <div class="d-flex justify-content-between mb-4 fs-5 fw-bold text-danger">
+                    @* Nhãn hiển thị Tổng thanh toán *@
+                    <span>Tổng thanh toán:</span>
+                    @* Giá trị tổng số tiền tính toán từ Model *@
+                    <span>@totalAmount.ToString("N0") VNĐ</span>
+                    @* Đóng khung flexbox tổng tiền *@
+                </div>
+                @* Link Barem Dòng 48: Nút Thanh toán chỉ hiển thị khi giỏ hàng CÓ sản phẩm *@
+                @if (Model != null && Model.Any())
+                {
+                    @* Nút chuyển hướng sang trang Checkout để hoàn tất đặt hàng *@
+                    <a href="@Url.Action("Index", "Checkout")" class="btn btn-success w-100 fw-bold py-2 shadow-sm fs-6">
+                        @* Chữ nút bấm Thanh toán *@
+                        TIẾN HÀNH THANH TOÁN <i class="fa-solid fa-arrow-right ms-1"></i>
+                        @* Đóng thẻ link Thanh toán *@
+                    </a>
+                    @* Đóng khối kiểm tra ẩn nút thanh toán khi giỏ hàng rỗng *@
+                }
+                @* Đóng thẻ Card tóm tắt đơn hàng *@
+            </div>
+            @* Đóng cột bên phải *@
+        </div>
+        @* Đóng hàng chia lưới Bootstrap *@
+    </div>
+    @* Đóng thẻ div container *@
+</div>

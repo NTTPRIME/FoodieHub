@@ -1,0 +1,65 @@
+﻿@* Khai báo Model truyền vào View là đối tượng User (khách hàng bao gồm danh sách đơn hàng Orders) *@
+@model FoodieHub.Web.Models.User
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Chi tiết thông tin khách hàng";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung tiêu đề chính của trang hiển thị chi tiết khách hàng *@
+<h2 class="mt-4 mb-3 text-info fw-bold">Chi tiết thông tin khách hàng</h2>
+
+@* Thẻ Card Bootstrap hiển thị danh mục thông tin cá nhân của khách hàng *@
+<div class="card shadow p-4 mb-4">
+    @* Tiêu đề phân đoạn thông tin cá nhân *@
+    <h4 class="card-title text-secondary border-bottom pb-2">Thông tin tài khoản khách hàng</h4>
+
+    @* Khung lưới thông tin dạng dòng cột *@
+    <dl class="row mt-3">
+        @* Tên thuộc tính Mã khách hàng *@
+        <dt class="col-sm-3">Mã khách hàng:</dt>
+        @* Giá trị Mã số khách hàng *@
+        <dd class="col-sm-9">@Model.UserID</dd>
+
+        @* Tên thuộc tính Họ và tên *@
+        <dt class="col-sm-3">Họ và tên khách hàng:</dt>
+        @* Giá trị Họ tên in đậm màu xanh *@
+        <dd class="col-sm-9 fw-bold text-primary">@Model.FullName</dd>
+
+        @* Tên thuộc tính Địa chỉ Email *@
+        <dt class="col-sm-3">Địa chỉ Email liên hệ:</dt>
+        @* Giá trị Email đăng ký *@
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        @* Tên thuộc tính Tổng số đơn hàng đã đặt *@
+        <dt class="col-sm-3">Tổng số đơn đã đặt:</dt>
+        @* Giá trị số lượng đơn hàng *@
+        <dd class="col-sm-9">
+            @* Thẻ badge thông tin hiển thị số đơn hàng *@
+            <span class="badge bg-info text-dark">@(Model.Orders != null ? Model.Orders.Count : 0) đơn hàng</span>
+        </dd>
+    </dl>
+</div>
+
+@* Thẻ Card Bootstrap chứa danh sách lịch sử đơn hàng đã đặt (Barem Dòng 25) *@
+<div class="card shadow p-4 mb-4">
+    @* Tiêu đề phân đoạn lịch sử giao dịch *@
+    <h4 class="card-title text-secondary border-bottom pb-2">Lịch sử đơn hàng đã mua</h4>
+
+    @* Nhúng Partial View _OrderList.cshtml để tái sử dụng hiển thị danh sách đơn hàng (Barem Dòng 25) *@
+    <div class="mt-3">
+        @* Gọi hàm Partial truyền tập hợp danh sách đơn hàng của khách hàng sang Partial View *@
+        @Html.Partial("_OrderList", Model.Orders)
+    </div>
+
+    @* Khung nút bấm điều hướng quay trở lại *@
+    <div class="mt-3">
+        @* Nút chuyển hướng quay về trang danh sách khách hàng *@
+        <a href="@Url.Action("Index", "AdminCustomer")" class="btn btn-secondary">
+            @* Biểu tượng mũi tên quay lại *@
+            <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách khách hàng
+        </a>
+    </div>
+</div>

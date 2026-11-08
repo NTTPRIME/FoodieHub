@@ -1,0 +1,82 @@
+﻿@* Khai báo kiểu dữ liệu Model nhận vào View là danh sách đối tượng người dùng (User) *@
+@model IEnumerable<FoodieHub.Web.Models.User>
+
+@{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab của trình duyệt *@
+    ViewBag.Title = "Quản lý khách hàng";
+    @* Chỉ định sử dụng khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung vùng chứa giao diện tổng thể dạng tràn viền của Bootstrap *@
+<div class="container-fluid">
+    @* Tiêu đề chính của trang quản lý khách hàng *@
+    <h2 class="mb-4 text-primary fw-bold">Quản Lý Khách Hàng</h2>
+
+    @* Thẻ Card Bootstrap tạo hiệu ứng đổ bóng và bỏ đường viền mặc định *@
+    <div class="card shadow-sm border-0">
+        @* Thân thẻ Card bọc bảng dữ liệu *@
+        <div class="card-body">
+            @* Thẻ bảng HTML hiển thị danh sách khách hàng *@
+            <table class="table table-hover align-middle">
+                @* Đầu bảng chứa các tiêu đề cột *@
+                <thead class="table-dark">
+                    @* Dòng chứa các ô tiêu đề cột *@
+                    <tr>
+                        @* Cột hiển thị Mã khách hàng *@
+                        <th>Mã KH</th>
+                        @* Cột hiển thị Họ và tên khách hàng *@
+                        <th>Họ Tên</th>
+                        @* Cột hiển thị Địa chỉ Email *@
+                        <th>Email</th>
+                        @* Cột hiển thị Tổng số đơn hàng đã đặt *@
+                        <th class="text-center">Số Đơn Đã Đặt</th>
+                        @* Cột chứa nút thao tác xem chi tiết (Không có Thêm/Sửa/Xóa theo Barem Dòng 24) *@
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                @* Thân bảng chứa dữ liệu thực tế được đổ từ CSDL *@
+                <tbody>
+                    @* Kiểm tra danh sách khách hàng truyền vào từ Model có dữ liệu không *@
+                    @if (Model != null && Model.Any())
+                    {
+                        @* Vòng lặp duyệt qua từng đối tượng người dùng trong danh sách *@
+                        foreach (var item in Model)
+                        {
+                            @* Dòng hiển thị thông tin của từng khách hàng *@
+                            <tr>
+                                @* Ô hiển thị Mã khách hàng *@
+                                <td class="fw-bold">@item.UserID</td>
+                                @* Ô hiển thị Họ và tên khách hàng *@
+                                <td class="fw-bold text-dark">@item.FullName</td>
+                                @* Ô hiển thị Địa chỉ Email khách hàng *@
+                                <td>@item.Email</td>
+                                @* Ô hiển thị Tổng số đơn hàng khách đã đặt *@
+                                <td class="text-center">
+                                    @* Thẻ badge xanh lá hiển thị số lượng đơn hàng *@
+                                    <span class="badge bg-success">@(item.Orders != null ? item.Orders.Count : 0) đơn</span>
+                                </td>
+                                @* Ô chứa nút chuyển hướng xem chi tiết đơn hàng của khách *@
+                                <td class="text-center">
+                                    @* Nút xem chi tiết chuyển hướng đến Action Details của AdminCustomerController *@
+                                    <a href="@Url.Action("Details", "AdminCustomer", new { id = item.UserID })" class="btn btn-sm btn-info text-white">
+                                        @* Biểu tượng con mắt của FontAwesome *@
+                                        <i class="fa-solid fa-eye me-1"></i> Xem Đơn Đã Mua
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        @* Dòng hiển thị thông báo rỗng khi chưa có dữ liệu khách hàng *@
+                        <tr>
+                            @* Ô gộp 5 cột hiển thị câu thông báo rỗng *@
+                            <td colspan="5" class="text-center text-muted py-4">Chưa có dữ liệu khách hàng nào trong hệ thống.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

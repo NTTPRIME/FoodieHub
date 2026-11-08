@@ -1,0 +1,127 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào Partial View là danh sách Chi tiết đơn hàng OrderDetail *@
+@model IEnumerable<FoodieHub.Web.Models.OrderDetail>
+
+@* Thẻ Style định dạng giao diện hóa đơn in chuyên nghiệp *@
+<style>
+    /* Định dạng khung hóa đơn tổng thể */
+    .invoice-box {
+        background-color: #ffffff; /* Nền trắng tinh cho hóa đơn */
+        border: 1px solid #dee2e6; /* Đường viền xám nhẹ xung quanh hóa đơn */
+        border-radius: 8px; /* Bo cong 4 góc khung hóa đơn */
+        padding: 25px; /* Khoảng cách lề bên trong hóa đơn */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Đổ bóng nhẹ tạo độ nổi 3D */
+    }
+
+    /* Định dạng tiêu đề thương hiệu trên hóa đơn */
+    .invoice-header-title {
+        color: #dc3545; /* Màu đỏ thương hiệu F&B */
+        font-weight: 800; /* Chữ in đậm nổi bật */
+        letter-spacing: 1px; /* Khoảng cách giữa các chữ cái */
+    }
+
+    /* Định dạng đường kẻ phân cách hóa đơn */
+    .invoice-divider {
+        border-top: 2px dashed #ced4da; /* Đường kẻ nét đứt giống hóa đơn in nhiệt */
+        margin: 15px 0; /* Khoảng cách trên dưới đường kẻ */
+    }
+</style>
+
+@* Khung chính chứa toàn bộ giao diện Hóa đơn mua hàng (Invoice) *@
+<div class="invoice-box">
+    @* Khung tiêu đề hóa đơn cửa hàng *@
+    <div class="text-center mb-3">
+        @* Tên thương hiệu nhà hàng/hệ thống FoodieHub *@
+        <h3 class="invoice-header-title m-0">FOODIEHUB RESTAURANT</h3>
+        @* Địa chỉ chính của hệ thống *@
+        <p class="text-muted small m-0">Địa chỉ: 155 Sư Vạn Hạnh, Phường 12, Quận 10, TP. Hồ Chí Minh</p>
+        @* Số điện thoại tổng đài hỗ trợ *@
+        <p class="text-muted small m-0">Hotline đặt món: 1900 6789 - Email: support@foodiehub.vn</p>
+        @* Tiêu đề hóa đơn thanh toán *@
+        <h4 class="fw-bold text-dark mt-3 mb-1">HÓA ĐƠN THANH TOÁN</h4>
+    </div>
+
+    @* Đường kẻ đứt phân cách giữa thông tin thương hiệu và danh sách món *@
+    <div class="invoice-divider"></div>
+
+    @* Bảng hiển thị danh sách các món ăn trong hóa đơn chi tiết *@
+    <div class="table-responsive">
+        @* Thẻ bảng hiển thị danh sách chi tiết các món ăn *@
+        <table class="table table-bordered table-sm align-middle mb-0">
+            @* Tiêu đề các cột trong bảng hóa đơn *@
+            <thead class="table-light">
+                @* Dòng tiêu đề cột *@
+                <tr>
+                    @* Cột STT *@
+                    <th class="text-center" style="width: 50px;">STT</th>
+                    @* Cột Tên món ăn *@
+                    <th>Tên món ăn</th>
+                    @* Cột Số lượng *@
+                    <th class="text-center" style="width: 100px;">Số lượng</th>
+                    @* Cột Đơn giá *@
+                    <th class="text-end" style="width: 130px;">Đơn giá</th>
+                    @* Cột Thành tiền *@
+                    <th class="text-end" style="width: 150px;">Thành tiền</th>
+                </tr>
+            </thead>
+            @* Thân bảng chứa dữ liệu các món ăn được khách hàng chọn *@
+            <tbody>
+                @* Khởi tạo biến đếm số thứ tự và biến tích lũy tổng tiền *@
+                @{ int stt = 1; decimal totalCalc = 0; }
+                @* Kiểm tra danh sách món ăn chi tiết có dữ liệu hay không *@
+                @if (Model != null && Model.Any())
+                {
+                    @* Vòng lặp duyệt qua từng món ăn chi tiết trong đơn hàng *@
+                    foreach (var item in Model)
+                    {
+                        @* Tính thành tiền cho dòng hiện tại *@
+                        var lineTotal = item.Quantity * item.UnitPrice;
+                        @* Cộng dồn tổng số tiền của tất cả món *@
+                        totalCalc += lineTotal;
+                        @* Dòng hiển thị thông tin 1 món ăn *@
+                        <tr>
+                            @* Ô hiển thị Số thứ tự món *@
+                            <td class="text-center">@(stt++)</td>
+                            @* Ô hiển thị Tên món ăn *@
+                            <td class="fw-bold text-dark">
+                                @(item.Product != null ? item.Product.ProductName : "Món ăn #" + item.ProductID)
+                            </td>
+                            @* Ô hiển thị Số lượng mua *@
+                            <td class="text-center fw-bold">@item.Quantity</td>
+                            @* Ô hiển thị Đơn giá món ăn định dạng số phân cách *@
+                            <td class="text-end">@item.UnitPrice.ToString("N0") VNĐ</td>
+                            @* Ô hiển thị Thành tiền món ăn màu đỏ in đậm *@
+                            <td class="text-end fw-bold text-danger">@lineTotal.ToString("N0") VNĐ</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    @* Dòng hiển thị khi không có chi tiết sản phẩm nào *@
+                    <tr>
+                        @* Ô gộp 5 cột báo rỗng *@
+                        <td colspan="5" class="text-center text-muted py-3">Chưa có chi tiết sản phẩm cho đơn hàng này.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* Đường kẻ đứt phân cách giữa danh sách món và tổng tiền *@
+    <div class="invoice-divider"></div>
+
+    @* Khung hiển thị tổng tiền thanh toán hóa đơn *@
+    <div class="d-flex justify-content-between align-items-center fs-5 fw-bold mt-2">
+        @* Tiêu đề Tổng tiền thanh toán *@
+        <span class="text-dark">TỔNG CỘNG THANH TOÁN:</span>
+        @* Giá trị tổng tiền in đỏ đậm *@
+        <span class="text-danger fs-4">@totalCalc.ToString("N0") VNĐ</span>
+    </div>
+
+    @* Lời cảm ơn chân thành ở cuối hóa đơn *@
+    <div class="text-center mt-4 pt-2">
+        @* Dòng tin nhắn cảm ơn khách hàng *@
+        <p class="text-muted small fst-italic m-0">Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của FoodieHub!</p>
+        @* Dòng chúc ngon miệng *@
+        <p class="text-muted small fst-italic m-0">Chúc quý khách ngon miệng!</p>
+    </div>
+</div>

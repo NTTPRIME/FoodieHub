@@ -1,0 +1,35 @@
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là danh sách các đơn hàng Order *@
+@model IEnumerable<FoodieHub.Web.Models.Order>
+
+@{
+    @* Thiết lập tiêu đề hiển thị trên thẻ tab trình duyệt *@
+    ViewBag.Title = "Quản lý đơn hàng";
+    @* Chỉ định trang khung giao diện trang quản trị _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Khung bọc toàn bộ giao diện quản lý đơn hàng *@
+<div class="container-fluid mt-3">
+    @* Khung tiêu đề chính và nút thông tin *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        @* Tiêu đề trang quản lý đơn hàng *@
+        <h2 class="fw-bold text-dark m-0">
+            @* Biểu tượng hóa đơn đơn hàng *@
+            <i class="fa-solid fa-receipt text-danger me-2"></i>Quản Lý Đơn Hàng & Hóa Đơn
+        </h2>
+        @* Thẻ hiển thị tổng số lượng đơn hàng *@
+        <span class="badge bg-danger fs-6 px-3 py-2">
+            @* Biểu tượng giỏ hàng *@
+            <i class="fa-solid fa-box me-1"></i>Tổng số: @(Model != null ? Model.Count() : 0) đơn hàng
+        </span>
+    </div>
+
+    @* Thẻ Card Bootstrap tạo khung bao quanh bảng danh sách đơn hàng *@
+    <div class="card shadow-sm border-0">
+        @* Thân thẻ Card chứa nội dung chính *@
+        <div class="card-body p-3">
+            @* Nhúng Partial View _OrderList.cshtml để hiển thị danh sách đơn hàng động (Barem Dòng 23 & 24) *@
+            @Html.Partial("_OrderList", Model)
+        </div>
+    </div>
+</div>

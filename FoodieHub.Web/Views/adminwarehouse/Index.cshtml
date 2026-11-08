@@ -1,0 +1,72 @@
+﻿@* Khai báo kiểu dữ liệu Model nhận từ Controller là danh sách sản phẩm *@
+@model IEnumerable<FoodieHub.Web.Models.Product>
+@* Mở khối xử lý kịch bản C# Razor *@
+@{
+    @* Thiết lập tiêu đề của trang web trên thanh tiêu đề trình duyệt *@
+    ViewBag.Title = "Quản lý kho hàng";
+    @* Chỉ định file Layout trang quản trị chung _AdminLayout.cshtml *@
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    @* Đóng khối xử lý kịch bản C# Razor *@
+}
+@* Thẻ div bọc toàn bộ khung giao diện quản lý kho hàng dạng fluid *@
+<div class="container-fluid">
+    @* Tiêu đề trang quản lý kho hàng in đậm màu xanh chủ đạo *@
+    <h2 class="mb-4 text-primary fw-bold">Quản Lý Kho Hàng</h2>
+    @* Mở thẻ ul chứa thanh Tab chuyển đổi danh sách hàng tồn và hàng cần nhập *@
+    <ul class="nav nav-tabs mb-3" id="warehouseTab" role="tablist">
+        @* Mở thẻ li cho Tab 1 - Danh sách hàng tồn kho *@
+        <li class="nav-item" role="presentation">
+            @* Nút kích hoạt Tab Hàng tồn kho (đang hoạt động mặc định) *@
+            <button class="nav-link active fw-bold text-dark" id="inStock-tab" data-bs-toggle="tab" data-bs-target="#inStock" type="button" role="tab">
+                @* Chèn biểu tượng icon FontAwesome hình khối hàng hóa *@
+                <i class="fa-solid fa-boxes-stacked me-1"></i> Hàng Tồn Kho (> 0)
+                @* Đóng nút bấm Tab 1 *@
+            </button>
+            @* Đóng thẻ li của Tab 1 *@
+        </li>
+        @* Mở thẻ li cho Tab 2 - Danh sách hàng cần nhập thêm *@
+        <li class="nav-item" role="presentation">
+            @* Nút kích hoạt Tab Hàng cần nhập màu đỏ cảnh báo *@
+            <button class="nav-link fw-bold text-danger" id="needImport-tab" data-bs-toggle="tab" data-bs-target="#needImport" type="button" role="tab">
+                @* Chèn biểu tượng icon FontAwesome cảnh báo tam giác *@
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Hàng Cần Nhập (= 0)
+                @* Đóng nút bấm Tab 2 *@
+            </button>
+            @* Đóng thẻ li của Tab 2 *@
+        </li>
+        @* Đóng thẻ ul danh sách các Tab *@
+    </ul>
+    @* Mở khung bọc chứa nội dung hiển thị của từng Tab *@
+    <div class="tab-content" id="warehouseTabContent">
+        @* Mở khung nội dung Tab 1: Hàng tồn kho (> 0) *@
+        <div class="tab-pane fade show active" id="inStock" role="tabpanel">
+            @* Khung Card Bootstrap tạo hiệu ứng viền bóng mờ *@
+            <div class="card shadow-sm border-0">
+                @* Thân thẻ Card chứa bảng danh sách sản phẩm còn hàng *@
+                <div class="card-body">
+                    @* Gọi Partial View _InStockPartial và truyền dữ liệu ViewBag.InStockProducts *@
+                    @Html.Partial("_InStockPartial", ViewBag.InStockProducts as IEnumerable<FoodieHub.Web.Models.Product>)
+                    @* Đóng thẻ div card-body của Tab 1 *@
+                </div>
+                @* Đóng thẻ div card của Tab 1 *@
+            </div>
+            @* Đóng thẻ div tab-pane của Tab 1 *@
+        </div>
+        @* Mở khung nội dung Tab 2: Hàng cần nhập (= 0) *@
+        <div class="tab-pane fade" id="needImport" role="tabpanel">
+            @* Khung Card Bootstrap tạo hiệu ứng viền bóng mờ *@
+            <div class="card shadow-sm border-0">
+                @* Thân thẻ Card chứa bảng danh sách sản phẩm hết hàng *@
+                <div class="card-body">
+                    @* Gọi Partial View _NeedImportPartial và truyền dữ liệu ViewBag.NeedImportProducts *@
+                    @Html.Partial("_NeedImportPartial", ViewBag.NeedImportProducts as IEnumerable<FoodieHub.Web.Models.Product>)
+                    @* Đóng thẻ div card-body của Tab 2 *@
+                </div>
+                @* Đóng thẻ div card của Tab 2 *@
+            </div>
+            @* Đóng thẻ div tab-pane của Tab 2 *@
+        </div>
+        @* Đóng thẻ div tab-content *@
+    </div>
+    @* Đóng thẻ div container-fluid bọc ngoài cùng *@
+</div>
