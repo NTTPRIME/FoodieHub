@@ -16,8 +16,8 @@ using FoodieHub.Web.Models;
 // Định nghĩa không gian tên chứa các Controller thuộc phân hệ Quản trị của FoodieHub
 namespace FoodieHub.Web.Controllers
 {
-    // Khai báo lớp AdminCategoryController kế thừa từ lớp Controller mặc định của ASP.NET MVC
-    public class AdminCategoryController : Controller
+    // THAY ĐỔI: Kế thừa từ BaseAdminController thay vì Controller để tự động kích hoạt OnActionExecuting bảo mật
+    public class AdminCategoryController : BaseAdminController
     {
         // Khởi tạo đối tượng db từ lớp FoodieHubDbContext để kết nối và thao tác với SQL Server
         private FoodieHubDbContext db = new FoodieHubDbContext();

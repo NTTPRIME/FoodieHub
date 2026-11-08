@@ -9,7 +9,8 @@ using FoodieHub.Web.Models;
 
 namespace FoodieHub.Web.Controllers
 {
-    public class AdminProductController : Controller
+    // THAY ĐỔI: Kế thừa từ BaseAdminController để bảo vệ toàn bộ chức năng CRUD thực đơn món ăn
+    public class AdminProductController : BaseAdminController
     {
         // Khởi tạo đối tượng kết nối CSDL
         private FoodieHubDbContext db = new FoodieHubDbContext();

@@ -8,7 +8,8 @@ using FoodieHub.Web.Models;
 
 namespace FoodieHub.Web.Controllers
 {
-    public class AdminWarehouseController : Controller
+    // THAY ĐỔI: Kế thừa từ BaseAdminController để bảo mật trang Quản lý kho hàng
+    public class AdminWarehouseController : BaseAdminController
     {
         // Khởi tạo đối tượng kết nối CSDL
         private FoodieHubDbContext db = new FoodieHubDbContext();

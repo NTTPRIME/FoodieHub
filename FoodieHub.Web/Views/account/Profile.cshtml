@@ -1,42 +1,102 @@
-﻿@model dynamic /* Hoặc kiểu model thực tế của bảng User, ví dụ: @model FoodieHub.Web.Models.User */
+﻿@* Khai báo kiểu dữ liệu Model truyền vào View là đối tượng User mạnh kiểu (Strongly-typed) *@
+@model FoodieHub.Web.Models.User
 
 @{
+    @* Thiết lập tiêu đề trang hiển thị trên thẻ tab của trình duyệt web *@
     ViewBag.Title = "Hồ sơ cá nhân";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; /* Hoặc layout chung của trang */
+
+    // Khai báo biến cờ isAdmin để kiểm tra người dùng hiện tại có phải là Quản trị viên hay không
+    // Điều kiện 1: Kiểm tra Session["UserRole"] có tồn tại và bằng "Admin" hay không
+    // Điều kiện 2: Kiểm tra nếu Model không null, Email không rỗng và có chứa chuỗi "admin" (không phân biệt hoa thường)
+    bool isAdmin = (Session["UserRole"] != null && Session["UserRole"].ToString() == "Admin")
+                || (Model != null && !string.IsNullOrEmpty(Model.Email) && Model.Email.ToLower().Contains("admin"));
+
+    // Sử dụng toán tử 3 ngôi thiết lập giao diện Layout động:
+    // Nếu isAdmin = true -> Áp dụng giao diện Admin (_AdminLayout.cshtml)
+    // Nếu isAdmin = false -> Áp dụng giao diện Khách hàng (_MasterLayout.cshtml)
+    Layout = isAdmin ? "~/Views/Shared/_AdminLayout.cshtml" : "~/Views/Shared/_MasterLayout.cshtml";
 }
 
-<div class="container-fluid px-4">
-    <h2 class="mt-4">Hồ sơ cá nhân</h2>
-    <hr />
+@* Thẻ div bọc ngoài: Nếu là Admin dùng class co giãn container-fluid, nếu là Khách dùng container căn giữa giới hạn độ rộng *@
+<div class="@(isAdmin ? "container-fluid px-4 py-4" : "container my-5")" style="@(isAdmin ? "" : "max-width: 650px;")">
+    @* Thẻ Card Bootstrap tạo hiệu ứng đổ bóng mờ (shadow), bỏ đường viền (border-0) và bo tròn góc (rounded-3) *@
+    <div class="card shadow border-0 p-4 rounded-3">
+        @* Tiêu đề trang in đậm màu đỏ căn giữa kết hợp biểu tượng thẻ căn cước FontAwesome *@
+        <h3 class="text-center mb-4 text-danger fw-bold">
+            <i class="fa-solid fa-id-card me-2"></i>HỒ SƠ CÁ NHÂN
+        </h3>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Họ và tên:</label>
-                        <p class="form-control-static">@(Session["FullName"] ?? Model.FullName)</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Email:</label>
-                        <p class="form-control-static">@(Session["UserEmail"] ?? Model.Email)</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Vai trò hệ thống:</label>
-                        <p class="form-control-static">
-                            @if (Session["UserRole"] != null && Session["UserRole"].ToString() == "Admin")
-                            {
-                                <span class="badge bg-success">Quản trị viên (Admin)</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-primary">Khách hàng</span>
-                            }
-                        </p>
-                    </div>
-                    <a href="@Url.Action("Index", "AdminProduct")" class="btn btn-secondary">Quay lại trang quản trị</a>
-                </div>
-            </div>
+        @* Khung nhóm hiển thị Mã tài khoản *@
+        <div class="mb-3">
+            @* Nhãn tên trường Mã tài khoản màu xám in đậm *@
+            <label class="form-label fw-bold text-secondary">Mã tài khoản:</label>
+            @* Hiển thị mã ID người dùng lấy từ thuộc tính UserID của Model *@
+            <p class="form-control-static fw-bold fs-6">#@Model.UserID</p>
+        </div>
+
+        @* Khung nhóm hiển thị Họ và tên người dùng *@
+        <div class="mb-3">
+            @* Nhãn tên trường Họ và tên *@
+            <label class="form-label fw-bold text-secondary">Họ và tên:</label>
+            @* Hiển thị Họ và tên lấy từ thuộc tính FullName của Model in đậm màu xanh *@
+            <p class="form-control-static text-primary fs-5 fw-bold">@Model.FullName</p>
+        </div>
+
+        @* Khung nhóm hiển thị Địa chỉ Email *@
+        <div class="mb-3">
+            @* Nhãn tên trường Địa chỉ Email *@
+            <label class="form-label fw-bold text-secondary">Địa chỉ Email:</label>
+            @* Hiển thị địa chỉ Email lấy từ thuộc tính Email của Model *@
+            <p class="form-control-static text-dark fw-semibold">@Model.Email</p>
+        </div>
+
+        @* Khung nhóm hiển thị Vai trò hệ thống *@
+        <div class="mb-3">
+            @* Nhãn tên trường Vai trò hệ thống *@
+            <label class="form-label fw-bold text-secondary">Vai trò hệ thống:</label>
+            @* Thẻ p hiển thị Badge trạng thái tương ứng *@
+            <p class="form-control-static">
+                @* Rẽ nhánh điều kiện Razor kiểm tra nếu là Admin *@
+                @if (isAdmin)
+                {
+                    @* Thẻ badge màu xanh lá cây hiển thị nhãn Quản trị viên kèm icon lá chắn *@
+                    <span class="badge bg-success fs-6"><i class="fa-solid fa-user-shield me-1"></i> Quản trị viên (Admin)</span>
+                }
+                @* Nhánh xử lý nếu người dùng là Khách hàng thông thường *@
+                else
+                {
+                    @* Thẻ badge màu xanh dương hiển thị nhãn Khách hàng kèm icon người dùng *@
+                    <span class="badge bg-primary fs-6"><i class="fa-solid fa-user me-1"></i> Khách hàng</span>
+                }
+            </p>
+        </div>
+
+        @* Khung chứa các nút điều hướng chuyển hướng ở chân Card *@
+        <div class="d-flex justify-content-between pt-3 border-top mt-4">
+            @* Rẽ nhánh hiển thị nút bấm tùy theo vai trò hệ thống *@
+            @if (isAdmin)
+            {
+                @* Nút chuyển hướng dành riêng cho Admin: Quay lại trang danh sách món ăn quản trị *@
+                <a href="@Url.Action("Index", "AdminProduct")" class="btn btn-secondary fw-semibold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại trang quản trị
+                </a>
+                @* Nút chuyển hướng dành riêng cho Admin: Chuyển sang trang Quản lý tài khoản Admin *@
+                <a href="@Url.Action("Index", "AdminUser")" class="btn btn-primary fw-bold">
+                    <i class="fa-solid fa-users-gear me-1"></i> Quản lý tài khoản
+                </a>
+            }
+            @* Nhánh hiển thị nút bấm dành riêng cho Khách hàng *@
+            else
+            {
+                @* Nút chuyển hướng dành cho Khách hàng: Quay lại trang chủ hệ thống *@
+                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary fw-semibold">
+                    <i class="fa-solid fa-house me-1"></i> Quay lại trang chủ
+                </a>
+                @* Nút chuyển hướng dành cho Khách hàng: Xem danh sách Lịch sử đơn hàng đã đặt *@
+                <a href="@Url.Action("TransactionHistory", "Customer")" class="btn btn-danger fw-bold">
+                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Xem lịch sử đơn hàng
+                </a>
+            }
         </div>
     </div>
 </div>

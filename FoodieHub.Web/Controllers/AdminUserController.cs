@@ -10,8 +10,8 @@ using FoodieHub.Web.Models;
 // Định nghĩa không gian tên chứa các Controller phục vụ phân hệ Quản trị của FoodieHub
 namespace FoodieHub.Web.Controllers
 {
-    // Khai báo lớp AdminUserController kế thừa từ Controller để quản lý tài khoản người dùng Admin
-    public class AdminUserController : Controller
+    // THAY ĐỔI: Kế thừa từ BaseAdminController để đảm bảo chỉ có Admin đã đăng nhập mới quản lý tài khoản Quản trị
+    public class AdminUserController : BaseAdminController
     {
         // Khởi tạo đối tượng db từ FoodieHubDbContext để thực hiện các thao tác CRUD với CSDL
         private FoodieHubDbContext db = new FoodieHubDbContext();
