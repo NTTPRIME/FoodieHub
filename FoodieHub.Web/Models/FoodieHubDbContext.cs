@@ -37,6 +37,10 @@ namespace FoodieHub.Web.Models
         // Khai báo thuộc tính Email kiểu chuỗi lưu địa chỉ hòm thư điện tử
         public string Email { get; set; }
 
+        // === BỔ SUNG THUỘC TÍNH NÀY VÀO CLASS USER ===
+        public string Phone { get; set; }
+        // ============================================
+
         // Bắt buộc người dùng phải nhập mật khẩu khi đăng ký / tạo tài khoản
         [Required(ErrorMessage = "Mật khẩu không được để trống")]
         // Ràng buộc độ dài chuỗi mật khẩu bắt buộc phải đạt tối thiểu 6 ký tự
@@ -151,6 +155,15 @@ namespace FoodieHub.Web.Models
 
         // Khai báo thuộc tính CustomerName kiểu chuỗi lưu tên người nhận hàng
         public string CustomerName { get; set; }
+
+        // === BỔ SUNG 2 THUỘC TÍNH NÀY VÀO ĐÂY ===
+        [Required(ErrorMessage = "Số điện thoại không được để trống")]
+        public string Phone { get; set; }
+
+        [Required(ErrorMessage = "Email không được để trống")]
+        [EmailAddress(ErrorMessage = "Email sai định dạng")]
+        public string Email { get; set; }
+        // ==========================================
 
         // Khai báo thuộc tính Address kiểu chuỗi lưu địa chỉ giao hàng
         public string Address { get; set; }

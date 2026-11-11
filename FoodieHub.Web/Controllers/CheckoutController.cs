@@ -14,7 +14,6 @@ namespace FoodieHub.Web.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            // [BỔ SUNG CHO LỖI 4]: Kiểm tra bắt buộc đăng nhập trước khi vào trang thanh toán
             var currentUser = Session["User"] as User;
             if (currentUser == null)
             {
@@ -28,15 +27,13 @@ namespace FoodieHub.Web.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            // Truyền danh sách giỏ hàng sang View để hiển thị tóm tắt đơn hàng
             return View(cart);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ProcessOrder(string CustomerName, string Address)
+        public ActionResult ProcessOrder(string CustomerName, string Phone, string Email, string Address)
         {
-            // [BỔ SUNG CHO LỖI 4]: Kiểm tra bắt buộc đăng nhập khi bấm nút đặt đơn
             var currentUser = Session["User"] as User;
             if (currentUser == null)
             {
@@ -51,13 +48,15 @@ namespace FoodieHub.Web.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            // 1. Tạo đơn hàng tổng
+            // 1. Tạo đơn hàng tổng (Đã bổ sung Phone và Email)
             Order newOrder = new Order
             {
                 CustomerName = CustomerName,
+                Phone = Phone,       // <-- Bổ sung gán số điện thoại
+                Email = Email,       // <-- Bổ sung gán email
                 Address = Address,
                 OrderDate = DateTime.Now,
-                UserID = currentUser.UserID // Gán trực tiếp ID người dùng đã đăng nhập
+                UserID = currentUser.UserID
             };
 
             newOrder.TotalAmount = cart.Sum(item => item.Price * item.Quantity);

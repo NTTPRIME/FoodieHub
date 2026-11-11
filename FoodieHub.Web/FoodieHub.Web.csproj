@@ -151,6 +151,10 @@
     <Compile Include="Migrations\202610291141487_InitialCreate1.Designer.cs">
       <DependentUpon>202610291141487_InitialCreate1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202611110935411_UpdateDatabaseChanges.cs" />
+    <Compile Include="Migrations\202611110935411_UpdateDatabaseChanges.Designer.cs">
+      <DependentUpon>202611110935411_UpdateDatabaseChanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\FoodieHubDbContext.cs" />
     <Compile Include="Models\Metadata\CategoryMetadata.cs" />
@@ -180,6 +184,11 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\banh-mi-que.jpg" />
+    <Content Include="Images\bun-bo-hue.jpg" />
+    <Content Include="Images\com-bo-luc-lac.jpg" />
+    <Content Include="Images\com-tam.jpg" />
+    <Content Include="Images\tra-dao-cam-sa.jpg" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -281,6 +290,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202610291141487_InitialCreate1.resx">
       <DependentUpon>202610291141487_InitialCreate1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202611110935411_UpdateDatabaseChanges.resx">
+      <DependentUpon>202611110935411_UpdateDatabaseChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
