@@ -21,6 +21,8 @@
                 <th>Số lượng tồn</th>
                 @* Cột tiêu đề hiển thị Trạng thái kho hàng *@
                 <th>Trạng thái</th>
+                @* Cột tiêu đề thứ 7 hiển thị chức năng Nhập thêm hàng vào kho *@
+                <th>Nhập kho</th>
             </tr>
         </thead>
         @* Phần thân bảng chứa dữ liệu thực tế được đổ ra từ Model *@
@@ -32,41 +34,46 @@
                 foreach (var item in Model)
                 {
                     @* Dòng hiển thị thông tin chi tiết của một sản phẩm còn hàng *@
-            <tr>
-                @* Hiển thị giá trị mã định danh sản phẩm *@
-                <td>@item.ProductID</td>
-                @* Hiển thị tên sản phẩm in đậm *@
-                <td class="fw-bold">@item.ProductName</td>
-                @* Hiển thị tên danh mục liên kết (kiểm tra null an toàn) *@
-                <td>@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</td>
-                @* Hiển thị đơn giá sản phẩm theo định dạng số phân cách hàng nghìn *@
-                <td>@item.Price.ToString("N0") VNĐ</td>
-                @* Hiển thị số lượng tồn kho màu xanh lá *@
-                <td class="text-success fw-bold">@item.Stock</td>
-                @* Hiển thị thẻ nhãn trạng thái Còn hàng màu xanh *@
-                <td><span class="badge bg-success">Còn hàng</span></td>
-
-                <!-- Cột chứa form nhập thêm số lượng cho sản phẩm còn hàng -->
-                <td>
-                    @using (Html.BeginForm("ImportStock", "AdminWarehouse", FormMethod.Post, new { @class = "d-flex gap-2 align-items-center" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="productId" value="@item.ProductID" />
-                        <input type="number" name="importQuantity" min="1" value="10" class="form-control form-control-sm" style="width: 80px;" required />
-                        <button type="submit" class="btn btn-outline-primary btn-sm text-nowrap">
-                            <i class="fas fa-plus"></i> Nhập thêm
-                        </button>
-                    }
-                </td>
-            </tr>
+                    <tr>
+                        @* Hiển thị giá trị mã định danh sản phẩm *@
+                        <td>@item.ProductID</td>
+                        @* Hiển thị tên sản phẩm in đậm *@
+                        <td class="fw-bold">@item.ProductName</td>
+                        @* Hiển thị tên danh mục liên kết (kiểm tra null an toàn) *@
+                        <td>@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</td>
+                        @* Hiển thị đơn giá sản phẩm theo định dạng số phân cách hàng nghìn *@
+                        <td>@item.Price.ToString("N0") VNĐ</td>
+                        @* Hiển thị số lượng tồn kho màu xanh lá *@
+                        <td class="text-success fw-bold">@item.Stock</td>
+                        @* Hiển thị thẻ nhãn trạng thái Còn hàng màu xanh *@
+                        <td><span class="badge bg-success">Còn hàng</span></td>
+                        @* Cột thứ 7 chứa form nhập thêm số lượng cho sản phẩm còn hàng *@
+                        <td>
+                            @* Khởi tạo Form gửi dữ liệu theo phương thức POST đến Action ImportStock của AdminWarehouseController *@
+                            @using (Html.BeginForm("ImportStock", "AdminWarehouse", FormMethod.Post, new { @class = "d-flex gap-2 align-items-center" }))
+                            {
+                                @* Sinh mã token bảo mật chống tấn công giả mạo yêu cầu CSRF *@
+                                @Html.AntiForgeryToken()
+                                @* Trường ẩn truyền mã định danh sản phẩm (ProductID) cần nhập kho *@
+                                <input type="hidden" name="productId" value="@item.ProductID" />
+                                @* Ô nhập số lượng cần nhập thêm, mặc định là 10 và tối thiểu là 1 *@
+                                <input type="number" name="importQuantity" min="1" value="10" class="form-control form-control-sm" style="width: 80px;" required />
+                                @* Nút bấm gửi yêu cầu cộng thêm số lượng vào tồn kho *@
+                                <button type="submit" class="btn btn-outline-primary btn-sm text-nowrap">
+                                    @* Biểu tượng dấu cộng từ thư viện Font Awesome *@
+                                    <i class="fas fa-plus"></i> Nhập thêm
+                                </button>
+                            }
+                        </td>
+                    </tr>
                 }
             }
             else
             {
                 @* Hiển thị dòng thông báo khi danh sách rỗng *@
                 <tr>
-                    @* Ô gộp toàn bộ 6 cột để căn giữa câu thông báo rỗng *@
-                    <td colspan="6" class="text-center text-muted">Hiện tại không có sản phẩm nào còn hàng trong kho.</td>
+                    @* Ô gộp toàn bộ 7 cột để căn giữa câu thông báo rỗng *@
+                    <td colspan="7" class="text-center text-muted">Hiện tại không có sản phẩm nào còn hàng trong kho.</td>
                 </tr>
             }
         </tbody>

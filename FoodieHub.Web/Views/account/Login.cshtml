@@ -10,15 +10,19 @@
     <div class="card shadow border-0 p-4">
         @* Tiêu đề trang Đăng nhập hiển thị dạng chữ in đậm màu đỏ *@
         <h2 class="text-center mb-4 text-danger fw-bold">ĐĂNG NHẬP</h2>
-        @* Kiểm tra nếu Controller có truyền thông báo lỗi qua ViewBag.Error *@
-        @if (ViewBag.Error != null)
+        @{
+            @* Khởi tạo biến errorMsg ưu tiên lấy thông báo lỗi từ ViewBag.Error, nếu rỗng thì lấy từ TempData["Error"] *@
+            var errorMsg = ViewBag.Error ?? TempData["Error"];
+        }
+        @* Kiểm tra nếu tồn tại nội dung thông báo lỗi từ một trong hai nguồn trên *@
+        @if (errorMsg != null)
         {
-            @* Khung hiển thị thông báo lỗi màu đỏ nếu đăng nhập thất bại (Barem Dòng 54) *@
+            @* Khung hiển thị thông báo lỗi màu đỏ nếu đăng nhập thất bại hoặc bị chặn truy cập trái phép *@
             <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                 @* Biểu tượng hình tam giác chấm cảm cảnh báo *@
                 <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                @* Đổ nội dung câu thông báo lỗi từ ViewBag.Error ra giao diện *@
-                @ViewBag.Error
+                @* Đổ nội dung câu thông báo lỗi từ biến errorMsg ra giao diện *@
+                @errorMsg
                 @* Nút bấm góc phải cho phép tắt khung alert thông báo lỗi *@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>

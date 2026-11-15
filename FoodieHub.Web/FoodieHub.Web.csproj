@@ -155,11 +155,16 @@
     <Compile Include="Migrations\202611110935411_UpdateDatabaseChanges.Designer.cs">
       <DependentUpon>202611110935411_UpdateDatabaseChanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202611130846154_UpdateDatabaseChanges1.cs" />
+    <Compile Include="Migrations\202611130846154_UpdateDatabaseChanges1.Designer.cs">
+      <DependentUpon>202611130846154_UpdateDatabaseChanges1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\FoodieHubDbContext.cs" />
     <Compile Include="Models\Metadata\CategoryMetadata.cs" />
     <Compile Include="Models\Metadata\ProductMetadata.cs" />
     <Compile Include="Models\Metadata\UserMetadata.cs" />
+    <Compile Include="Models\ViewModels\BestSellerItem.cs" />
     <Compile Include="Models\ViewModels\CartItem.cs" />
     <Compile Include="Models\ViewModels\ProductListViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -293,6 +298,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202611110935411_UpdateDatabaseChanges.resx">
       <DependentUpon>202611110935411_UpdateDatabaseChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202611130846154_UpdateDatabaseChanges1.resx">
+      <DependentUpon>202611130846154_UpdateDatabaseChanges1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

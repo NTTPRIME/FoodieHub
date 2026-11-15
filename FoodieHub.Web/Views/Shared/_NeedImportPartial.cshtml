@@ -21,6 +21,8 @@
                 <th>Số lượng tồn</th>
                 @* Cột tiêu đề hiển thị Trạng thái kho hàng *@
                 <th>Trạng thái</th>
+                @* Cột tiêu đề thứ 7 hiển thị chức năng Nhập hàng vào kho *@
+                <th>Nhập kho</th>
             </tr>
         </thead>
         @* Phần thân bảng chứa dữ liệu thực tế được đổ ra từ Model *@
@@ -32,52 +34,58 @@
                 foreach (var item in Model)
                 {
                     @* Dòng hiển thị thông tin chi tiết của từng sản phẩm hết hàng hoặc sắp hết *@
-            <tr>
-                @* Hiển thị giá trị mã định danh sản phẩm *@
-                <td>@item.ProductID</td>
-                @* Hiển thị tên sản phẩm in đậm *@
-                <td class="fw-bold">@item.ProductName</td>
-                @* Hiển thị tên danh mục liên kết (kiểm tra null an toàn) *@
-                <td>@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</td>
-                @* Hiển thị đơn giá sản phẩm theo định dạng số phân cách hàng nghìn *@
-                <td>@item.Price.ToString("N0") VNĐ</td>
-                @* Hiển thị số lượng tồn kho màu đỏ cảnh báo *@
-                <td class="text-danger fw-bold">@item.Stock</td>
-                @* Hiển thị thẻ nhãn trạng thái Hết hàng hoặc Cần nhập hàng *@
-                <td>
-                    @* Kiểm tra nếu số lượng bằng 0 thì báo Hết hàng, ngược lại báo Sắp hết *@
-                    @if (item.Stock == 0)
-                    {
-                        @* Thẻ badge đỏ cảnh báo Hết hàng *@
-                        <span class="badge bg-danger">Hết hàng</span>
-                    }
-                    else
-                    {
-                        @* Thẻ badge vàng cảnh báo Sắp hết hàng *@
-                        <span class="badge bg-warning text-dark">Sắp hết hàng</span>
-                    }
-                </td>
-                <!-- Cột chứa form nhập kho thêm số lượng -->
-                <td>
-                    @using (Html.BeginForm("ImportStock", "AdminWarehouse", FormMethod.Post, new { @class = "d-flex gap-2 align-items-center" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="productId" value="@item.ProductID" /> <!-- Lưu ý: nếu khóa chính của bạn tên là ProductId hoặc Id thì giữ nguyên theo model, ở đây nhìn code bên trên cột đầu tiên đang dùng item.ProductID -->
-                        <input type="number" name="importQuantity" min="1" value="10" class="form-control form-control-sm" style="width: 80px;" required />
-                        <button type="submit" class="btn btn-primary btn-sm text-nowrap">
-                            <i class="fas fa-plus"></i> Nhập kho
-                        </button>
-                    }
-                </td>
-            </tr>
+                    <tr>
+                        @* Hiển thị giá trị mã định danh sản phẩm *@
+                        <td>@item.ProductID</td>
+                        @* Hiển thị tên sản phẩm in đậm *@
+                        <td class="fw-bold">@item.ProductName</td>
+                        @* Hiển thị tên danh mục liên kết (kiểm tra null an toàn) *@
+                        <td>@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")</td>
+                        @* Hiển thị đơn giá sản phẩm theo định dạng số phân cách hàng nghìn *@
+                        <td>@item.Price.ToString("N0") VNĐ</td>
+                        @* Hiển thị số lượng tồn kho màu đỏ cảnh báo *@
+                        <td class="text-danger fw-bold">@item.Stock</td>
+                        @* Hiển thị thẻ nhãn trạng thái Hết hàng hoặc Cần nhập hàng *@
+                        <td>
+                            @* Kiểm tra nếu số lượng bằng 0 thì báo Hết hàng, ngược lại báo Sắp hết *@
+                            @if (item.Stock == 0)
+                            {
+                                @* Thẻ badge đỏ cảnh báo Hết hàng *@
+                                <span class="badge bg-danger">Hết hàng</span>
+                            }
+                            else
+                            {
+                                @* Thẻ badge vàng cảnh báo Sắp hết hàng *@
+                                <span class="badge bg-warning text-dark">Sắp hết hàng</span>
+                            }
+                        </td>
+                        @* Cột thứ 7 chứa form nhập kho thêm số lượng *@
+                        <td>
+                            @* Khởi tạo Form gửi dữ liệu theo phương thức POST đến Action ImportStock của AdminWarehouseController *@
+                            @using (Html.BeginForm("ImportStock", "AdminWarehouse", FormMethod.Post, new { @class = "d-flex gap-2 align-items-center" }))
+                            {
+                                @* Sinh mã token bảo mật chống tấn công giả mạo yêu cầu CSRF *@
+                                @Html.AntiForgeryToken()
+                                @* Trường ẩn lưu mã định danh sản phẩm (ProductID) cần nhập kho *@
+                                <input type="hidden" name="productId" value="@item.ProductID" />
+                                @* Ô nhập số lượng cần nhập thêm vào kho, mặc định là 10 và tối thiểu là 1 *@
+                                <input type="number" name="importQuantity" min="1" value="10" class="form-control form-control-sm" style="width: 80px;" required />
+                                @* Nút bấm xác nhận gửi yêu cầu nhập thêm hàng vào kho *@
+                                <button type="submit" class="btn btn-primary btn-sm text-nowrap">
+                                    @* Biểu tượng dấu cộng từ thư viện Font Awesome *@
+                                    <i class="fas fa-plus"></i> Nhập kho
+                                </button>
+                            }
+                        </td>
+                    </tr>
                 }
             }
             else
             {
                 @* Hiển thị dòng thông báo khi không có sản phẩm nào cần nhập thêm *@
                 <tr>
-                    @* Ô gộp toàn bộ 6 cột để căn giữa câu thông báo *@
-                    <td colspan="6" class="text-center text-muted">Kho hàng ổn định, không có sản phẩm nào cần nhập thêm.</td>
+                    @* Ô gộp toàn bộ 7 cột để căn giữa câu thông báo *@
+                    <td colspan="7" class="text-center text-muted">Kho hàng ổn định, không có sản phẩm nào cần nhập thêm.</td>
                 </tr>
             }
         </tbody>

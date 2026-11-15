@@ -1,88 +1,876 @@
-﻿@* Khai báo kiểu dữ liệu Model truyền từ Controller sang View là danh sách các Đơn hàng (Order) *@
+﻿@* Khai báo kiểu dữ liệu (Model) truyền từ Controller sang View là danh sách các đơn hàng (Order) *@
 @model IEnumerable<FoodieHub.Web.Models.Order>
 
+@* Mở khối lệnh C# để thiết lập các thuộc tính cấu hình cho trang *@
 @{
-    @* Thiết lập tiêu đề trang web hiển thị trên thẻ tab của trình duyệt *@
+    // Thiết lập tiêu đề hiển thị trên thanh tab của trình duyệt
     ViewBag.Title = "Lịch sử giao dịch - FoodieHub";
-    @* Chỉ định sử dụng Master Layout dùng chung cho phân hệ Khách hàng *@
+    // Chỉ định đường dẫn file Layout dùng chung làm khung giao diện cho trang này
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
-@* Thẻ bọc toàn bộ nội dung trang Lịch sử giao dịch với khoảng cách lề trên dưới *@
-<div class="container my-5">
-    @* Tiêu đề chính của trang với biểu tượng đồng hồ lịch sử màu đỏ in đậm *@
-    <h2 class="mb-4 text-danger fw-bold"><i class="fa-solid fa-clock-rotate-left me-2"></i> Lịch Sử Giao Dịch Của Tôi</h2>
+@* Mở thẻ style để viết mã CSS tùy chỉnh hiệu ứng tương tác cho 3 thẻ thống kê và thẻ món ăn *@
+<style>
+    /* Định dạng chung cho thẻ KPI có thể bấm: đổi con trỏ thành bàn tay, tạo chuyển động mượt và chặn bôi đen chữ */
+    .kpi-interactive-card {
+        /* Đổi biểu tượng chuột thành hình bàn tay khi rê vào thẻ */
+        cursor: pointer;
+        /* Tạo hiệu ứng chuyển đổi mượt mà trong 0.25 giây cho mọi thay đổi thuộc tính */
+        transition: all 0.25s ease;
+        /* Ngăn người dùng vô tình bôi đen văn bản khi nhấp chuột liên tục vào thẻ */
+        user-select: none;
+    }
 
-    @* Thẻ Card Bootstrap tạo khung hiển thị danh sách đơn hàng có độ bóng nhẹ *@
+        /* Hiệu ứng khi người dùng di chuột (hover) lên thẻ KPI */
+        .kpi-interactive-card:hover {
+            /* Nâng nhẹ thẻ lên trên 4px tạo cảm giác nổi 3D */
+            transform: translateY(-4px);
+            /* Tăng độ đổ bóng giúp thẻ nổi bật hơn trên nền trang */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Trạng thái thẻ KPI đang được bấm mở ngăn kéo chi tiết bên dưới */
+        .kpi-interactive-card.active-kpi {
+            /* Đổi màu nền sang hồng nhạt để đánh dấu thẻ đang được chọn */
+            background-color: #fffaf9;
+            /* Tạo viền bóng màu đỏ nhạt quanh thẻ đang kích hoạt */
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.15) !important;
+        }
+
+        /* Định dạng hiệu ứng xoay mượt cho biểu tượng mũi tên nhỏ bên góc phải thẻ */
+        .kpi-interactive-card .kpi-chevron {
+            /* Thiết lập thời gian xoay mũi tên là 0.25 giây */
+            transition: transform 0.25s ease;
+        }
+
+        /* Khi thẻ có thuộc tính aria-expanded="true" (ngăn kéo đang mở), xoay mũi tên 180 độ hướng lên trên */
+        .kpi-interactive-card[aria-expanded="true"] .kpi-chevron {
+            /* Xoay biểu tượng mũi tên ngược lên 180 độ */
+            transform: rotate(180deg);
+        }
+
+    /* Làm dịu nhẹ thẻ món ăn nếu trước giờ khách chỉ toàn hủy chứ chưa từng nhận thành công */
+    .dish-card-cancelled-only {
+        /* Đổi màu nền sang sắc đỏ rất nhạt để phân biệt với các món đã thực đặt */
+        background-color: #fffafa;
+        /* Tạo đường viền nét đứt màu đỏ cảnh báo nhẹ cho thẻ món chưa từng nhận */
+        border: 1px dashed #dc3545 !important;
+    }
+</style>
+
+@* Thùng chứa chính của trang với khoảng cách lề trên dưới (my-5) theo chuẩn Bootstrap *@
+<div class="container my-5">
+    @* Tiêu đề chính của trang màu đỏ, in đậm, cách lề dưới 4 đơn vị *@
+    <h2 class="mb-4 text-danger fw-bold">
+        @* Biểu tượng đồng hồ quay ngược kèm dòng chữ tiêu đề trang *@
+        <i class="fa-solid fa-clock-rotate-left me-2"></i> Lịch Sử Giao Dịch Của Tôi
+    </h2>
+
+    @* Kiểm tra nếu có thông báo thành công từ TempData (sau khi đặt hàng hoặc hủy đơn thành công) *@
+    @if (TempData["Success"] != null)
+    {
+        @* Hộp thông báo màu xanh lá có nút đóng (alert-dismissible) và hiệu ứng mờ dần *@
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
+            @* Biểu tượng dấu tích tròn kèm nội dung thông báo thành công *@
+            <i class="fa-solid fa-circle-check me-2"></i>@TempData["Success"]
+            @* Nút X cho phép người dùng tự tắt hộp thông báo *@
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Kiểm tra nếu có thông báo lỗi từ TempData (khi đơn đã qua bước Chờ xác nhận hoặc hết phiên đăng nhập) *@
+    @if (TempData["Error"] != null)
+    {
+        @* Hộp thông báo cảnh báo lỗi màu đỏ có nút đóng và đổ bóng nhẹ *@
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+            @* Biểu tượng dấu chấm than tròn kèm nội dung thông báo lỗi chi tiết *@
+            <i class="fa-solid fa-circle-exclamation me-2"></i>@TempData["Error"]
+            @* Nút X cho phép người dùng tắt hộp thông báo lỗi *@
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Kiểm tra nếu danh sách đơn hàng tồn tại và có ít nhất 1 đơn thì mới tính toán và hiển thị 3 thẻ KPI *@
+    @if (Model != null && Model.Any())
+    {
+        // 1. Chuyển đổi Model sang dạng List để truy xuất toàn bộ đơn hàng khách từng thao tác (khách quan tuyệt đối)
+        var allOrders = Model.ToList();
+
+        // 2. Lọc ra nhóm đơn ĐÃ HOÀN THÀNH / ĐÃ GIAO (chỉ những đơn này mới chốt là tiền thực sự đã chi & món thực sự đã nhận)
+        var completedOrders = allOrders
+            .Where(o => o.Status != null && (o.Status.Trim() == "Hoàn thành" || o.Status.Trim() == "Đã giao"))
+            .ToList();
+
+        // 3. Lọc ra nhóm đơn ĐANG CHẠY (Chờ xác nhận / Đang xử lý / Đang giao -> tiền tạm tính, chưa thu tiền thật)
+        var pendingOrders = allOrders
+            .Where(o => string.IsNullOrEmpty(o.Status)
+                     || o.Status.Trim() == "Chờ xác nhận"
+                     || o.Status.Trim() == "Đang xử lý"
+                     || o.Status.Trim() == "Đang giao")
+            .ToList();
+
+        // 4. Lọc ra nhóm đơn ĐÃ HỦY để thống kê riêng
+        var cancelledOrders = allOrders
+            .Where(o => o.Status != null && o.Status.Trim() == "Đã hủy")
+            .ToList();
+
+        // Đếm tổng số đơn hàng mà khách hàng này đã từng thao tác (bao gồm cả hoàn thành, đang chạy lẫn đã hủy)
+        int userTotalOrders = allOrders.Count;
+        // Tính tổng số tiền THỰC CHI (chỉ tính trên các đơn hàng đã giao/hoàn thành)
+        decimal userTotalSpent = completedOrders.Sum(o => o.TotalAmount);
+        // Tính tổng số tiền TẠM TÍNH đang chờ giao và thu tiền (trên các đơn đang chạy)
+        decimal pendingAmount = pendingOrders.Sum(o => o.TotalAmount);
+        // Tính giá trị chi tiêu trung bình mỗi đơn đã hoàn thành (tránh lỗi chia cho 0 nếu danh sách rỗng)
+        decimal avgOrderSpent = completedOrders.Any() ? completedOrders.Average(o => o.TotalAmount) : 0;
+        // Tìm giá trị đơn hàng cao nhất trong các đơn đã hoàn thành
+        decimal maxOrderSpent = completedOrders.Any() ? completedOrders.Max(o => o.TotalAmount) : 0;
+
+        // 5. Truy vấn gom nhóm TOÀN BỘ món ăn từ allOrders (bao gồm cả đơn hoàn thành, đang giao lẫn đã hủy)
+        var orderedDishes = allOrders
+            // Chỉ lấy những đơn hàng có dữ liệu chi tiết đơn hàng (OrderDetails)
+            .Where(o => o.OrderDetails != null)
+            // Trải phẳng toàn bộ dòng chi tiết món ăn kèm trạng thái đã chuẩn hóa của đơn hàng chứa món đó
+            .SelectMany(o => o.OrderDetails.Select(d => new
+            {
+                // Lưu lại đối tượng chi tiết đơn hàng hiện tại
+                Detail = d,
+                // Lấy trạng thái đơn hàng đã cắt khoảng trắng thừa (mặc định là "Đang xử lý" nếu null)
+                OrderStatus = o.Status != null ? o.Status.Trim() : "Đang xử lý"
+            }))
+            // Loại bỏ các dòng bị thiếu thông tin sản phẩm (tránh lỗi NullReferenceException)
+            .Where(x => x.Detail.Product != null)
+            // Gom nhóm các dòng chi tiết theo thông tin định danh của từng món ăn
+            .GroupBy(x => new
+            {
+                // Gom theo mã sản phẩm
+                x.Detail.ProductID,
+                // Gom theo tên món ăn
+                x.Detail.Product.ProductName,
+                // Gom theo đường dẫn hình ảnh món ăn
+                x.Detail.Product.ImageUrl,
+                // Gom theo đơn giá bán hiện tại của món ăn
+                x.Detail.Product.Price,
+                // Gom theo số lượng tồn kho hiện tại để kiểm tra nút Đặt lại / Đặt thử lại
+                x.Detail.Product.Stock
+            })
+            // Tính toán chi tiết số lượng và doanh thu theo từng trạng thái cho mỗi món ăn sau khi gom nhóm
+            .Select(g =>
+            {
+                // Tính tổng số phần đã giao/hoàn thành thành công của món này
+                int completedQty = g
+                    .Where(x => x.OrderStatus == "Hoàn thành" || x.OrderStatus == "Đã giao")
+                    .Sum(x => x.Detail.Quantity);
+
+                // Tính tổng số phần đang chờ xác nhận / đang xử lý / đang giao của món này
+                int pendingQty = g
+                    .Where(x => x.OrderStatus != "Hoàn thành" && x.OrderStatus != "Đã giao" && x.OrderStatus != "Đã hủy")
+                    .Sum(x => x.Detail.Quantity);
+
+                // Tính tổng số phần của món này nằm trong các đơn đã bị hủy
+                int cancelledQty = g
+                    .Where(x => x.OrderStatus == "Đã hủy")
+                    .Sum(x => x.Detail.Quantity);
+
+                // Đếm số lần (số đơn hàng khác nhau) đặt thực tế món này (không tính các đơn bị hủy)
+                int activeOrderTimes = g
+                    .Where(x => x.OrderStatus != "Đã hủy")
+                    .Select(x => x.Detail.OrderID)
+                    .Distinct()
+                    .Count();
+
+                // Đếm số lần (số đơn hàng khác nhau) bị hủy có chứa món ăn này
+                int cancelledOrderTimes = g
+                    .Where(x => x.OrderStatus == "Đã hủy")
+                    .Select(x => x.Detail.OrderID)
+                    .Distinct()
+                    .Count();
+
+                // Tính tổng tiền thực chi cho món này (chỉ tính trên các đơn đã hoàn thành/đã giao)
+                decimal realSpentOnDish = g
+                    .Where(x => x.OrderStatus == "Hoàn thành" || x.OrderStatus == "Đã giao")
+                    .Sum(x => x.Detail.Quantity * x.Detail.UnitPrice);
+
+                // Trả về đối tượng ẩn danh chứa đầy đủ thông số phân tích của món ăn
+                return new
+                {
+                    // Mã sản phẩm
+                    ProductID = g.Key.ProductID,
+                    // Tên món ăn
+                    ProductName = g.Key.ProductName,
+                    // Đường dẫn hình ảnh món ăn
+                    ImageUrl = g.Key.ImageUrl,
+                    // Giá bán hiện tại của món ăn
+                    CurrentPrice = g.Key.Price,
+                    // Số lượng tồn kho hiện tại
+                    Stock = g.Key.Stock,
+                    // Số phần đã nhận thành công
+                    CompletedQty = completedQty,
+                    // Số phần đang chờ xử lý / đang giao
+                    PendingQty = pendingQty,
+                    // Tổng số phần thực đặt (gồm đã nhận + đang giao/chờ)
+                    ActiveQty = completedQty + pendingQty,
+                    // Số phần nằm trong đơn đã hủy
+                    CancelledQty = cancelledQty,
+                    // Số lần đặt hợp lệ (không tính đơn hủy)
+                    ActiveOrderTimes = activeOrderTimes,
+                    // Số lần nằm trong đơn bị hủy
+                    CancelledOrderTimes = cancelledOrderTimes,
+                    // Tổng tiền thực chi cho món này
+                    RealSpentOnDish = realSpentOnDish
+                };
+            })
+            // Ưu tiên xếp các món đã từng thực đặt (ActiveQty > 0) lên trên, món chỉ từng hủy xếp xuống dưới
+            .OrderByDescending(x => x.ActiveQty > 0)
+            // Tiếp theo sắp xếp giảm dần theo số phần đã nhận thành công
+            .ThenByDescending(x => x.CompletedQty)
+            // Tiếp theo sắp xếp giảm dần theo số phần đang giao/chờ
+            .ThenByDescending(x => x.PendingQty)
+            // Cuối cùng sắp xếp giảm dần theo số phần đã hủy
+            .ThenByDescending(x => x.CancelledQty)
+            // Chuyển kết quả truy vấn thành danh sách List hoàn chỉnh
+            .ToList();
+
+        // Tính tổng cộng tất cả số phần ăn đã thực đặt (đã nhận + đang chờ/giao)
+        int totalActivePortions = orderedDishes.Sum(x => x.ActiveQty);
+        // Tính tổng cộng tất cả số phần ăn nằm trong các đơn đã hủy
+        int totalCancelledPortions = orderedDishes.Sum(x => x.CancelledQty);
+        // Đếm số loại món ăn đã từng thực đặt (có ít nhất 1 phần không bị hủy)
+        int activeDishTypesCount = orderedDishes.Count(x => x.ActiveQty > 0);
+        // Đếm số loại món ăn từ trước đến nay chỉ từng bị hủy chứ chưa bao giờ đặt thành công
+        int cancelledOnlyDishTypesCount = orderedDishes.Count(x => x.ActiveQty == 0 && x.CancelledQty > 0);
+
+        @* Hàng lưới Bootstrap chia làm 3 cột đều nhau chứa 3 thẻ thống kê KPI tương tác *@
+        <div class="row g-3 mb-3">
+            @* Cột 1 (chiếm 4/12 phần màn hình vừa trở lên): Thẻ Tổng Đơn Đã Đặt *@
+            <div class="col-md-4">
+                @* Thẻ Card có viền trái xanh dương, kích hoạt đóng/mở ngăn kéo #drawerOrders khi bấm *@
+                <div class="card border-0 shadow-sm border-start border-4 border-primary h-100 kpi-interactive-card"
+                     data-bs-toggle="collapse" data-bs-target="#drawerOrders" aria-expanded="false" aria-controls="drawerOrders">
+                    @* Phần thân thẻ căn bố cục dọc đều hai đầu *@
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        @* Hàng tiêu đề thẻ bên trái và nhãn gợi ý bấm bên phải *@
+                        <div class="d-flex justify-content-between align-items-center">
+                            @* Nhãn tiêu đề thẻ Tổng Đơn Đã Đặt *@
+                            <span class="text-muted small fw-bold text-uppercase">
+                                <i class="fa-solid fa-bag-shopping text-primary me-1"></i>Tổng Đơn Đã Đặt
+                            </span>
+                            @* Nhãn bo tròn gợi ý người dùng bấm để xem tất cả kèm mũi tên xoay *@
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                                Xem tất cả <i class="fa-solid fa-chevron-down ms-1 kpi-chevron"></i>
+                            </span>
+                        </div>
+                        @* Con số thống kê chính: Tổng số đơn hàng khách từng thao tác *@
+                        <div class="h3 fw-bold text-primary my-2">@userTotalOrders đơn</div>
+                        @* Dòng chú thích phụ phân tách rõ số đơn hoàn thành, đang xử lý và đã hủy *@
+                        <div class="small text-muted">
+                            @* Hiển thị số lượng đơn đã hoàn thành/đã giao bằng chữ xanh lá *@
+                            <span class="text-success fw-semibold">@completedOrders.Count hoàn thành</span>
+                            @* Nếu có đơn đang xử lý/đang giao thì hiển thị thêm bằng chữ vàng đậm *@
+                            @if (pendingOrders.Any())
+                            {
+                                <span> &bull; <span class="text-warning text-dark fw-semibold">@pendingOrders.Count đang xử lý</span></span>
+                            }
+                            @* Nếu có ít nhất 1 đơn bị hủy thì hiển thị thêm số đơn hủy màu đỏ *@
+                            @if (cancelledOrders.Any())
+                            {
+                                <span> &bull; <span class="text-danger fw-semibold">@cancelledOrders.Count đã hủy</span></span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Cột 2 (chiếm 4/12 phần màn hình): Thẻ Tổng Tiền Đã Chi (chỉ tính đơn hoàn thành / đã giao) *@
+            <div class="col-md-4">
+                @* Thẻ Card có viền trái màu đỏ, kích hoạt đóng/mở ngăn kéo sao kê #drawerSpending khi bấm *@
+                <div class="card border-0 shadow-sm border-start border-4 border-danger h-100 kpi-interactive-card"
+                     data-bs-toggle="collapse" data-bs-target="#drawerSpending" aria-expanded="false" aria-controls="drawerSpending">
+                    @* Phần thân thẻ căn bố cục dọc đều hai đầu *@
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        @* Hàng tiêu đề thẻ bên trái và nhãn sao kê hóa đơn bên phải *@
+                        <div class="d-flex justify-content-between align-items-center">
+                            @* Nhãn tiêu đề thẻ Tổng Tiền Đã Chi *@
+                            <span class="text-muted small fw-bold text-uppercase">
+                                <i class="fa-solid fa-wallet text-danger me-1"></i>Tổng Tiền Đã Chi
+                            </span>
+                            @* Nhãn bo tròn gợi ý bấm xem sao kê hóa đơn *@
+                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
+                                Sao kê hóa đơn <i class="fa-solid fa-chevron-down ms-1 kpi-chevron"></i>
+                            </span>
+                        </div>
+                        @* Con số thống kê chính: Tổng tiền thực chi định dạng phân cách hàng nghìn *@
+                        <div class="h3 fw-bold text-danger my-2">@userTotalSpent.ToString("N0") VNĐ</div>
+                        @* Dòng chú thích phụ hiển thị tiền chờ thanh toán (nếu có) và trung bình mỗi đơn hoàn thành *@
+                        <div class="small text-muted">
+                            @* Nếu có đơn đang chờ giao thì hiển thị thêm số tiền tạm tính chờ thanh toán *@
+                            @if (pendingAmount > 0)
+                            {
+                                <span>Chờ thanh toán: <strong class="text-dark">@pendingAmount.ToString("N0")đ</strong> &bull; </span>
+                            }
+                            @* Hiển thị mức chi tiêu trung bình trên mỗi đơn đã hoàn thành *@
+                            <span>TB: <strong class="text-dark">@avgOrderSpent.ToString("N0")đ</strong>/đơn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Cột 3 (chiếm 4/12 phần màn hình): Thẻ Những Món Đã Đặt (tách rõ phần đã đặt và phần đã hủy) *@
+            <div class="col-md-4">
+                @* Thẻ Card có viền trái xanh lá, kích hoạt đóng/mở ngăn kéo thực đơn #drawerDishes khi bấm *@
+                <div class="card border-0 shadow-sm border-start border-4 border-success h-100 kpi-interactive-card"
+                     data-bs-toggle="collapse" data-bs-target="#drawerDishes" aria-expanded="false" aria-controls="drawerDishes">
+                    @* Phần thân thẻ căn bố cục dọc đều hai đầu *@
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        @* Hàng tiêu đề thẻ bên trái và nhãn sổ thực đơn bên phải *@
+                        <div class="d-flex justify-content-between align-items-center">
+                            @* Nhãn tiêu đề thẻ Những Món Đã Đặt *@
+                            <span class="text-muted small fw-bold text-uppercase">
+                                <i class="fa-solid fa-utensils text-success me-1"></i>Những Món Đã Đặt
+                            </span>
+                            @* Nhãn bo tròn gợi ý bấm mở danh sách món ăn *@
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill">
+                                Sổ thực đơn <i class="fa-solid fa-chevron-down ms-1 kpi-chevron"></i>
+                            </span>
+                        </div>
+                        @* Con số thống kê chính: Tổng số loại món ăn khác nhau đã từng thao tác *@
+                        <div class="h3 fw-bold text-success my-2">@orderedDishes.Count món</div>
+                        @* Dòng chú thích phụ hiển thị số phần đã đặt và số phần đã hủy (nếu có) *@
+                        <div class="small text-muted">
+                            @* Hiển thị tổng số phần ăn thực đặt bằng chữ xanh lá *@
+                            <span class="text-success fw-semibold">@totalActivePortions phần đã đặt</span>
+                            @* Nếu có phần ăn nằm trong đơn đã hủy thì hiển thị thêm bằng chữ đỏ *@
+                            @if (totalCancelledPortions > 0)
+                            {
+                                <span> &bull; <span class="text-danger fw-semibold">@totalCancelledPortions phần đã hủy</span></span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Nhóm Accordion bao bọc 3 ngăn kéo chi tiết (đảm bảo tại một thời điểm chỉ mở tối đa 1 ngăn kéo) *@
+        <div id="kpiAccordionGroup" class="mb-4">
+
+            @* NGĂN KÉO 1: Hiển thị phân tích trạng thái và danh sách toàn bộ đơn hàng *@
+            <div class="collapse" id="drawerOrders" data-bs-parent="#kpiAccordionGroup">
+                @* Khung thẻ Card chứa nội dung ngăn kéo 1 với viền trên màu xanh dương *@
+                <div class="card border-0 shadow-sm border-top border-4 border-primary rounded-3">
+                    @* Phần đầu ngăn kéo gồm tiêu đề và nút X để thu gọn ngăn kéo *@
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        @* Tiêu đề ngăn kéo 1 kèm tổng số đơn *@
+                        <h5 class="fw-bold text-primary m-0">
+                            <i class="fa-solid fa-list-check me-2"></i>Tổng Hợp Toàn Bộ Đơn Hàng (@userTotalOrders đơn)
+                        </h5>
+                        @* Nút đóng nhanh ngăn kéo 1 *@
+                        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#drawerOrders" aria-label="Close"></button>
+                    </div>
+                    @* Phần thân ngăn kéo 1 *@
+                    <div class="card-body">
+                        @* Mở khối lệnh C# đếm số lượng đơn hàng chi tiết theo từng nhóm trạng thái *@
+                        @{
+                            // Lấy số đơn đã hoàn thành hoặc đã giao thành công từ biến completedOrders
+                            int countCompleted = completedOrders.Count;
+                            // Đếm số đơn đang trên đường giao (có cắt khoảng trắng thừa)
+                            int countShipping = allOrders.Count(o => o.Status != null && o.Status.Trim() == "Đang giao");
+                            // Đếm số đơn đang chờ xác nhận hoặc đang xử lý (có cắt khoảng trắng thừa)
+                            int countPending = allOrders.Count(o => string.IsNullOrEmpty(o.Status) || o.Status.Trim() == "Đang xử lý" || o.Status.Trim() == "Chờ xác nhận");
+                            // Lấy số đơn đã hủy từ biến cancelledOrders
+                            int countCancelled = cancelledOrders.Count;
+                        }
+                        @* Hàng 4 ô thống kê nhỏ phân loại số đơn theo trạng thái *@
+                        <div class="row g-2 mb-3 text-center">
+                            @* Ô 1: Số đơn chờ xử lý *@
+                            <div class="col-6 col-md-3">
+                                <div class="p-2 rounded bg-warning bg-opacity-10 border border-warning">
+                                    <div class="small text-muted fw-semibold">Chờ xử lý</div>
+                                    <div class="fw-bold fs-5 text-dark">@countPending</div>
+                                </div>
+                            </div>
+                            @* Ô 2: Số đơn đang giao *@
+                            <div class="col-6 col-md-3">
+                                <div class="p-2 rounded bg-info bg-opacity-10 border border-info">
+                                    <div class="small text-muted fw-semibold">Đang giao</div>
+                                    <div class="fw-bold fs-5 text-info">@countShipping</div>
+                                </div>
+                            </div>
+                            @* Ô 3: Số đơn hoàn thành *@
+                            <div class="col-6 col-md-3">
+                                <div class="p-2 rounded bg-success bg-opacity-10 border border-success">
+                                    <div class="small text-muted fw-semibold">Hoàn thành</div>
+                                    <div class="fw-bold fs-5 text-success">@countCompleted</div>
+                                </div>
+                            </div>
+                            @* Ô 4: Số đơn đã hủy *@
+                            <div class="col-6 col-md-3">
+                                <div class="p-2 rounded bg-danger bg-opacity-10 border border-danger">
+                                    <div class="small text-muted fw-semibold">Đã hủy</div>
+                                    <div class="fw-bold fs-5 text-danger">@countCancelled</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Khung cuộn ngang cho bảng tóm tắt tất cả đơn hàng *@
+                        <div class="table-responsive">
+                            @* Bảng tóm tắt danh sách tất cả đơn hàng *@
+                            <table class="table table-sm table-bordered table-hover align-middle mb-0">
+                                @* Phần đầu bảng màu xanh dương nhạt *@
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>Mã Đơn</th>
+                                        <th>Thời Gian Đặt</th>
+                                        <th>Số Món</th>
+                                        <th>Trạng Thái</th>
+                                        <th class="text-end">Tổng Tiền</th>
+                                        <th class="text-center">Hóa Đơn</th>
+                                    </tr>
+                                </thead>
+                                @* Phần thân bảng lặp qua từng đơn hàng trong allOrders *@
+                                <tbody>
+                                    @foreach (var o in allOrders)
+                                    {
+                                        // Tính tổng số phần ăn trong đơn hàng hiện tại
+                                        int itemCount = o.OrderDetails != null ? o.OrderDetails.Sum(d => d.Quantity) : 0;
+                                        <tr>
+                                            @* Hiển thị mã đơn hàng theo định dạng #FH-ID *@
+                                            <td class="fw-bold">#FH-@o.OrderID</td>
+                                            @* Hiển thị ngày giờ đặt hàng nếu có giá trị *@
+                                            <td>@(o.OrderDate.HasValue ? o.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                                            @* Hiển thị tổng số phần ăn trong đơn *@
+                                            <td>@itemCount phần</td>
+                                            @* Cột hiển thị huy hiệu trạng thái đơn hàng theo màu sắc tương ứng *@
+                                            <td>
+                                                @if (o.Status == "Đã giao" || o.Status == "Hoàn thành")
+                                                {
+                                                    <span class="badge bg-success">@o.Status</span>
+                                                }
+                                                else if (o.Status == "Đang giao")
+                                                {
+                                                    <span class="badge bg-info text-dark">@o.Status</span>
+                                                }
+                                                else if (o.Status == "Đã hủy")
+                                                {
+                                                    <span class="badge bg-danger">@o.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">@(string.IsNullOrEmpty(o.Status) ? "Đang xử lý" : o.Status)</span>
+                                                }
+                                            </td>
+                                            @* Hiển thị tổng tiền đơn hàng căn lề phải *@
+                                            <td class="text-end fw-bold text-danger">@o.TotalAmount.ToString("N0") VNĐ</td>
+                                            @* Nút mở trực tiếp Modal hóa đơn chi tiết của đơn hàng đó *@
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-xs btn-sm btn-outline-primary py-0 px-2"
+                                                        data-bs-toggle="modal" data-bs-target="#customerInvoiceModal_@o.OrderID">
+                                                    <i class="fa-solid fa-receipt me-1"></i>Mở Bill
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* NGĂN KÉO 2: Hiển thị sao kê chi tiêu thực tế (chỉ tính đơn hoàn thành / đã giao) *@
+            <div class="collapse" id="drawerSpending" data-bs-parent="#kpiAccordionGroup">
+                @* Khung thẻ Card chứa nội dung ngăn kéo 2 với viền trên màu đỏ *@
+                <div class="card border-0 shadow-sm border-top border-4 border-danger rounded-3">
+                    @* Phần đầu ngăn kéo 2 gồm tiêu đề và nút X thu gọn *@
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold text-danger m-0">
+                            <i class="fa-solid fa-file-invoice-dollar me-2"></i>Sao Kê Chi Tiêu Thực Tế & Hóa Đơn Đã Hoàn Thành
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#drawerSpending" aria-label="Close"></button>
+                    </div>
+                    @* Phần thân ngăn kéo 2 *@
+                    <div class="card-body">
+                        @* Thanh tóm tắt 4 chỉ số tài chính: Thực chi, Chờ thanh toán, Đơn cao nhất, Trung bình/đơn *@
+                        <div class="alert alert-light border d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            @* Chỉ số 1: Tổng tiền thực chi trên các đơn đã giao/hoàn thành *@
+                            <div>
+                                <span class="text-muted small d-block">Tổng tiền thực chi (đơn đã giao/hoàn thành):</span>
+                                <strong class="fs-5 text-danger">@userTotalSpent.ToString("N0") VNĐ</strong>
+                            </div>
+                            @* Chỉ số 2: Tổng tiền tạm tính đang chờ giao và thanh toán *@
+                            <div>
+                                <span class="text-muted small d-block">Đang chờ giao & thanh toán:</span>
+                                <strong class="fs-6 text-warning text-dark">@pendingAmount.ToString("N0") VNĐ</strong>
+                            </div>
+                            @* Chỉ số 3: Giá trị đơn hàng hoàn thành lớn nhất *@
+                            <div>
+                                <span class="text-muted small d-block">Đơn hoàn thành cao nhất:</span>
+                                <strong class="fs-6 text-dark">@maxOrderSpent.ToString("N0") VNĐ</strong>
+                            </div>
+                            @* Chỉ số 4: Giá trị trung bình mỗi đơn đã hoàn thành *@
+                            <div>
+                                <span class="text-muted small d-block">Trung bình mỗi đơn hoàn thành:</span>
+                                <strong class="fs-6 text-primary">@avgOrderSpent.ToString("N0") VNĐ</strong>
+                            </div>
+                        </div>
+
+                        @* Kiểm tra nếu có ít nhất 1 đơn hoàn thành thì hiển thị bảng sao kê chi tiết *@
+                        @if (completedOrders.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover align-middle mb-0">
+                                    @* Tiêu đề bảng sao kê nền đỏ nhạt *@
+                                    <thead class="table-danger">
+                                        <tr>
+                                            <th>Hóa Đơn</th>
+                                            <th>Ngày Đặt</th>
+                                            <th>Chi Tiết Món Trong Đơn</th>
+                                            <th class="text-end">Số Tiền Thực Chi</th>
+                                            <th class="text-center">Thao Tác</th>
+                                        </tr>
+                                    </thead>
+                                    @* Lặp qua từng đơn hàng đã hoàn thành để liệt kê món và số tiền thực chi *@
+                                    <tbody>
+                                        @foreach (var vo in completedOrders)
+                                        {
+                                            // Nối tên các món ăn kèm số lượng trong đơn thành chuỗi tóm tắt ngắn gọn
+                                            var dishSummary = (vo.OrderDetails != null && vo.OrderDetails.Any())
+                                                ? string.Join(", ", vo.OrderDetails.Select(d => (d.Product != null ? d.Product.ProductName : "Món ăn") + " (x" + d.Quantity + ")"))
+                                                : "Không có chi tiết";
+                                            <tr>
+                                                @* Mã hóa đơn màu đỏ in đậm *@
+                                                <td class="fw-bold text-danger">#FH-@vo.OrderID</td>
+                                                @* Ngày giờ đặt đơn không xuống dòng *@
+                                                <td class="text-nowrap">@(vo.OrderDate.HasValue ? vo.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                                                @* Danh sách tóm tắt các món có trong hóa đơn *@
+                                                <td class="small text-muted">@dishSummary</td>
+                                                @* Số tiền thực chi của hóa đơn căn phải *@
+                                                <td class="text-end fw-bold text-dark text-nowrap">@vo.TotalAmount.ToString("N0") VNĐ</td>
+                                                @* Nút mở Modal xem và in hóa đơn *@
+                                                <td class="text-center text-nowrap">
+                                                    <button type="button" class="btn btn-sm btn-danger py-0 px-2"
+                                                            data-bs-toggle="modal" data-bs-target="#customerInvoiceModal_@vo.OrderID">
+                                                        <i class="fa-solid fa-print me-1"></i>Xem & In Bill
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            @* Thông báo khi khách chưa có đơn hàng nào hoàn thành thanh toán (kèm nhắc nhở nếu đang có đơn chờ giao) *@
+                            <p class="text-muted text-center mb-0 py-3">
+                                Chưa có đơn hàng nào hoàn thành thanh toán.
+                                @if (pendingAmount > 0)
+                                {
+                                    <span>Bạn hiện có <strong>@pendingOrders.Count đơn</strong> (@pendingAmount.ToString("N0") VNĐ) đang chờ xác nhận/giao hàng.</span>
+                                }
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* NGĂN KÉO 3: Sổ thực đơn lịch sử (phân rõ món đã thực đặt & món đã hủy kèm bộ lọc nhanh) *@
+            <div class="collapse" id="drawerDishes" data-bs-parent="#kpiAccordionGroup">
+                @* Khung thẻ Card chứa nội dung ngăn kéo 3 với viền trên màu xanh lá *@
+                <div class="card border-0 shadow-sm border-top border-4 border-success rounded-3">
+                    @* Phần đầu ngăn kéo 3 gồm tiêu đề, mô tả ngắn, nhóm nút lọc trạng thái và nút X thu gọn *@
+                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        @* Khối tiêu đề và dòng giải thích bên trái *@
+                        <div>
+                            <h5 class="fw-bold text-success m-0">
+                                <i class="fa-solid fa-bowl-rice me-2"></i>Nhật Ký Món Ăn Đã Thao Tác (@orderedDishes.Count món)
+                            </h5>
+                            <small class="text-muted">
+                                Phân tách rõ món đã nhận, món đang giao và món nằm trong đơn đã hủy để bạn dễ theo dõi khẩu vị.
+                            </small>
+                        </div>
+
+                        @* Khối nút lọc nhanh trạng thái món ăn và nút đóng ngăn kéo bên phải *@
+                        <div class="d-flex align-items-center gap-2">
+                            @* Nhóm nút lọc nhanh trạng thái món ăn (Tất cả / Đã thực đặt / Có lần hủy) *@
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Lọc trạng thái món">
+                                @* Nút lọc hiển thị tất cả món ăn (mặc định đang kích hoạt) *@
+                                <button type="button" class="btn btn-success active dish-filter-btn" data-filter="all">
+                                    Tất cả (@orderedDishes.Count)
+                                </button>
+                                @* Nút lọc chỉ hiển thị các món đã từng thực đặt *@
+                                <button type="button" class="btn btn-outline-success dish-filter-btn" data-filter="active">
+                                    Đã thực đặt (@activeDishTypesCount)
+                                </button>
+                                @* Nếu có món từng nằm trong đơn hủy thì hiển thị thêm nút lọc "Có lần hủy" *@
+                                @if (totalCancelledPortions > 0)
+                                {
+                                    <button type="button" class="btn btn-outline-danger dish-filter-btn" data-filter="cancelled">
+                                        Có lần hủy (@orderedDishes.Count(x => x.CancelledQty > 0))
+                                    </button>
+                                }
+                            </div>
+                            @* Nút đóng nhanh ngăn kéo 3 *@
+                            <button type="button" class="btn-close ms-2" data-bs-toggle="collapse" data-bs-target="#drawerDishes" aria-label="Close"></button>
+                        </div>
+                    </div>
+
+                    @* Phần thân ngăn kéo 3 nền xám nhạt để làm nổi bật các thẻ món ăn màu trắng *@
+                    <div class="card-body bg-light">
+                        @* Kiểm tra nếu danh sách món ăn có dữ liệu *@
+                        @if (orderedDishes.Any())
+                        {
+                            // Khởi tạo biến đếm thứ hạng bắt đầu từ hạng 1 (chỉ đánh số hạng cho món đã thực đặt)
+                            int rank = 1;
+                            @* Lưới hiển thị danh sách thẻ món ăn có gắn id="dishHistoryGrid" để JS lọc *@
+                            <div class="row g-3" id="dishHistoryGrid">
+                                @* Lặp qua từng món ăn trong danh sách đã sắp xếp *@
+                                @foreach (var dish in orderedDishes)
+                                {
+                                    // Cờ xác định món này từ trước đến nay CHỈ từng nằm trong đơn hủy (chưa từng nhận/đặt thành công)
+                                    bool isCancelledOnly = (dish.ActiveQty == 0 && dish.CancelledQty > 0);
+                                    // Cờ xác định món này có ít nhất 1 lần nằm trong đơn bị hủy
+                                    bool hasCancelled = (dish.CancelledQty > 0);
+                                    // Tạo chuỗi thẻ phân loại (tags) phục vụ chức năng lọc bằng JavaScript
+                                    string filterTags = (dish.ActiveQty > 0 ? "active " : "") + (hasCancelled ? "cancelled" : "");
+
+                                    @* Cột lưới chứa thẻ món ăn kèm thuộc tính data-status-tags để JS ẩn/hiện khi bấm bộ lọc *@
+                                    <div class="col-12 col-md-6 col-lg-4 dish-history-item" data-status-tags="@filterTags.Trim()">
+                                        @* Thẻ hiển thị thông tin món ăn (thêm viền nét đứt nếu món chỉ từng bị hủy) *@
+                                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden @(isCancelledOnly ? "dish-card-cancelled-only" : "")">
+                                            <div class="card-body p-3 d-flex flex-column">
+                                                @* Khối trên: Hình ảnh món bên trái và nhóm huy hiệu trạng thái chi tiết bên phải *@
+                                                <div class="d-flex align-items-start mb-2">
+                                                    @* Ảnh đại diện món ăn (làm mờ nhẹ nếu món chưa từng được nhận thành công) *@
+                                                    <img src="@(!string.IsNullOrEmpty(dish.ImageUrl) ? Url.Content(dish.ImageUrl) : "https://via.placeholder.com/80?text=FoodieHub")"
+                                                         alt="@dish.ProductName"
+                                                         class="rounded-3 me-3 border"
+                                                         style="width: 68px; height: 68px; object-fit: cover; @(isCancelledOnly ? "opacity: 0.78;" : "")" />
+
+                                                    @* Khối thông tin chữ của món ăn *@
+                                                    <div class="flex-grow-1 overflow-hidden">
+                                                        @* Nhóm huy hiệu phân tách rõ ràng: Thứ hạng / Đã nhận / Đang giao / Đã hủy *@
+                                                        <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                                                            @if (!isCancelledOnly)
+                                                            {
+                                                                @* Hiển thị huy hiệu thứ hạng (#1 màu vàng nổi bật) cho các món đã thực đặt *@
+                                                                <span class="badge @(rank == 1 ? "bg-warning text-dark" : "bg-secondary")">#@rank</span>
+                                                                // Tăng biến thứ hạng lên 1 đơn vị cho món thực đặt tiếp theo
+                                                                rank++;
+                                                            }
+                                                            else
+                                                            {
+                                                                @* Nếu món chỉ từng bị hủy thì gắn nhãn "Chưa từng nhận" thay cho thứ hạng *@
+                                                                <span class="badge bg-danger bg-opacity-75">Chưa từng nhận</span>
+                                                            }
+
+                                                            @* Nếu có số phần đã giao thành công thì hiển thị huy hiệu màu xanh lá *@
+                                                            @if (dish.CompletedQty > 0)
+                                                            {
+                                                                <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                                                                    <i class="fa-solid fa-check me-1"></i>Đã nhận @dish.CompletedQty phần
+                                                                </span>
+                                                            }
+
+                                                            @* Nếu có số phần đang giao hoặc đang chờ xử lý thì hiển thị huy hiệu màu vàng *@
+                                                            @if (dish.PendingQty > 0)
+                                                            {
+                                                                <span class="badge bg-warning bg-opacity-25 text-dark border border-warning">
+                                                                    <i class="fa-solid fa-clock me-1"></i>Đang giao/chờ @dish.PendingQty phần
+                                                                </span>
+                                                            }
+
+                                                            @* Nếu có số phần nằm trong đơn đã hủy thì hiển thị huy hiệu màu đỏ *@
+                                                            @if (dish.CancelledQty > 0)
+                                                            {
+                                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">
+                                                                    <i class="fa-solid fa-ban me-1"></i>Đã hủy @dish.CancelledQty phần
+                                                                </span>
+                                                            }
+                                                        </div>
+
+                                                        @* Tên món ăn in đậm, tự động cắt dấu ... nếu quá dài *@
+                                                        <h6 class="fw-bold text-dark mb-1 text-truncate" title="@dish.ProductName">
+                                                            @dish.ProductName
+                                                        </h6>
+
+                                                        @* Dòng tóm tắt số lần đặt, số lần hủy và tổng tiền thực chi của riêng món này *@
+                                                        <small class="text-muted d-block">
+                                                            @* Hiển thị số lần đặt hợp lệ nếu có *@
+                                                            @if (dish.ActiveOrderTimes > 0)
+                                                            {
+                                                                <span>Đặt @dish.ActiveOrderTimes lần</span>
+                                                            }
+                                                            @* Hiển thị dấu chấm ngăn cách nếu món vừa có đơn đặt vừa có đơn hủy *@
+                                                            @if (dish.ActiveOrderTimes > 0 && dish.CancelledOrderTimes > 0)
+                                                            {
+                                                                <span> &bull; </span>
+                                                            }
+                                                            @* Hiển thị số lần bị hủy bằng chữ màu đỏ nếu có *@
+                                                            @if (dish.CancelledOrderTimes > 0)
+                                                            {
+                                                                <span class="text-danger">Hủy @dish.CancelledOrderTimes lần</span>
+                                                            }
+                                                            @* Hiển thị tổng tiền thực chi cho món này nếu đã có đơn hoàn thành *@
+                                                            @if (dish.RealSpentOnDish > 0)
+                                                            {
+                                                                <span> &bull; Thực chi: <strong class="text-danger">@dish.RealSpentOnDish.ToString("N0")đ</strong></span>
+                                                            }
+                                                        </small>
+                                                    </div>
+                                                </div>
+
+                                                @* Khối dưới: Giá bán hiện tại bên trái và nút hành động phù hợp ngữ cảnh bên phải *@
+                                                <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                                    @* Đơn giá bán hiện tại của món ăn *@
+                                                    <span class="text-danger fw-bold">@dish.CurrentPrice.ToString("N0") VNĐ</span>
+                                                    @* Nhóm nút Chi tiết và Đặt lại / Đặt thử lại *@
+                                                    <div class="d-flex gap-1">
+                                                        @* Nút chuyển sang trang xem chi tiết sản phẩm *@
+                                                        <a href="@Url.Action("Detail", "Product", new { id = dish.ProductID })"
+                                                           class="btn btn-sm btn-outline-secondary rounded-pill px-2">
+                                                            Chi tiết
+                                                        </a>
+                                                        @* Kiểm tra tồn kho: nếu còn hàng (Stock > 0) thì hiển thị nút thêm vào giỏ hàng *@
+                                                        @if (dish.Stock > 0)
+                                                        {
+                                                            // Nếu món trước đó chỉ toàn bị hủy thì hiển thị nút viền đỏ "Đặt thử lại"
+                                                            if (isCancelledOnly)
+                                                            {
+                                                                @* Nút gọi Action AddToCart để khách đặt thử lại món từng hủy *@
+                                                                <a href="@Url.Action("AddToCart", "Cart", new { id = dish.ProductID, quantity = 1 })"
+                                                                   class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold"
+                                                                   title="Món này lần trước bạn đã hủy, bấm để đặt thử lại">
+                                                                    <i class="fa-solid fa-cart-plus me-1"></i>Đặt thử lại
+                                                                </a>
+                                                            }
+                                                            // Ngược lại, nếu món đã từng thực đặt thì hiển thị nút đỏ đặc "Đặt lại"
+                                                            else
+                                                            {
+                                                                @* Nút gọi Action AddToCart để thêm nhanh 1 phần món quen thuộc vào giỏ hàng *@
+                                                                <a href="@Url.Action("AddToCart", "Cart", new { id = dish.ProductID, quantity = 1 })"
+                                                                   class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
+                                                                    <i class="fa-solid fa-rotate-right me-1"></i>Đặt lại
+                                                                </a>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            @* Nếu món đã hết hàng thì hiển thị nút màu xám bị vô hiệu hóa *@
+                                                            <button type="button" class="btn btn-sm btn-secondary rounded-pill px-2" disabled>
+                                                                Hết hàng
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            @* Thông báo khi khách chưa có dữ liệu món ăn nào trong lịch sử *@
+                            <p class="text-muted text-center mb-0 py-3">Bạn chưa có dữ liệu món ăn nào trong lịch sử.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+
+    @* Khung thẻ Card chứa bảng lịch sử giao dịch chính bên dưới *@
     <div class="card shadow-sm border-0">
-        @* Thân thẻ Card chứa bảng dữ liệu *@
         <div class="card-body">
-            @* Khung cuộn responsive cho bảng dữ liệu khi xem trên thiết bị di động *@
+            @* Khung cho phép cuộn ngang bảng trên màn hình điện thoại nhỏ *@
             <div class="table-responsive">
-                @* Thẻ bảng HTML hiển thị danh sách đơn hàng với hiệu ứng di chuột *@
+                @* Bảng hiển thị danh sách lịch sử các đơn hàng *@
                 <table class="table table-hover align-middle">
-                    @* Đầu bảng chứa tiêu đề các cột dữ liệu *@
+                    @* Hàng tiêu đề các cột của bảng *@
                     <thead class="table-light">
-                        @* Dòng tiêu đề các cột *@
                         <tr>
-                            @* Tiêu đề cột Mã đơn hàng *@
                             <th>Mã Đơn Hàng</th>
-                            @* Tiêu đề cột Ngày đặt hàng *@
                             <th>Ngày Đặt</th>
-                            @* Tiêu đề cột Địa chỉ giao hàng *@
                             <th>Địa Chỉ Giao Hàng</th>
-                            @* Tiêu đề cột Tổng tiền thanh toán *@
                             <th>Tổng Tiền</th>
-                            @* Tiêu đề cột Trạng thái đơn hàng *@
                             <th>Trạng Thái</th>
-                            @* Tiêu đề cột Nút xem chi tiết đơn hàng căn giữa *@
                             <th class="text-center">Chi Tiết</th>
                         </tr>
                     </thead>
-                    @* Thân bảng chứa dữ liệu các đơn hàng *@
+                    @* Phần thân bảng chứa dữ liệu từng đơn hàng *@
                     <tbody>
-                        @* Kiểm tra xem danh sách đơn hàng truyền sang từ Controller có dữ liệu hay không *@
+                        @* Kiểm tra nếu khách hàng có dữ liệu đơn hàng *@
                         @if (Model != null && Model.Any())
                         {
-                            @* Vòng lặp foreach duyệt qua từng đơn hàng trong danh sách lịch sử của khách *@
+                            @* Lặp qua từng đơn hàng trong Model để tạo dòng dữ liệu *@
                             foreach (var item in Model)
                             {
-                                @* Dòng hiển thị thông tin tổng quan của một đơn hàng *@
                                 <tr>
-                                    @* Cột hiển thị Mã đơn hàng dạng in đậm *@
+                                    @* Cột 1: Mã đơn hàng in đậm *@
                                     <td class="fw-bold">#FH-@item.OrderID</td>
-                                    @* Cột hiển thị Ngày đặt hàng theo định dạng Ngày/Tháng/Năm Giờ:Phút *@
+                                    @* Cột 2: Ngày giờ đặt hàng định dạng dd/MM/yyyy HH:mm *@
                                     <td>@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
-                                    @* Cột hiển thị Địa chỉ giao hàng của đơn hàng *@
+                                    @* Cột 3: Địa chỉ giao hàng của đơn *@
                                     <td>@(string.IsNullOrEmpty(item.Address) ? "N/A" : item.Address)</td>
-                                    @* Cột hiển thị Tổng số tiền của đơn hàng màu đỏ in đậm *@
+                                    @* Cột 4: Tổng tiền đơn hàng màu đỏ in đậm *@
                                     <td class="text-danger fw-bold">@item.TotalAmount.ToString("N0") VNĐ</td>
-                                    @* Cột hiển thị Trạng thái đơn hàng bằng thẻ Badge màu xanh *@
-                                    <td><span class="badge bg-success">Hoàn thành</span></td>
-                                    @* Cột chứa nút bấm mở Modal xem chi tiết hóa đơn đơn hàng *@
-                                    <td class="text-center">
-                                        @* Nút kích hoạt Modal xem hóa đơn chi tiết gắn ID động theo mã đơn hàng *@
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#customerInvoiceModal_@item.OrderID">
-                                            @* Biểu tượng con mắt kèm chữ Xem Chi Tiết *@
+
+                                    @* Cột 5: Hiển thị huy hiệu trạng thái động theo từng tình trạng đơn *@
+                                    <td>
+                                        @if (item.Status == "Đã giao" || item.Status == "Hoàn thành")
+                                        {
+                                            <span class="badge bg-success">@item.Status</span>
+                                        }
+                                        else if (item.Status == "Đang giao")
+                                        {
+                                            <span class="badge bg-info text-dark">@item.Status</span>
+                                        }
+                                        else if (item.Status == "Đã hủy")
+                                        {
+                                            <span class="badge bg-danger">@item.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">@(string.IsNullOrEmpty(item.Status) ? "Đang xử lý" : item.Status)</span>
+                                        }
+                                    </td>
+
+                                    @* Cột 6: Nút xem chi tiết & Nút Hủy đơn (chỉ cho phép khách tự hủy khi đơn đang ở trạng thái "Chờ xác nhận") *@
+                                    <td class="text-center text-nowrap">
+                                        @* Nút mở cửa sổ Modal xem chi tiết hóa đơn đơn hàng *@
+                                        <button type="button" class="btn btn-sm btn-outline-danger me-1"
+                                                data-bs-toggle="modal" data-bs-target="#customerInvoiceModal_@item.OrderID">
                                             <i class="fa-solid fa-eye me-1"></i> Xem Chi Tiết
                                         </button>
+
+                                        @* Kiểm tra nghiệp vụ: Chỉ hiển thị nút Hủy đơn nếu trạng thái hiện tại là "Chờ xác nhận" *@
+                                        @if (item.Status != null && item.Status.Trim() == "Chờ xác nhận")
+                                        {
+                                            @* Tạo Form gửi yêu cầu HTTP POST đến Action CancelOrder của CustomerController *@
+                                            using (Html.BeginForm("CancelOrder", "Customer", new { id = item.OrderID }, FormMethod.Post, new { @class = "d-inline" }))
+                                            {
+                                                @* Sinh mã token bảo mật chống giả mạo yêu cầu liên trang (CSRF) *@
+                                                @Html.AntiForgeryToken()
+                                                @* Nút submit hủy đơn kèm hộp thoại xác nhận trước khi gửi lên máy chủ *@
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng #FH-@item.OrderID không?');">
+                                                    <i class="fa-solid fa-ban me-1"></i> Hủy đơn
+                                                </button>
+                                            }
+                                        }
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            @* Dòng thông báo hiển thị khi khách hàng chưa thực hiện đơn hàng nào *@
+                            @* Trường hợp khách hàng chưa có bất kỳ đơn hàng nào trong hệ thống *@
                             <tr>
-                                @* Ô gộp 6 cột căn giữa dòng thông báo giỏ hàng/lịch sử rỗng *@
+                                @* Gộp 6 cột để hiển thị thông báo trống và nút điều hướng sang trang Thực đơn *@
                                 <td colspan="6" class="text-center py-5 text-muted">
-                                    @* Biểu tượng hộp rỗng cảnh báo *@
                                     <i class="fa-solid fa-box-open fs-1 mb-3 text-secondary d-block"></i>
-                                    @* Dòng văn bản thông báo chưa có giao dịch *@
                                     <p class="fs-5 mb-3">Bạn chưa có giao dịch hoặc đơn hàng nào trong hệ thống.</p>
-                                    @* Nút chuyển hướng sang trang thực đơn để khách chọn mua món ăn *@
                                     <a href="@Url.Action("Index", "Product")" class="btn btn-danger fw-bold px-4 py-2">
-                                        @* Biểu tượng muỗng nĩa kèm chữ Khám phá thực đơn *@
                                         <i class="fa-solid fa-utensils me-2"></i>Khám Phá Thực Đơn Ngay
                                     </a>
                                 </td>
@@ -95,57 +883,68 @@
     </div>
 </div>
 
-@* Kiểm tra nếu danh sách đơn hàng có dữ liệu thì sinh các Modal hóa đơn tương ứng *@
+@* Khu vực sinh sẵn các cửa sổ Modal hóa đơn chi tiết cho từng đơn hàng *@
 @if (Model != null && Model.Any())
 {
-    @* Vòng lặp sinh khung Modal Chi tiết Hóa đơn cho từng đơn hàng riêng biệt *@
+    @* Lặp qua từng đơn hàng để tạo một Modal riêng biệt gắn theo OrderID *@
     foreach (var item in Model)
     {
-        @* Thẻ Modal chứa thông tin hóa đơn chi tiết gắn ID duy nhất theo OrderID *@
+        @* Khung Modal Bootstrap hiển thị căn giữa màn hình với kích thước lớn (modal-lg) *@
         <div class="modal fade" id="customerInvoiceModal_@item.OrderID" tabindex="-1" aria-hidden="true">
-            @* Thẻ định dạng kích thước khung Modal *@
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                @* Thẻ nội dung Modal với khoảng cách padding *@
                 <div class="modal-content p-3">
-                    @* Đầu trang Modal chứa nút đóng *@
+                    @* Phần đầu Modal chứa tiêu đề hóa đơn kèm mã đơn và nút đóng X *@
                     <div class="modal-header border-0 pb-0">
-                        @* Tiêu đề khung Modal *@
-                        <h5 class="modal-title fw-bold text-danger">Hóa Đơn Chi Tiết Đơn Hàng</h5>
-                        @* Nút đóng Modal dạng X *@
+                        <h5 class="modal-title fw-bold text-danger">Hóa Đơn Chi Tiết Đơn Hàng #FH-@item.OrderID</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    @* Thân Modal chứa thông tin giao hàng và nhúng Partial View _OrderDetail (Barem Dòng 65) *@
+                    @* Phần thân Modal chứa thông tin người nhận và bảng danh sách món ăn *@
                     <div class="modal-body p-3">
-                        @* Khung hiển thị thông tin Người nhận, Địa chỉ và Thời gian đặt hàng riêng của Đơn hàng *@
+                        @* Khung nền xám nhạt hiển thị thông tin giao nhận của đơn hàng *@
                         <div class="p-3 bg-light rounded-3 mb-3 border">
                             <div class="row small">
-                                @* Hiển thị tên người nhận *@
+                                @* Tên người nhận hàng *@
                                 <div class="col-md-6 mb-1">
                                     <strong>Người nhận:</strong> <span class="text-dark fw-bold">@(string.IsNullOrEmpty(item.CustomerName) ? "Khách hàng" : item.CustomerName)</span>
                                 </div>
-                                @* Hiển thị địa chỉ giao hàng *@
+                                @* Địa chỉ giao hàng *@
                                 <div class="col-md-6 mb-1">
                                     <strong>Địa chỉ giao:</strong> <span class="text-dark fw-bold">@(string.IsNullOrEmpty(item.Address) ? "N/A" : item.Address)</span>
                                 </div>
-                                @* Hiển thị thời gian đặt hàng *@
+                                @* Thời gian đặt đơn chính xác đến từng giây *@
                                 <div class="col-md-12 mt-1">
                                     <strong>Thời gian đặt:</strong> <span class="text-muted">@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "N/A")</span>
                                 </div>
                             </div>
                         </div>
 
-                        @* Lệnh nhúng Partial View hiển thị danh sách món ăn dạng hóa đơn dùng chung cho Admin & Customer (Barem Dòng 65) *@
+                        @* Nhúng Partial View _OrderDetail để hiển thị bảng chi tiết từng món ăn và tổng tiền *@
                         @Html.Partial("_OrderDetail", item.OrderDetails)
                     </div>
 
-                    @* Chân Modal chứa nút đóng và nút in hóa đơn *@
+                    @* Phần chân Modal chứa nút Hủy đơn (nếu đang Chờ xác nhận), nút Đóng và nút In Hóa Đơn *@
                     <div class="modal-footer border-0 justify-content-center">
-                        @* Nút bấm đóng cửa sổ Modal *@
+                        @* Nếu đơn hàng vẫn đang ở trạng thái "Chờ xác nhận", hiển thị nút Hủy đơn ở góc trái chân Modal *@
+                        @if (item.Status != null && item.Status.Trim() == "Chờ xác nhận")
+                        {
+                            @* Form POST gọi Action CancelOrder và dùng lớp me-auto để đẩy nút hủy sang bên trái *@
+                            using (Html.BeginForm("CancelOrder", "Customer", new { id = item.OrderID }, FormMethod.Post, new { @class = "d-inline me-auto" }))
+                            {
+                                @* Chèn mã xác thực chống giả mạo CSRF *@
+                                @Html.AntiForgeryToken()
+                                @* Nút xác nhận hủy đơn hàng ngay trong cửa sổ xem chi tiết hóa đơn *@
+                                <button type="submit" class="btn btn-danger fw-bold"
+                                        onclick="return confirm('Xác nhận hủy đơn hàng #FH-@item.OrderID? Thao tác này không thể hoàn tác.');">
+                                    <i class="fa-solid fa-ban me-1"></i> Hủy Đơn Hàng Này
+                                </button>
+                            }
+                        }
+
+                        @* Nút đóng cửa sổ Modal *@
                         <button type="button" class="btn btn-secondary btn-sm px-4" data-bs-dismiss="modal">Đóng</button>
-                        @* Nút bấm gửi lệnh in trang tính hóa đơn của trình duyệt *@
+                        @* Nút gọi lệnh in của trình duyệt (window.print) để xuất hóa đơn *@
                         <button type="button" class="btn btn-danger btn-sm px-4 fw-bold" onclick="window.print()">
-                            @* Biểu tượng máy in *@
                             <i class="fa-solid fa-print me-1"></i> In Hóa Đơn
                         </button>
                     </div>
@@ -153,4 +952,94 @@
             </div>
         </div>
     }
+}
+
+@* Khu vực nhúng mã JavaScript vào cuối trang thông qua section scripts của Layout *@
+@section scripts {
+    <script>
+        // Lắng nghe sự kiện khi toàn bộ cây DOM của trang web đã tải xong
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. HIỆU ỨNG TÔ SÁNG THẺ KPI ĐANG MỞ NGĂN KÉO
+            // Khai báo mảng chứa ID của 3 ngăn kéo chi tiết
+            const drawers = ['drawerOrders', 'drawerSpending', 'drawerDishes'];
+            // Duyệt qua từng ID ngăn kéo để gắn sự kiện đóng/mở
+            drawers.forEach(function (drawerId) {
+                // Lấy phần tử HTML của ngăn kéo tương ứng theo ID
+                const el = document.getElementById(drawerId);
+                // Nếu không tìm thấy phần tử (khi khách chưa có đơn hàng nào) thì thoát hàm hiện tại
+                if (!el) return;
+
+                // Bắt sự kiện khi ngăn kéo bắt đầu mở ra (show.bs.collapse của Bootstrap 5)
+                el.addEventListener('show.bs.collapse', function () {
+                    // Xóa lớp tô sáng (active-kpi) khỏi tất cả 3 thẻ KPI trước
+                    document.querySelectorAll('.kpi-interactive-card').forEach(c => c.classList.remove('active-kpi'));
+                    // Tìm thẻ KPI đang điều khiển ngăn kéo vừa được mở
+                    const triggerCard = document.querySelector('[data-bs-target="#' + drawerId + '"]');
+                    // Nếu tìm thấy thẻ KPI thì thêm lớp active-kpi để tô sáng viền và nền thẻ
+                    if (triggerCard) triggerCard.classList.add('active-kpi');
+                });
+
+                // Bắt sự kiện khi ngăn kéo bắt đầu thu gọn lại (hide.bs.collapse của Bootstrap 5)
+                el.addEventListener('hide.bs.collapse', function () {
+                    // Tìm thẻ KPI tương ứng với ngăn kéo vừa đóng
+                    const triggerCard = document.querySelector('[data-bs-target="#' + drawerId + '"]');
+                    // Gỡ bỏ lớp tô sáng active-kpi để đưa thẻ về trạng thái bình thường
+                    if (triggerCard) triggerCard.classList.remove('active-kpi');
+                });
+            });
+
+            // 2. BỘ LỌC NHANH MÓN ĂN TRONG NGĂN KÉO 3 (Tất cả / Đã thực đặt / Có lần hủy)
+            // Lấy danh sách tất cả các nút bấm bộ lọc trạng thái món ăn
+            const filterButtons = document.querySelectorAll('.dish-filter-btn');
+            // Lấy danh sách tất cả các thẻ cột món ăn trong lưới lịch sử
+            const dishItems = document.querySelectorAll('.dish-history-item');
+
+            // Gắn sự kiện click cho từng nút lọc trạng thái món ăn
+            filterButtons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    // Lấy giá trị bộ lọc được gắn trong thuộc tính data-filter của nút vừa bấm
+                    const filterValue = this.getAttribute('data-filter');
+
+                    // Đặt lại giao diện mặc định (nền rỗng có viền) cho toàn bộ các nút lọc trước
+                    filterButtons.forEach(b => {
+                        // Gỡ bỏ trạng thái đang chọn và màu nền đặc khỏi nút
+                        b.classList.remove('active', 'btn-success', 'btn-danger');
+                        // Nếu là nút lọc "Có lần hủy" thì trả về viền đỏ
+                        if (b.getAttribute('data-filter') === 'cancelled') {
+                            b.classList.add('btn-outline-danger');
+                        } else {
+                            // Các nút lọc còn lại trả về viền xanh lá
+                            b.classList.add('btn-outline-success');
+                        }
+                    });
+
+                    // Đánh dấu nút vừa được bấm là đang kích hoạt (active)
+                    this.classList.add('active');
+                    // Tô màu nền đặc tương ứng cho nút đang được chọn
+                    if (filterValue === 'cancelled') {
+                        // Nếu chọn "Có lần hủy" thì tô nền đỏ đặc
+                        this.classList.remove('btn-outline-danger');
+                        this.classList.add('btn-danger');
+                    } else {
+                        // Nếu chọn "Tất cả" hoặc "Đã thực đặt" thì tô nền xanh lá đặc
+                        this.classList.remove('btn-outline-success');
+                        this.classList.add('btn-success');
+                    }
+
+                    // Duyệt qua từng thẻ món ăn để ẩn hoặc hiện khớp với điều kiện lọc
+                    dishItems.forEach(function (item) {
+                        // Lấy chuỗi thẻ phân loại trạng thái (tags) gắn trên thẻ món ăn
+                        const tags = item.getAttribute('data-status-tags') || '';
+                        // Nếu chọn "all" hoặc chuỗi tags có chứa từ khóa lọc thì hiển thị thẻ món ăn
+                        if (filterValue === 'all' || tags.includes(filterValue)) {
+                            item.classList.remove('d-none');
+                        } else {
+                            // Ngược lại thì thêm lớp d-none của Bootstrap để ẩn thẻ món ăn đi
+                            item.classList.add('d-none');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 }

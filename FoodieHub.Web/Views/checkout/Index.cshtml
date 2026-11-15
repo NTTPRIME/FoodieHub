@@ -1,31 +1,30 @@
-﻿@* Khai báo Model nhận vào View là danh sách các món ăn trong Giỏ hàng *@
-@model IEnumerable<FoodieHub.Web.Models.ViewModels.CartItem>
+﻿@model IEnumerable<FoodieHub.Web.Models.ViewModels.CartItem>
 
 @{
-    @* Thiết lập tiêu đề hiển thị trên trình duyệt *@
     ViewBag.Title = "Xác Nhận & Thanh Toán Đơn Hàng";
-    @* Kế thừa khung giao diện chung MasterLayout dành cho Khách hàng *@
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
-    @* Khởi tạo biến tính tổng tiền của toàn bộ giỏ hàng *@
     decimal totalAmount = Model != null ? Model.Sum(x => x.TotalPrice) : 0;
-    @* Lấy thông tin tài khoản đang đăng nhập từ Session nếu có *@
     var currentUser = Session["User"] as FoodieHub.Web.Models.User;
 }
 
-@* Khung vùng chứa chính của trang thanh toán *@
 <div class="container my-5">
-    @* Tiêu đề trang xác nhận thanh toán *@
     <h3 class="fw-bold mb-4 text-success">
         <i class="fas fa-credit-card me-2"></i>Xác Nhận & Thanh Toán Đơn Hàng
     </h3>
 
-    @* Sử dụng Form HTML gửi dữ liệu phương thức POST về Action ProcessOrder trong CheckoutController *@
+    @* Khung hiển thị thông báo lỗi (nếu có sự cố tồn kho hoặc xác thực) *@
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     @using (Html.BeginForm("ProcessOrder", "Checkout", FormMethod.Post, new { @id = "checkoutForm" }))
     {
-        @* Tạo mã AntiForgeryToken bảo mật chống tấn công giả mạo CSRF *@
         @Html.AntiForgeryToken()
 
-        @* Bố cục 2 cột Bootstrap *@
         <div class="row g-4">
             @* CỘT TRÁI: ĐIỀN THÔNG TIN GIAO HÀNG *@
             <div class="col-md-7">
@@ -34,7 +33,6 @@
                         <i class="fas fa-map-marker-alt me-2"></i>Thông tin người nhận & Địa chỉ giao hàng
                     </h5>
 
-                    @* Ô nhập Họ và tên người nhận *@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Họ và tên người nhận (*)</label>
                         <input type="text" name="CustomerName" class="form-control"
@@ -42,7 +40,6 @@
                                placeholder="Nhập họ và tên người nhận..." required />
                     </div>
 
-                    @* ================= THÊM MỚI: Ô NHẬP SỐ ĐIỆN THOẠI ================= *@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Số điện thoại liên hệ (*)</label>
                         <input type="tel" name="Phone" class="form-control"
@@ -50,7 +47,6 @@
                                placeholder="Nhập số điện thoại nhận hàng (VD: 0901234567)..." required />
                     </div>
 
-                    @* ================= THÊM MỚI: Ô NHẬP EMAIL ================= *@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Địa chỉ Email nhận thông báo (*)</label>
                         <input type="email" name="Email" class="form-control"
@@ -58,14 +54,12 @@
                                placeholder="Nhập địa chỉ email của bạn..." required />
                     </div>
 
-                    @* Ô nhập Địa chỉ giao hàng chi tiết *@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Địa chỉ nhận hàng chi tiết (*)</label>
                         <textarea name="Address" class="form-control" rows="3"
                                   placeholder="Nhập số nhà, tên đường, phường/xã, quận/huyện..." required></textarea>
                     </div>
 
-                    @* Ghi chú bổ sung dành cho đơn hàng *@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Ghi chú giao hàng (Tùy chọn)</label>
                         <input type="text" name="Note" class="form-control"
@@ -81,7 +75,6 @@
                         <i class="fas fa-utensils me-2"></i>Danh sách món ăn đã chọn
                     </h5>
 
-                    @* Khung cuộn hiển thị từng món ăn trong giỏ *@
                     <div class="cart-summary-list mb-3" style="max-height: 300px; overflow-y: auto;">
                         @if (Model != null && Model.Any())
                         {
@@ -104,7 +97,6 @@
                         }
                     </div>
 
-                    @* Chọn phương thức thanh toán giao dịch *@
                     <h6 class="fw-bold mb-2">Phương thức thanh toán</h6>
                     <div class="form-check mb-2 p-3 border rounded bg-light">
                         <input class="form-check-input ms-0 me-2" type="radio" name="paymentMethod" id="cod" value="COD" checked>

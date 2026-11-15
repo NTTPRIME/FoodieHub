@@ -50,6 +50,13 @@
             <p class="form-control-static text-dark fw-semibold">@Model.Email</p>
         </div>
 
+        @* ================= BỔ SUNG: KHÔNG HIỂN THỊ SỐ ĐIỆN THOẠI NGAY DƯỚI EMAIL ================= *@
+        <div class="mb-3">
+            <label class="form-label fw-bold text-secondary">Số điện thoại:</label>
+            <p class="form-control-static text-dark fw-semibold">@(!string.IsNullOrEmpty(Model.Phone) ? Model.Phone : "Chưa cập nhật")</p>
+        </div>
+        @* ======================================================================================= *@
+
         @* Khung nhóm hiển thị Vai trò hệ thống *@
         <div class="mb-3">
             @* Nhãn tên trường Vai trò hệ thống *@

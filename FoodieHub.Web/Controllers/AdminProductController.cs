@@ -34,7 +34,9 @@ namespace FoodieHub.Web.Controllers
             {
                 return HttpNotFound();
             }
-            Product product = db.Products.Find(id);
+            // Sử dụng .Include để nạp kèm thông tin Danh mục tránh lỗi null khi hiển thị
+            Product product = db.Products.Include(p => p.Category)
+                                         .FirstOrDefault(p => p.ProductID == id);
             if (product == null)
             {
                 return HttpNotFound();
@@ -155,7 +157,9 @@ namespace FoodieHub.Web.Controllers
             {
                 return HttpNotFound();
             }
-            Product product = db.Products.Find(id);
+            Product product = db.Products.Include(p => p.Category)
+                                         .Include(p => p.OrderDetails)
+                                         .FirstOrDefault(p => p.ProductID == id);
             if (product == null)
             {
                 return HttpNotFound();
@@ -167,7 +171,9 @@ namespace FoodieHub.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Product product = db.Products.Find(id);
+            Product product = db.Products.Include(p => p.Category)
+                                         .Include(p => p.OrderDetails)
+                                         .FirstOrDefault(p => p.ProductID == id);
             if (product != null)
             {
                 // KIỂM TRA RÀNG BUỘC (Constraints): Kiểm tra xem món ăn đã từng nằm trong Chi tiết đơn hàng chưa
@@ -182,6 +188,18 @@ namespace FoodieHub.Web.Controllers
                 db.SaveChanges();
             }
             return RedirectToAction("Index");
+        }
+
+        // ----------------------------------------------------------------------
+        // 6. GIẢI PHÓNG TÀI NGUYÊN KẾT NỐI CSDL
+        // ----------------------------------------------------------------------
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

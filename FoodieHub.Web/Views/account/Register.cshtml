@@ -50,6 +50,15 @@
                 @* Hiển thị dòng tin nhắn báo lỗi đỏ nếu Email bị trùng hoặc sai định dạng (Barem Dòng 51) *@
                 @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
             </div>
+
+            @* ================= BỔ SUNG: KHUNG NHẬP SỐ ĐIỆN THOẠI NGAY DƯỚI EMAIL ================= *@
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Số điện thoại</label>
+                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", type = "tel", placeholder = "Nhập số điện thoại liên hệ..." })
+                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger small" })
+            </div>
+            @* =================================================================================== *@
+
             @* Khung nhập liệu Mật khẩu *@
             <div class="mb-3">
                 @* Hiển thị nhãn Mật khẩu lấy từ UserMetadata *@

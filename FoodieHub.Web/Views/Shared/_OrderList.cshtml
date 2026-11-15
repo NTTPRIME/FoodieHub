@@ -32,54 +32,65 @@
                 foreach (var item in Model)
                 {
                     @* Dòng hiển thị thông tin của một đơn hàng *@
-            <tr>
-                @* Ô hiển thị mã đơn hàng in đậm *@
-                <td class="fw-bold text-dark">#@item.OrderID</td>
-                @* Ô hiển thị tên khách hàng (ưu tiên lấy tên tài khoản, nếu không lấy tên người nhận) *@
-                <td>
-                    @* Khung linh hoạt sắp xếp tên khách hàng *@
-                    <div class="d-flex align-items-center">
-                        @* Biểu tượng đại diện khách hàng *@
-                        <i class="fa-solid fa-user-circle me-2 text-secondary fs-5"></i>
-                        @* Thẻ chứa tên hiển thị khách hàng *@
-                        <span class="fw-semibold">@(item.User != null ? item.User.FullName : (!string.IsNullOrEmpty(item.CustomerName) ? item.CustomerName : "Khách vãng lai"))</span>
-                    </div>
-                </td>
-                @* Ô hiển thị ngày giờ đặt hàng định dạng ngày/tháng/năm giờ:phút *@
-                <td>@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
-                @* Ô hiển thị tổng giá trị tiền đơn hàng màu đỏ in đậm *@
-                <td class="text-end text-danger fw-bold fs-6">@item.TotalAmount.ToString("N0") VNĐ</td>
-                @* Ô hiển thị dropdown cho phép Admin thay đổi trạng thái đơn hàng *@
-                <td class="text-center">
-                    @{
-                        string currentVal = "";
-                        try
-                        {
-                            dynamic dyn = item;
-                            currentVal = (string)(dyn.Status ?? dyn.TrangThai ?? dyn.Orderstatus ?? "");
-                        }
-                        catch { }
-                    }
-                    <form action="@Url.Action("UpdateStatus", "AdminOrder")" method="post" class="d-inline update-status-form">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@item.OrderID" />
-                        <select name="status" class="form-select form-select-sm d-inline-block w-auto text-center" onchange="this.form.submit()">
-                            <option value="Pending" @(currentVal == "Pending" ? "selected" : "")>Chờ xác nhận</option>
-                            <option value="Processing" @(currentVal == "Processing" ? "selected" : "")>Đang xử lý</option>
-                            <option value="Shipping" @(currentVal == "Shipping" ? "selected" : "")>Đang giao hàng</option>
-                            <option value="Completed" @(currentVal == "Completed" ? "selected" : "")>Hoàn thành</option>
-                        </select>
-                    </form>
-                </td>
-                @* Ô chứa nút Xem Hóa Đơn chuyển hướng đến Action Details của AdminOrderController *@
-                <td class="text-center">
-                    @* Thẻ liên kết mở trang chi tiết hóa đơn của đơn hàng tương ứng *@
-                    <a href="@Url.Action("Details", "AdminOrder", new { id = item.OrderID })" class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết hóa đơn">
-                        @* Biểu tượng tờ hóa đơn *@
-                        <i class="fa-solid fa-file-invoice me-1"></i> Xem Hóa Đơn
-                    </a>
-                </td>
-            </tr>
+                    <tr>
+                        @* Ô hiển thị mã đơn hàng in đậm *@
+                        <td class="fw-bold text-dark">#@item.OrderID</td>
+                        @* Ô hiển thị tên khách hàng (ưu tiên lấy tên tài khoản, nếu không lấy tên người nhận) *@
+                        <td>
+                            @* Khung linh hoạt sắp xếp tên khách hàng *@
+                            <div class="d-flex align-items-center">
+                                @* Biểu tượng đại diện khách hàng *@
+                                <i class="fa-solid fa-user-circle me-2 text-secondary fs-5"></i>
+                                @* Thẻ chứa tên hiển thị khách hàng *@
+                                <span class="fw-semibold">@(item.User != null ? item.User.FullName : (!string.IsNullOrEmpty(item.CustomerName) ? item.CustomerName : "Khách vãng lai"))</span>
+                            </div>
+                        </td>
+                        @* Ô hiển thị ngày giờ đặt hàng định dạng ngày/tháng/năm giờ:phút *@
+                        <td>@(item.OrderDate.HasValue ? item.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                        @* Ô hiển thị tổng giá trị tiền đơn hàng màu đỏ in đậm *@
+                        <td class="text-end text-danger fw-bold fs-6">@item.TotalAmount.ToString("N0") VNĐ</td>
+                        @* Ô hiển thị dropdown cho phép Admin thay đổi trạng thái đơn hàng *@
+                        <td class="text-center">
+                            @* Mở khối mã C# để lấy giá trị trạng thái hiện tại của đơn hàng *@
+                            @{
+                                string currentVal = ""; // Khởi tạo biến lưu chuỗi trạng thái hiện tại mặc định là rỗng
+                                try // Bắt đầu khối kiểm tra ngoại lệ khi truy xuất thuộc tính động
+                                {
+                                    dynamic dyn = item; // Ép kiểu đối tượng item sang dynamic để tránh lỗi biên dịch nếu khác tên cột
+                                    currentVal = (string)(dyn.Status ?? dyn.TrangThai ?? dyn.Orderstatus ?? ""); // Lấy giá trị trạng thái từ các tên thuộc tính có thể tồn tại
+                                }
+                                catch { } // Bỏ qua lỗi nếu không đọc được thuộc tính
+                            }
+                            @* Form gửi yêu cầu POST cập nhật trạng thái đơn hàng về Action UpdateStatus của AdminOrderController *@
+                            <form action="@Url.Action("UpdateStatus", "AdminOrder")" method="post" class="d-inline update-status-form">
+                                @* Sinh mã token chống giả mạo yêu cầu CSRF *@
+                                @Html.AntiForgeryToken()
+                                @* Trường ẩn lưu mã định danh đơn hàng (OrderID) cần cập nhật *@
+                                <input type="hidden" name="id" value="@item.OrderID" />
+                                @* Thẻ chọn trạng thái đơn hàng tự động submit form ngay khi Admin thay đổi lựa chọn *@
+                                <select name="status" class="form-select form-select-sm d-inline-block w-auto text-center" onchange="this.form.submit()">
+                                    @* Tùy chọn trạng thái Chờ xác nhận (đồng bộ tiếng Việt với CheckoutController) *@
+                                    <option value="Chờ xác nhận" @(currentVal == "Chờ xác nhận" ? "selected" : "")>Chờ xác nhận</option>
+                                    @* Tùy chọn trạng thái Đang xử lý *@
+                                    <option value="Đang xử lý" @(currentVal == "Đang xử lý" ? "selected" : "")>Đang xử lý</option>
+                                    @* Tùy chọn trạng thái Đang giao (đồng bộ tiếng Việt với TransactionHistory) *@
+                                    <option value="Đang giao" @(currentVal == "Đang giao" ? "selected" : "")>Đang giao</option>
+                                    @* Tùy chọn trạng thái Hoàn thành (đồng bộ tiếng Việt với TransactionHistory) *@
+                                    <option value="Hoàn thành" @(currentVal == "Hoàn thành" ? "selected" : "")>Hoàn thành</option>
+                                    @* Tùy chọn trạng thái Đã hủy (đồng bộ tiếng Việt với TransactionHistory) *@
+                                    <option value="Đã hủy" @(currentVal == "Đã hủy" ? "selected" : "")>Đã hủy</option>
+                                </select>
+                            </form>
+                        </td>
+                        @* Ô chứa nút Xem Hóa Đơn chuyển hướng đến Action Details của AdminOrderController *@
+                        <td class="text-center">
+                            @* Thẻ liên kết mở trang chi tiết hóa đơn của đơn hàng tương ứng *@
+                            <a href="@Url.Action("Details", "AdminOrder", new { id = item.OrderID })" class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết hóa đơn">
+                                @* Biểu tượng tờ hóa đơn *@
+                                <i class="fa-solid fa-file-invoice me-1"></i> Xem Hóa Đơn
+                            </a>
+                        </td>
+                    </tr>
                 }
             }
             else

@@ -2,15 +2,10 @@
    LỘT XÁC GIAO DIỆN FOODIEHUB - CHÚ THÍCH CHI TIẾT TỪNG DÒNG
    ========================================================= */
 
-/* Định dạng cấu trúc nền tảng cho toàn bộ trang web */
 body {
-    /* Đẩy phần nội dung xuống 60px để không bị thanh menu trên cùng đè lên */
     padding-top: 60px;
-    /* Dùng phông chữ hiện đại, mượt mà không chân */
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    /* Đổi màu nền từ trắng toát sang xám nhạt để làm nổi bật các thẻ món ăn */
-    background-color: #f4f7f6;
-    /* Màu chữ xám đen dễ đọc, không gắt mắt */
+    background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80') center/cover fixed no-repeat !important;
     color: #2b2b2b;
 }
 
@@ -88,8 +83,8 @@ body {
    ========================================================= */
 /* Thay đổi toàn bộ nút đỏ (btn-danger) và xanh (btn-primary) */
 .btn-danger, .btn-primary {
-    /* Đổ màu dốc (Gradient) từ cam nhạt sang cam đậm */
-    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    /* Đổ màu dốc (Gradient) từ đỏ tươi sang đỏ đậm */
+    background: linear-gradient(135deg, #dc3545, #a71d2a);
     /* Bỏ viền nút */
     border: none;
     /* Bo tròn hoàn toàn 2 đầu nút như viên thuốc */
@@ -106,8 +101,61 @@ body {
 
     /* Hiệu ứng khi di chuột vào nút */
     .btn-danger:hover, .btn-primary:hover {
+        background: linear-gradient(135deg, #c82333, #8f1622);
         /* Phóng to nút lên 5% */
         transform: scale(1.05);
-        /* Đổ bóng màu cam cho nút phát sáng nhẹ */
-        box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+        /* Đổ bóng màu đỏ cho nút phát sáng nhẹ */
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
     }
+
+.hero-banner {
+    background-color: #c1121f !important;
+    background-image: linear-gradient(135deg, rgba(230, 57, 70, 0.88) 0%, rgba(181, 23, 39, 0.88) 55%, rgba(127, 13, 24, 0.92) 100%), url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1600&q=80') !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    border-radius: 20px;
+    color: #ffffff !important;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(230, 57, 70, 0.25);
+}
+
+/* Hiệu ứng quầng sáng vàng cam phía sau Hamburger */
+.burger-glow {
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(255, 193, 7, 0.45) 0%, rgba(255, 193, 7, 0) 70%);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Định dạng ảnh Hamburger nổi khối và bay nhẹ */
+.hero-burger-img {
+    position: relative;
+    z-index: 2;
+    max-height: 290px;
+    object-fit: contain;
+    /* Đổ bóng bám sát viền bánh (không bị khung vuông) */
+    filter: drop-shadow(0 18px 25px rgba(0, 0, 0, 0.45));
+    animation: floatBurger 3.5s ease-in-out infinite;
+    transition: transform 0.3s ease;
+}
+
+    /* Rê chuột vào bánh sẽ nghiêng nhẹ và phóng to */
+    .hero-burger-img:hover {
+        transform: scale(1.08) rotate(-3deg);
+    }
+
+/* Chuyển động lơ lửng lên xuống */
+@keyframes floatBurger {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}

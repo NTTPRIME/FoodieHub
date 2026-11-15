@@ -1,108 +1,211 @@
-﻿@* Khai báo Mô hình dữ liệu truyền sang View là danh sách các đối tượng Sản phẩm (Product) *@
+﻿@* Khai báo Mô hình dữ liệu truyền từ HomeController sang View là danh sách các đối tượng Sản phẩm (Product) *@
 @model IEnumerable<FoodieHub.Web.Models.Product>
 
+@* Mở khối lệnh C# để thiết lập cấu hình trang và hứng dữ liệu từ ViewBag *@
 @{
     // Cấu hình tiêu đề hiển thị trên thẻ tab của trình duyệt
     ViewBag.Title = "FoodieHub - Đặt Món Ngon Giao Nhanh Tận Nơi";
     // Đặt đường dẫn sử dụng file Giao diện khung chung (Master Layout)
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
-    // Ép kiểu dữ liệu từ ViewBag.Categories sang danh sách List<Category> để sử dụng bên dưới
+    // Ép kiểu dữ liệu từ ViewBag.Categories sang danh sách List<Category> để hiển thị thanh danh mục
     var categories = ViewBag.Categories as List<FoodieHub.Web.Models.Category>;
+    // Ép kiểu dữ liệu từ ViewBag.BestSellers sang danh sách List<BestSellerItem> đã được xếp hạng đồng hạng từ Controller
+    var bestSellers = ViewBag.BestSellers as List<FoodieHub.Web.Models.ViewModels.BestSellerItem>;
+    // Đóng khối lệnh C#
 }
 
+@* Khai báo khối CSS nội bộ để tinh chỉnh kích thước nút bấm, chống tràn chữ và đồng bộ hiệu ứng thẻ *@
+<style>
+    /* Lớp ghi đè padding khổng lồ của .btn-danger trong Site.css giúp nút bấm trong thẻ món ăn gọn gàng, không rớt dòng */
+    .btn-card-action {
+        /* Thu gọn khoảng đệm trên dưới 6px và trái phải 12px */
+        padding: 6px 12px !important;
+        /* Cỡ chữ vừa vặn trên 1 dòng */
+        font-size: 0.85rem !important;
+        /* Giữ nguyên kiểu chữ thường thay vì ép in hoa toàn bộ */
+        text-transform: none !important;
+        /* Ngăn chữ trên nút bị ngắt xuống hàng thứ hai */
+        white-space: nowrap;
+    }
+
+    /* Hiệu ứng nâng nhẹ thẻ danh mục và thẻ món ăn khi người dùng rê chuột qua */
+    .food-card-hover {
+        /* Tạo chuyển động mượt mà trong 0.2 giây */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        /* Trạng thái thẻ khi rê chuột (hover) */
+        .food-card-hover:hover {
+            /* Nâng thẻ lên trên 4px */
+            transform: translateY(-4px);
+            /* Tăng độ đổ bóng tạo chiều sâu */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12) !important;
+        }
+
+    /* Cố định tiêu đề tên món ăn tối đa 2 dòng để các thẻ trong cùng một hàng luôn cao bằng nhau */
+    .product-title-clamp {
+        /* Sử dụng hộp linh hoạt WebKit để giới hạn số dòng */
+        display: -webkit-box;
+        /* Giới hạn hiển thị tối đa 2 dòng văn bản */
+        -webkit-line-clamp: 2;
+        /* Căn hướng sắp xếp dọc */
+        -webkit-box-orient: vertical;
+        /* Ẩn phần văn bản vượt quá 2 dòng */
+        overflow: hidden;
+        /* Giữ chiều cao tối thiểu tương đương 2 dòng chữ */
+        min-height: 2.6rem;
+    }
+</style>
+
 <!-- ========================================== -->
-<!-- 1. VÙNG HERO BANNER ĐẦU TRANG             -->
+<!-- 1. VÙNG HERO BANNER ĐẦU TRANG              -->
 <!-- ========================================== -->
-<!-- Khung Banner tràn lề sử dụng hiệu ứng màu chuyển Đỏ - Cam thương hiệu FoodieHub -->
-<div class="p-5 mb-4 text-white rounded-3 shadow" style="background: linear-gradient(135deg, #EE4D2D, #ff7e5f) !important;">
-    <!-- Khung chứa nội dung căn giữa banner -->
-    <div class="container-fluid py-3 text-center">
-        <!-- Tiêu đề lớn chào mừng khách hàng kèm icon ngọn lửa -->
-        <h1 class="display-4 fw-bold mb-3">
-            <i class="fa-solid fa-fire me-2"></i>Thỏa Sức Thưởng Thức Món Ngon Cùng FoodieHub!
-        </h1>
-        <!-- Lời nhắn cam kết chất lượng và thời gian giao hàng -->
-        <p class="fs-5 mb-4 opacity-90">Giao hàng siêu tốc trong 20 phút - Đảm bảo nóng hổi, thơm ngon chuẩn vị gia đình.</p>
-        <!-- Nút cuộn nhanh xuống phần danh sách thực đơn bên dưới -->
-        <a href="#menuSection" class="btn btn-light btn-lg fw-bold text-danger rounded-pill px-4 shadow-sm">
-            <i class="fa-solid fa-utensils me-2"></i>Khám Phá Thực Đơn Ngay
-        </a>
+@* Khung Banner mặt tiền sử dụng class .hero-banner (nền đỏ gradient định nghĩa trong Site.css) và cách lề dưới 5 đơn vị *@
+<div class="hero-banner mb-5">
+    @* Hàng lưới Bootstrap căn giữa các phần tử theo chiều dọc *@
+    <div class="row align-items-center">
+        @* Cột bên trái (chiếm 7/12 phần để khớp với cột ảnh 5/12 phần bên phải): Chứa thông điệp và thanh tìm kiếm *@
+        <div class="col-lg-7">
+            @* Huy hiệu nổi bật màu vàng bo tròn cam kết thời gian giao hàng *@
+            <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-3">
+                @* Icon tia sét FontAwesome kèm nhãn thời gian giao nhanh *@
+                <i class="fa-solid fa-bolt me-1"></i> GIAO NHANH TRONG 30 PHÚT
+            </span>
+            @* Tiêu đề chính cỡ lớn in đậm thu hút khách hàng *@
+            <h1 class="display-5 fw-bold mb-3">Đặt Món Ngon Chuẩn Vị Tại FoodieHub</h1>
+            @* Đoạn văn mô tả phụ giới thiệu sự đa dạng của thực đơn với màu chữ trắng mờ nhẹ *@
+            <p class="lead mb-4 text-white-50">
+                Khám phá thực đơn đa dạng từ cơm tấm, bún phở đến trà sữa & ăn vặt nóng hổi giao tận nơi.
+            </p>
+
+            @* Form tìm kiếm món ăn nhanh gửi dữ liệu qua phương thức GET tới Action Index của ProductController *@
+            <form action="@Url.Action("Index", "Product")" method="get" class="d-flex gap-2" style="max-width: 540px;">
+                @* Ô nhập từ khóa tên món ăn bo tròn 2 đầu, viền trống và đổ bóng nhẹ *@
+                <input type="text" name="searchString" class="form-control form-control-lg rounded-pill px-4 border-0 shadow-sm"
+                       placeholder="Bạn đang thèm món gì hôm nay?..." />
+                @* Nút submit màu vàng nổi bật thực thi tìm kiếm và giữ chữ không xuống dòng *@
+                <button type="submit" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold text-dark shadow-sm text-nowrap">
+                    @* Icon kính lúp kèm nhãn Tìm món *@
+                    <i class="fa-solid fa-magnifying-glass me-1"></i> Tìm món
+                </button>
+            </form>
+        </div>
+
+        @* Cột bên phải (chiếm 5/12 phần trên màn hình lớn): Chứa vòng hào quang và ảnh Hamburger nổi khối *@
+        <div class="col-lg-5 d-none d-lg-flex justify-content-center align-items-center position-relative">
+            @* Lớp phủ tròn tạo quầng hào quang sáng nhẹ phía sau chiếc bánh Hamburger *@
+            <div class="burger-glow"></div>
+
+            @* Thẻ hiển thị hình ảnh chiếc Hamburger phô mai thịt xông khói với hiệu ứng đổ bóng và bo góc mềm mại *@
+            <img src="https://img.magnific.com/psd-mien-phi/banh-pho-mai-kep-thit-doi-voi-thit-xong-khoi-va-pho-mai-tan-chay_84443-78715.jpg?semt=ais_hybrid&w=740&q=80"
+                 alt="Hamburger Đặc Biệt FoodieHub"
+                 class="img-fluid hero-burger-img rounded-4" />
+        </div>
     </div>
 </div>
 
 <!-- ========================================== -->
 <!-- 2. VÙNG DANH MỤC MÓN ĂN NỔI BẬT            -->
 <!-- ========================================== -->
-<!-- Khung chứa các nút lọc danh mục sản phẩm -->
-<div class="container mb-5" id="menuSection">
-    <!-- Tiêu đề phần danh mục -->
+@* Khung chứa các thẻ lọc danh mục sản phẩm (không dùng .container lồng trong .body-content để tránh bóp khung) *@
+<div class="mb-5" id="menuSection">
+    @* Khối tiêu đề khu vực danh mục căn giữa *@
     <div class="text-center mb-4">
+        @* Tiêu đề in hoa màu đỏ thương hiệu *@
         <h3 class="fw-bold text-uppercase text-danger">
+            @* Icon danh sách kèm chữ tiêu đề *@
             <i class="fa-solid fa-list-check me-2"></i>Danh Mục Món Ăn Nổi Bật
         </h3>
+        @* Dòng mô tả phụ hướng dẫn người dùng chọn danh mục *@
         <p class="text-muted">Chọn danh mục yêu thích để tìm kiếm món ăn nhanh nhất</p>
     </div>
 
-    <!-- Hàng chứa danh sách nút danh mục căn giữa -->
+    @* Hàng lưới Bootstrap chứa danh sách các nút danh mục căn giữa *@
     <div class="row g-3 justify-content-center">
-        <!-- Nút xem tất cả sản phẩm (Mặc định) -->
+        @* Cột đầu tiên: Thẻ nút xem tất cả sản phẩm (Mặc định) *@
         <div class="col-6 col-sm-4 col-md-2">
-            <a href="@Url.Action("Index", "Product")" class="card text-center p-3 text-decoration-none shadow-sm h-100 border-0 rounded-3 bg-white text-dark">
-                <div class="fs-2 text-warning mb-2"><i class="fa-solid fa-star"></i></div>
+            @* Liên kết điều hướng sang trang Product/Index không kèm bộ lọc danh mục *@
+            <a href="@Url.Action("Index", "Product")" class="card food-card-hover text-center p-3 text-decoration-none shadow-sm h-100 border-0 rounded-3 bg-white text-dark">
+                @* Biểu tượng ngôi sao màu đỏ đại diện cho toàn bộ thực đơn *@
+                <div class="fs-2 text-danger mb-2"><i class="fa-solid fa-star"></i></div>
+                @* Nhãn tên nút Tất Cả Món *@
                 <span class="fw-bold small">Tất Cả Món</span>
             </a>
         </div>
 
-        @* Kiểm tra nếu danh sách danh mục có dữ liệu thì tiến hành lặp *@
+        @* Kiểm tra nếu danh sách danh mục từ CSDL có dữ liệu thì tiến hành lặp hiển thị *@
         @if (categories != null && categories.Any())
+        // Mở khối kiểm tra danh mục
         {
-            @* Lặp qua từng danh mục món ăn thu được từ CSDL *@
+            // Duyệt qua từng đối tượng danh mục (Category) trong danh sách
             foreach (var cat in categories)
+            // Mở vòng lặp danh mục
             {
-                <!-- Mỗi danh mục hiển thị dưới dạng một thẻ card thu nhỏ -->
+                @* Cột lưới chứa thẻ card thu nhỏ của từng danh mục *@
                 <div class="col-6 col-sm-4 col-md-2">
-                    <a href="@Url.Action("Index", "Product", new { categoryId = cat.CategoryID })" class="card text-center p-3 text-decoration-none shadow-sm h-100 border-0 rounded-3 bg-white text-dark">
+                    @* Liên kết điều hướng sang trang Product/Index kèm tham số lọc categoryId *@
+                    <a href="@Url.Action("Index", "Product", new { categoryId = cat.CategoryID })" class="card food-card-hover text-center p-3 text-decoration-none shadow-sm h-100 border-0 rounded-3 bg-white text-dark">
+                        @* Biểu tượng tô thức ăn màu đỏ *@
                         <div class="fs-2 text-danger mb-2"><i class="fa-solid fa-bowl-food"></i></div>
+                        @* Hiển thị tên danh mục lấy từ CSDL *@
                         <span class="fw-bold small">@cat.CategoryName</span>
                     </a>
                 </div>
+                // Đóng vòng lặp danh mục
             }
+            // Đóng khối kiểm tra danh mục
         }
     </div>
 </div>
 
 <!-- ========================================== -->
-<!-- 3. BỘ LỌC VÀ TÌM KIẾM MÓN ĂN              -->
+<!-- 3. BỘ LỌC VÀ TÌM KIẾM MÓN ĂN               -->
 <!-- ========================================== -->
-<!-- Khung chứa Form tìm kiếm theo từ khóa và danh mục -->
-<div class="container mb-4">
+@* Khung chứa thanh tìm kiếm món ăn theo từ khóa và danh mục *@
+<div class="mb-5">
+    @* Form gửi dữ liệu qua phương thức GET đến Action Index của ProductController *@
     <form method="get" action="@Url.Action("Index", "Product")" class="card p-3 shadow-sm border-0 bg-white rounded-3">
-        <div class="row g-3">
-            <!-- Ô nhập từ khóa tên món ăn -->
+        @* Hàng chia 3 cột trên màn hình vừa trở lên *@
+        <div class="row g-3 align-items-center">
+            @* Cột 1 (chiếm 6/12 phần): Ô nhập từ khóa tên món ăn *@
             <div class="col-md-6">
+                @* Nhóm input gắn kèm biểu tượng kính lúp ở đầu *@
                 <div class="input-group">
+                    @* Phần nhãn chứa icon kính lúp nền xám nhạt *@
                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    @* Ô nhập liệu từ khóa tìm kiếm với tham số name="searchString" khớp tham số Controller *@
                     <input type="text" name="searchString" class="form-control border-start-0 bg-light" placeholder="Nhập tên món ăn cần tìm...">
                 </div>
             </div>
 
-            <!-- Dropdown chọn danh mục cần tìm -->
+            @* Cột 2 (chiếm 4/12 phần): Dropdown chọn danh mục món ăn cần lọc *@
             <div class="col-md-4">
+                @* Thẻ select gửi tham số name="categoryId" sang ProductController *@
                 <select name="categoryId" class="form-select bg-light">
+                    @* Tùy chọn mặc định không giới hạn danh mục *@
                     <option value="">-- Tất cả danh mục --</option>
+                    @* Kiểm tra nếu danh sách danh mục tồn tại thì đổ các thẻ option *@
                     @if (categories != null)
+                    // Mở khối kiểm tra danh mục dropdown
                     {
+                        // Lặp qua từng danh mục để tạo mục chọn tương ứng
                         foreach (var cat in categories)
+                        // Mở vòng lặp danh mục dropdown
                         {
+                            // Giá trị option là CategoryID và chữ hiển thị là CategoryName
                             <option value="@cat.CategoryID">@cat.CategoryName</option>
+                            // Đóng vòng lặp danh mục dropdown
                         }
+                        // Đóng khối kiểm tra danh mục dropdown
                     }
                 </select>
             </div>
 
-            <!-- Nút bấm thực thi lệnh Tìm kiếm -->
+            @* Cột 3 (chiếm 2/12 phần): Nút bấm thực thi lệnh Tìm kiếm *@
             <div class="col-md-2">
-                <button type="submit" class="btn btn-danger w-100 fw-bold">
+                @* Nút submit gửi form tìm kiếm với màu đỏ nổi bật *@
+                <button type="submit" class="btn btn-danger w-100 fw-bold btn-card-action py-2">
+                    @* Icon kính lúp kèm chữ Tìm Kiếm *@
                     <i class="fa-solid fa-magnifying-glass me-1"></i> Tìm Kiếm
                 </button>
             </div>
@@ -111,106 +214,262 @@
 </div>
 
 <!-- ========================================== -->
+<!-- 3.5. TOP MÓN BÁN CHẠY NHẤT (BEST SELLERS)  -->
+<!-- ========================================== -->
+@* Khung chứa khu vực Top món bán chạy nhất luôn hiển thị cố định trên trang chủ *@
+<div class="mb-5">
+    @* Hộp nổi bật viền vàng nhạt với màu nền chuyển sắc ấm áp (gradient hồng cam nhạt) *@
+    <div class="p-4 rounded-4 shadow-sm border border-warning" style="background: linear-gradient(135deg, #fff8f5, #fff0eb);">
+        @* Thanh tiêu đề khu vực Best Sellers gồm tiêu đề bên trái và huy hiệu bên phải *@
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+            @* Khối tiêu đề chính và dòng mô tả phụ *@
+            <div>
+                @* Tiêu đề khu vực Top món bán chạy nhất kèm icon vương miện vàng *@
+                <h3 class="fw-bold text-danger m-0">
+                    <i class="fa-solid fa-crown text-warning me-2"></i>TOP MÓN BÁN CHẠY NHẤT
+                </h3>
+                @* Chú thích nguồn dữ liệu thống kê từ các đơn hàng thực tế *@
+                <small class="text-muted">Được thực khách FoodieHub đặt nhiều nhất</small>
+            </div>
+            @* Huy hiệu bo tròn màu đỏ gắn nhãn Best Seller *@
+            <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow-sm">
+                <i class="fa-solid fa-fire me-1"></i>Best Seller
+            </span>
+        </div>
+
+        @* Kiểm tra nếu danh sách ViewBag.BestSellers có dữ liệu đơn hàng thì hiển thị các món đạt Top 3 thứ hạng *@
+        @if (bestSellers != null && bestSellers.Any())
+        // Mở khối hiển thị danh sách Best Sellers
+        {
+            @* Lưới 3 cột hiển thị các món ăn bán chạy nhất từ TOP #1 đến TOP #3 *@
+            <div class="row g-4">
+                @* Lặp qua từng món ăn bán chạy trong danh sách bestSellers *@
+                @foreach (var best in bestSellers)
+                // Mở vòng lặp món bán chạy
+                {
+                    // Xác định màu nền huy hiệu theo thứ hạng thực tế (best.Rank): Hạng 1 màu vàng, Hạng 2 màu bạc, Hạng 3 màu đỏ
+                    string rankBadgeClass = best.Rank == 1
+                        ? "bg-warning text-dark"
+                        : (best.Rank == 2 ? "bg-secondary text-white" : "bg-danger text-white");
+
+                    // Xác định biểu tượng huy chương tương ứng với thứ hạng thực tế #1 (vương miện), #2 (huy chương bạc), #3 (huy chương đồng)
+                    string rankIcon = best.Rank == 1
+                        ? "👑"
+                        : (best.Rank == 2 ? "🥈" : "🥉");
+                   
+                    // Tạo chuỗi nhãn thứ hạng động chuẩn C# 5 (dùng string.Format thay cho nội suy chuỗi $"" của C# 6)
+                    string rankLabel = best.IsTied
+                        ? string.Format("{0} TOP #{1} (Đồng hạng)", rankIcon, best.Rank)
+                        : string.Format("{0} TOP #{1}", rankIcon, best.Rank);
+
+                    @* Cột lưới chứa thẻ món bán chạy (chiếm 4/12 phần trên màn hình vừa trở lên) *@
+                    <div class="col-12 col-md-4">
+                        @* Thẻ Card chiều cao 100%, không viền, đổ bóng và đặt position-relative để ghim huy hiệu *@
+                        <div class="card food-card-hover h-100 border-0 shadow rounded-3 overflow-hidden position-relative">
+                            @* Huy hiệu hiển thị thứ hạng thực tế TOP #1, #2, #3 (và trạng thái đồng hạng nếu có) ghim ở góc trên bên trái ảnh *@
+                            <span class="badge @rankBadgeClass position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm fw-bold" style="z-index: 5;">
+                                @rankLabel
+                            </span>
+
+                            @* Nhãn hiển thị tổng số phần đã bán thành công ghim ở góc trên bên phải ảnh *@
+                            <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 end-0 m-3 px-2 py-1 rounded-pill small fw-semibold" style="z-index: 5;">
+                                Đã bán @best.TotalSold phần
+                            </span>
+
+                            @* Liên kết bao quanh hình ảnh đại diện để người dùng bấm vào ảnh cũng xem được chi tiết *@
+                            <a href="@Url.Action("Detail", "Product", new { id = best.ProductID })" class="d-block">
+                                @* Hình ảnh đại diện của món bán chạy (dùng ảnh mặc định nếu ImageUrl bị rỗng) *@
+                                <img src="@(!string.IsNullOrEmpty(best.ImageUrl) ? Url.Content(best.ImageUrl) : "https://via.placeholder.com/400x250?text=FoodieHub")"
+                                     class="card-img-top" alt="@best.ProductName" style="height: 220px; object-fit: cover;">
+                            </a>
+
+                            @* Phần thân thẻ Card căn bố cục dọc *@
+                            <div class="card-body d-flex flex-column">
+                                @* Tên danh mục của món ăn *@
+                                <p class="card-text text-muted small fw-semibold mb-1 text-truncate">
+                                    <i class="fa-solid fa-tag me-1 text-danger"></i>@best.CategoryName
+                                </p>
+
+                                @* Tên món ăn in đậm, giới hạn tối đa 2 dòng để các thẻ cân đối *@
+                                <h5 class="card-title fw-bold text-dark mb-2 product-title-clamp" title="@best.ProductName">
+                                    @best.ProductName
+                                </h5>
+
+                                @* Hàng hiển thị đơn giá màu đỏ nổi bật và nhãn Bán chạy đẩy sát xuống đáy *@
+                                <div class="d-flex justify-content-between align-items-center gap-2 mt-auto pt-2 border-top">
+                                    @* Giá bán định dạng phân cách hàng nghìn *@
+                                    <span class="text-danger fw-bold fs-5 text-nowrap">@best.Price.ToString("N0") VNĐ</span>
+                                    @* Huy hiệu xanh lá xác nhận món đang bán chạy *@
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success text-nowrap">
+                                        <i class="fa-solid fa-fire-flame-curved me-1"></i>Bán chạy
+                                    </span>
+                                </div>
+
+                                @* Hàng chứa 2 nút thao tác: Xem chi tiết và Đặt ngay *@
+                                <div class="d-flex gap-2 mt-3">
+                                    @* Nút điều hướng sang trang xem chi tiết sản phẩm theo ProductID *@
+                                    <a href="@Url.Action("Detail", "Product", new { id = best.ProductID })" class="btn btn-outline-secondary btn-card-action flex-fill fw-bold rounded-pill">
+                                        Chi tiết
+                                    </a>
+                                    @* Nút gọi Action AddToCart của CartController để thêm nhanh 1 phần vào giỏ hàng *@
+                                    <a href="@Url.Action("AddToCart", "Cart", new { id = best.ProductID, quantity = 1 })" class="btn btn-danger btn-card-action flex-fill fw-bold rounded-pill shadow-sm">
+                                        <i class="fa-solid fa-cart-plus me-1"></i>Đặt Ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    // Đóng vòng lặp món bán chạy
+                }
+            </div>
+            // Đóng khối hiển thị danh sách Best Sellers
+        }
+        else
+        // Mở khối hiển thị thông báo dự phòng khi CSDL chưa có đơn hàng nào
+        {
+            @* Hộp thông báo nền trắng thông báo trạng thái bảng xếp hạng *@
+            <div class="bg-white border rounded-3 text-center py-4 px-3">
+                @* Biểu tượng cúp vàng *@
+                <i class="fa-solid fa-award fs-2 text-warning mb-2 d-block"></i>
+                @* Dòng thông báo hướng dẫn người dùng đặt đơn để bảng xếp hạng cập nhật *@
+                <p class="text-muted mb-0">
+                    Chưa có dữ liệu đơn hàng trong hệ thống để xếp hạng Best Sellers. Hãy thử đặt một đơn hàng để bảng xếp hạng tự động cập nhật!
+                </p>
+            </div>
+            // Đóng khối thông báo dự phòng
+        }
+    </div>
+</div>
+
+<!-- ========================================== -->
 <!-- 4. DANH SÁCH MÓN ĂN (GRID 3 CỘT / HÀNG)    -->
 <!-- ========================================== -->
-<div class="container my-4">
-    <!-- Thanh tiêu đề danh sách món ăn kèm nhãn trạng thái giao hàng -->
-    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+@* Khung chứa lưới thực đơn món ngon nổi bật (không lồng thêm .container để giữ đúng độ rộng 1200px) *@
+<div class="my-4">
+    @* Thanh tiêu đề danh sách món ăn kèm nhãn trạng thái giao hàng *@
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 pb-2 border-bottom">
+        @* Tiêu đề khu vực món ngon nổi bật *@
         <h3 class="text-dark fw-bold m-0">
             <i class="fa-solid fa-fire-flame-curved text-danger me-2"></i>Món Ngon Nổi Bật
         </h3>
+        @* Nhãn màu xanh lá thông báo sẵn sàng giao hàng *@
         <span class="badge bg-success fs-6"><i class="fa-solid fa-truck-fast me-1"></i>Sẵn sàng giao hàng</span>
     </div>
 
-    <!-- Hàng chứa toàn bộ danh sách card sản phẩm món ăn -->
+    @* Hàng lưới chứa toàn bộ danh sách thẻ sản phẩm món ăn *@
     <div class="row g-4">
         @* Kiểm tra nếu Mô hình Model có chứa danh sách món ăn *@
         @if (Model != null && Model.Any())
+        // Mở khối kiểm tra danh sách sản phẩm
         {
-            @* Lặp qua từng món ăn để đổ ra giao diện card *@
+            // Duyệt qua từng sản phẩm (Product) trong danh sách Model
             foreach (var item in Model)
+            // Mở vòng lặp danh sách sản phẩm
             {
-                <!-- ĐÃ SỬA: Đặt col-md-4 để cố định chia đúng 3 CỘT / HÀNG trên PC/Laptop (12 / 4 = 3 món) -->
+                @* Cột lưới hiển thị 1 cột trên điện thoại, 2 cột trên tablet, 3 cột trên máy tính *@
                 <div class="col-12 col-sm-6 col-md-4">
-                    <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden position-relative">
-                        <!-- Nhãn HOT đè lên góc trên ảnh sản phẩm -->
+                    @* Thẻ Card sản phẩm bo góc, đổ bóng nhẹ *@
+                    <div class="card food-card-hover h-100 shadow-sm border-0 rounded-3 overflow-hidden position-relative">
+                        @* Nhãn HOT màu đỏ ghim ở góc trên bên trái ảnh sản phẩm *@
                         <span class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small fw-bold rounded-end mt-2" style="z-index: 5;">
                             <i class="fa-solid fa-bolt me-1"></i>HOT
                         </span>
 
-                        <!-- Hình ảnh món ăn: Đẩy chiều cao lên 230px để hình món ăn bự, nét và ngon mắt hơn -->
-                        <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content(item.ImageUrl) : "https://via.placeholder.com/300x200?text=FoodieHub")"
-                             class="card-img-top" alt="@item.ProductName" style="height: 230px; object-fit: cover;">
+                        @* Liên kết bao quanh hình ảnh món ăn để bấm vào ảnh mở ngay trang chi tiết *@
+                        <a href="@Url.Action("Detail", "Product", new { id = item.ProductID })" class="d-block">
+                            @* Hình ảnh món ăn với chiều cao cố định 230px và tự căn khung (object-fit: cover) *@
+                            <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content(item.ImageUrl) : "https://via.placeholder.com/300x200?text=FoodieHub")"
+                                 class="card-img-top" alt="@item.ProductName" style="height: 230px; object-fit: cover;">
+                        </a>
 
-                        <!-- Thân card chứa thông tin chi tiết món ăn -->
+                        @* Thân thẻ Card chứa thông tin chi tiết món ăn *@
                         <div class="card-body d-flex flex-column">
-                            <!-- Tên món ăn hiển thị chữ bự đậm -->
-                            <h5 class="card-title fw-bold text-dark mb-1" title="@item.ProductName">@item.ProductName</h5>
+                            @* Tên món ăn in đậm, giới hạn tối đa 2 dòng để đồng đều chiều cao thẻ *@
+                            <h5 class="card-title fw-bold text-dark mb-1 product-title-clamp" title="@item.ProductName">
+                                @item.ProductName
+                            </h5>
 
-                            <!-- Tên danh mục phân loại món ăn -->
-                            <p class="card-text text-muted small mb-2">
+                            @* Hiển thị tên danh mục (kiểm tra an toàn null trước khi truy cập CategoryName) *@
+                            <p class="card-text text-muted small mb-2 text-truncate">
                                 <i class="fa-solid fa-tag me-1 text-danger"></i>@(item.Category != null ? item.Category.CategoryName : "Chưa phân loại")
                             </p>
 
-                            <!-- Khung hiển thị Giá tiền (Màu đỏ) và Số lượng tồn kho -->
-                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
-                                <span class="text-danger fw-bold fs-5">@item.Price.ToString("N0") VNĐ</span>
-                                <span class="badge bg-light text-dark border">Còn: @item.Stock</span>
+                            @* Hàng hiển thị giá bán và số lượng tồn kho hiện có *@
+                            <div class="d-flex justify-content-between align-items-center gap-2 mt-auto pt-2 border-top">
+                                @* Đơn giá định dạng có dấu phẩy phân cách hàng nghìn *@
+                                <span class="text-danger fw-bold fs-5 text-nowrap">@item.Price.ToString("N0") VNĐ</span>
+                                @* Huy hiệu hiển thị số lượng phần ăn còn trong kho *@
+                                <span class="badge bg-light text-dark border text-nowrap">Còn: @item.Stock</span>
                             </div>
 
-                            <!-- Hàng chứa 2 nút hành động: Xem Chi Tiết và Đặt Món -->
+                            @* Hàng chứa 2 nút bấm Chi tiết và Đặt Món đã được tinh chỉnh gọn gàng *@
                             <div class="d-flex gap-2 mt-3">
-                                <!-- Nút chuyển sang trang Xem chi tiết sản phẩm -->
-                                <a href="@Url.Action("Detail", "Product", new { id = item.ProductID })" class="btn btn-outline-secondary btn-sm flex-fill fw-bold rounded-pill">
+                                @* Liên kết xem trang chi tiết món ăn *@
+                                <a href="@Url.Action("Detail", "Product", new { id = item.ProductID })" class="btn btn-outline-secondary btn-card-action flex-fill fw-bold rounded-pill">
                                     Chi tiết
                                 </a>
-                                <!-- Nút thêm món vào giỏ hàng -->
-                                <a href="@Url.Action("AddToCart", "Cart", new { id = item.ProductID, quantity = 1 })" class="btn btn-danger btn-sm flex-fill fw-bold rounded-pill shadow-sm">
+                                @* Liên kết thêm nhanh 1 phần món ăn vào giỏ hàng *@
+                                <a href="@Url.Action("AddToCart", "Cart", new { id = item.ProductID, quantity = 1 })" class="btn btn-danger btn-card-action flex-fill fw-bold rounded-pill shadow-sm">
                                     <i class="fa-solid fa-cart-plus me-1"></i>Đặt Món
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
+                // Đóng vòng lặp danh sách sản phẩm
             }
+            // Đóng khối kiểm tra danh sách sản phẩm
         }
         else
+        // Mở khối thông báo khi không có món ăn nào còn hàng
         {
-            <!-- Khung thông báo màu vàng xuất hiện khi chưa có món ăn nào trong CSDL -->
+            @* Khung thông báo màu vàng xuất hiện khi chưa có món ăn nào còn hàng trong CSDL *@
             <div class="col-12 text-center py-5">
+                @* Hộp cảnh báo Bootstrap *@
                 <div class="alert alert-warning py-4 shadow-sm">
+                    @* Biểu tượng dấu chấm than và thông báo trạng thái *@
                     <i class="fa-solid fa-circle-exclamation me-2 fs-4"></i>
                     <strong>Hiện tại chưa có món ăn nào sẵn sàng giao hàng!</strong>
                 </div>
             </div>
+            // Đóng khối thông báo khi hết hàng
         }
     </div>
 </div>
 
 <!-- ========================================== -->
-<!-- 5. VÙNG CAM KẾT DỊCH VỤ KHÁCH HÀNG        -->
+<!-- 5. VÙNG CAM KẾT DỊCH VỤ KHÁCH HÀNG         -->
 <!-- ========================================== -->
-<div class="bg-white py-5 mt-5 border-top">
-    <div class="container">
-        <div class="row text-center g-4">
-            <!-- Cột cam kết 1: Giao hàng hỏa tốc -->
-            <div class="col-md-4">
-                <div class="fs-1 text-danger mb-2"><i class="fa-solid fa-truck-fast"></i></div>
-                <h5 class="fw-bold">Giao Hàng Hỏa Tốc</h5>
-                <p class="text-muted small">Món ăn được giao tận tay trong vòng 20-30 phút, luôn đảm bảo nóng hổi.</p>
-            </div>
-            <!-- Cột cam kết 2: Vệ sinh an toàn thực phẩm -->
-            <div class="col-md-4">
-                <div class="fs-1 text-success mb-2"><i class="fa-solid fa-shield-halved"></i></div>
-                <h5 class="fw-bold">An Toàn & Cho Sức Khỏe</h5>
-                <p class="text-muted small">100% nguyên liệu tươi sạch, chế biến chuẩn vệ sinh an toàn thực phẩm.</p>
-            </div>
-            <!-- Cột cam kết 3: Hỗ trợ khách hàng -->
-            <div class="col-md-4">
-                <div class="fs-1 text-primary mb-2"><i class="fa-solid fa-headset"></i></div>
-                <h5 class="fw-bold">Hỗ Trợ Khách Hàng 24/7</h5>
-                <p class="text-muted small">Đội ngũ chăm sóc khách hàng tận tâm, sẵn sàng giải đáp mọi thắc mắc.</p>
-            </div>
+@* Khung nền trắng chân trang chứa 3 cột cam kết chất lượng dịch vụ *@
+<div class="bg-white py-5 px-4 mt-5 border rounded-3 shadow-sm">
+    @* Hàng chia 3 cột đều nhau căn giữa nội dung *@
+    <div class="row text-center g-4">
+        @* Cột cam kết 1: Giao hàng hỏa tốc *@
+        <div class="col-md-4">
+            @* Icon xe tải giao hàng nhanh màu đỏ *@
+            <div class="fs-1 text-danger mb-2"><i class="fa-solid fa-truck-fast"></i></div>
+            @* Tiêu đề cam kết 1 *@
+            <h5 class="fw-bold">Giao Hàng Hỏa Tốc</h5>
+            @* Nội dung mô tả cam kết giao hàng trong 20-30 phút *@
+            <p class="text-muted small mb-0">Món ăn được giao tận tay trong vòng 20-30 phút, luôn đảm bảo nóng hổi.</p>
+        </div>
+        @* Cột cam kết 2: Vệ sinh an toàn thực phẩm *@
+        <div class="col-md-4">
+            @* Icon chiếc khiên bảo vệ màu xanh lá *@
+            <div class="fs-1 text-success mb-2"><i class="fa-solid fa-shield-halved"></i></div>
+            @* Tiêu đề cam kết 2 *@
+            <h5 class="fw-bold">An Toàn & Cho Sức Khỏe</h5>
+            @* Nội dung mô tả cam kết nguyên liệu tươi sạch *@
+            <p class="text-muted small mb-0">100% nguyên liệu tươi sạch, chế biến chuẩn vệ sinh an toàn thực phẩm.</p>
+        </div>
+        @* Cột cam kết 3: Hỗ trợ khách hàng *@
+        <div class="col-md-4">
+            @* Icon tai nghe tổng đài viên màu xanh dương *@
+            <div class="fs-1 text-primary mb-2"><i class="fa-solid fa-headset"></i></div>
+            @* Tiêu đề cam kết 3 *@
+            <h5 class="fw-bold">Hỗ Trợ Khách Hàng 24/7</h5>
+            @* Nội dung mô tả cam kết chăm sóc khách hàng *@
+            <p class="text-muted small mb-0">Đội ngũ chăm sóc khách hàng tận tâm, sẵn sàng giải đáp mọi thắc mắc.</p>
         </div>
     </div>
 </div>
