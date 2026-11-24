@@ -1,4 +1,6 @@
-﻿// Khai báo namespace chứa lớp DbContext và các Entity Model của ứng dụng
+// Khai báo namespace chứa lớp cấu hình Migrations và dữ liệu mẫu Seed()
+using FoodieHub.Web.Migrations;
+// Khai báo namespace chứa lớp DbContext và các Entity Model của ứng dụng
 using FoodieHub.Web.Models;
 // Khai báo namespace chứa các kiểu dữ liệu cơ bản và ngoại lệ hệ thống .NET
 using System;
@@ -35,8 +37,41 @@ namespace FoodieHub.Web
             // Đăng ký các gói tối ưu hóa tập tin giao diện CSS và JavaScript (Bundles)
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Cấu hình Entity Framework tự động cập nhật CSDL lên phiên bản mới nhất và chạy hàm Seed() trong file Configuration.cs để nạp dữ liệu mới
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<FoodieHubDbContext, FoodieHub.Web.Migrations.Configuration>());
+            // Tạm thời vô hiệu hóa cơ chế tự động khởi tạo CSDL để chủ động kiểm tra trạng thái thực tế trên SQL Server
+            Database.SetInitializer<FoodieHubDbContext>(null);
+
+            // Khởi tạo đối tượng ngữ cảnh CSDL tạm thời và tự động giải phóng tài nguyên sau khi kiểm tra xong
+            using (var db = new FoodieHubDbContext())
+            {
+                // Khai báo biến cờ mặc định cho phép kích hoạt cơ chế tự động cập nhật bằng EF Migrations
+                bool useMigration = true;
+
+                // Kiểm tra xem cơ sở dữ liệu FoodieHubDB đã được tạo sẵn trên máy chủ SQL Server hay chưa
+                if (db.Database.Exists())
+                {
+                    // Truy vấn hệ thống đếm số lượng bảng nghiệp vụ (Categories) đã tồn tại trong CSDL
+                    int hasTables = db.Database.SqlQuery<int>(
+                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Categories'").FirstOrDefault();
+
+                    // Truy vấn hệ thống đếm sự tồn tại của bảng lịch sử phiên bản (__MigrationHistory) của Entity Framework
+                    int hasMigrationHistory = db.Database.SqlQuery<int>(
+                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '__MigrationHistory'").FirstOrDefault();
+
+                    // Nếu CSDL đã có bảng dữ liệu (do chạy script .sql độc lập) nhưng chưa có lịch sử Migration
+                    if (hasTables > 0 && hasMigrationHistory == 0)
+                    {
+                        // Tắt cờ Migration để sử dụng trực tiếp cấu trúc bảng và dữ liệu từ file .sql, tránh lỗi xung đột trùng bảng
+                        useMigration = false;
+                    }
+                }
+
+                // Nếu CSDL chưa tồn tại hoặc được khởi tạo chuẩn từ Entity Framework Migrations
+                if (useMigration)
+                {
+                    // Cấu hình Entity Framework tự động cập nhật CSDL lên phiên bản mới nhất và chạy hàm Seed() trong file Configuration.cs
+                    Database.SetInitializer(new MigrateDatabaseToLatestVersion<FoodieHubDbContext, Configuration>());
+                }
+            }
         }
     }
 }
